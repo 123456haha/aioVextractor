@@ -7,9 +7,31 @@ import youtube_dl
 import jmespath
 import traceback
 import time
+import ujson as json
+import config
+from utils.user_agent import UserAgent
+from scrapy import Selector
+from random import choice
+from aiohttp.client_exceptions import (ServerDisconnectedError, ServerConnectionError, ClientOSError,
+                                       ClientConnectorCertificateError, ServerTimeoutError, ContentTypeError,
+                                       ClientConnectorError, ClientPayloadError)
 
 
-def entrance(webpage_url):
+async def entrance(webpage_url, session, chance_left=config.RETRY):
+    try:
+        gather_results = await asyncio.gather(*[
+            extract_info(webpage_url=webpage_url),
+            extract_author(webpage_url=webpage_url, session=session)
+        ])
+        return {**gather_results[0], **gather_results[1]}
+
+
+    except:
+        traceback.print_exc()
+        return False
+
+
+async def extract_info(webpage_url):
     args = {"nocheckcertificate": True,
             "ignoreerrors": True,
             "quiet": True,
@@ -23,13 +45,13 @@ def entrance(webpage_url):
         with youtube_dl.YoutubeDL(args) as ydl:
             try:
                 VideoJson = ydl.extract_info(webpage_url)
-                pprint(VideoJson)
-
+                # pprint(VideoJson)
             except:
                 traceback.print_exc()
                 return False
             else:
                 result = dict()
+                result['webpage_url'] = webpage_url
                 result['author'] = jmespath.search('uploader', VideoJson)
                 result['cover'] = jmespath.search('thumbnail', VideoJson)
                 create_time = jmespath.search('upload_date', VideoJson)
@@ -65,7 +87,45 @@ def entrance(webpage_url):
         traceback.print_exc()
         return False
 
+
+async def extract_author(webpage_url, session, chance_left=config.RETRY):
+    try:
+        headers = {
+            'authority': 'www.youtube.com',
+            'cache-control': 'max-age=0',
+            'upgrade-insecure-requests': '1',
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36',
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'zh-CN,zh;q=0.9',
+        }
+
+        async with session.get(webpage_url, headers=headers) as response:
+            text = await response.text(encoding='utf8', errors='ignore')
+    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
+            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
+            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+        if chance_left != 1:
+            return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
+        else:
+            return False
+    except:
+        traceback.print_exc()
+        return False
+    else:
+        regex = 'window\["ytInitialData"\] = (.*?});'
+        selector = Selector(text=text)
+        try:
+            ytInitialData = json.loads(selector.css('script').re_first(regex))
+        except TypeError:
+            return False
+        else:
+            # pprint(ytInitialData)
+            author_avatar = jmespath.search('contents.twoColumnWatchNextResults.results.results.contents[1].videoSecondaryInfoRenderer.owner.videoOwnerRenderer.thumbnail.thumbnails[-1].url', ytInitialData)
+        return {"author_avatar":author_avatar}
+
 FIELD_REMAIN = ['author_avatar', ]
+
 if __name__ == '__main__':
     import asyncio
     import aiohttp
@@ -75,9 +135,20 @@ if __name__ == '__main__':
     "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4"
 
 
-    def test():
-        return entrance(
-            webpage_url="https://www.youtube.com/watch?v=tofSaLB9kwE")
+    #
+    # def test():
+    #     return entrance(
+    #         webpage_url="https://www.youtube.com/watch?v=tofSaLB9kwE")
+    #
+    #
+    # pprint(test())
+    #
+
+    async def test():
+        async with aiohttp.ClientSession() as session_:
+            return await entrance(
+                webpage_url="https://www.youtube.com/watch?v=tofSaLB9kwE",
+                session=session_)
 
 
-    pprint(test())
+    pprint(asyncio.run(test()))
