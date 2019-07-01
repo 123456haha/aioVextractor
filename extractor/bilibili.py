@@ -2,95 +2,38 @@
 # -*- coding: utf-8 -*-
 # Created by panos on 2019/6/20
 # IDE: PyCharm
-
-import traceback
-import re
-import time
-import ujson as json
-import config
+"""
+I may need specific headers to play the video
+"""
 import jmespath
-from scrapy import Selector
-import os
-import asyncio
+import traceback
+import ujson as json
+from extractor import common
+import config
 from utils.user_agent import (UserAgent, android)
 from random import choice
+import os
+import re
+from utils.MergeDict import merge_dicts
 from aiohttp.client_exceptions import (ServerDisconnectedError, ServerConnectionError, ClientOSError,
                                        ClientConnectorCertificateError, ServerTimeoutError, ContentTypeError,
                                        ClientConnectorError, ClientPayloadError)
 
 
-async def entrance(webpage_url, session, chance_left=config.RETRY):
-    result = dict()
+async def entrance(webpage_url, session):
     try:
-        headers = {'Connection': 'keep-alive',
-                   'Cache-Control': 'max-age=0',
-                   'Upgrade-Insecure-Requests': '1',
-                   'User-Agent': choice(UserAgent),
-                   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-                   'Referer': 'https://www.bilibili.com/',
-                   'Accept-Encoding': 'gzip, deflate, br',
-                   'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'}
-        async with session.get(webpage_url, headers=headers) as response:
-            text = await response.text(encoding='utf8', errors='ignore')
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
-        if chance_left != 1:
-            return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
+        result = {'vid': webpage_url.split('?')[0].split('av')[-1]}
+        gather_results = await asyncio.gather(*[
+            common.extract_info(webpage_url=webpage_url),
+            extract_video(result=result, user_agent=choice(UserAgent), session=session)
+        ])
+        if all(gather_results):
+            return merge_dicts(*gather_results)
         else:
             return False
     except:
         traceback.print_exc()
         return False
-    else:
-        selector = Selector(text=text)
-        result['webpage_url'] = webpage_url
-        result['vid'] = webpage_url.split('?')[0].split('av')[-1]
-        # await get_play_addr(result['vid'], session=session)
-        result['title'] = selector.css('head title::text').extract_first()
-        result['tag'] = selector.css('head meta[itemprop*="keywords"]::attr(content)').extract_first()
-        result['description'] = selector.css('head meta[itemprop*="description"]::attr(content)').extract_first()
-        result['author'] = selector.css('head meta[itemprop*="author"]::attr(content)').extract_first()
-        # result['upload_ts'] = strptime(
-        #     selector.css('head meta[itemprop*="datePublished"]::attr(content)').extract_first())
-        # result['comment_count'] = selector.css('head meta[itemprop*="commentCount"]::attr(content)').extract_first()
-        try:
-            playinfo = json.loads(selector.css("head script").re_first("window.__playinfo__=(\{[\s|\S]*?\})</script>"))
-        except:
-            traceback.print_exc()
-            return False
-        else:
-            pprint(playinfo)
-        #     result['duration'] = jmespath.search('data.dash.duration', playinfo)
-        #     # return result
-        #     try:
-        #         video = sorted(filter(lambda x: 'avc' in x['codecs'],
-        #                               jmespath.search('data.dash.video[]', playinfo)),
-        #                        key=lambda x: x['width'])[-1]
-        #     except:
-        #         video =
-        #     result['height'] = video['height']
-        #     result['width'] = video['width']
-        #     result['play_addr'] = video['base_url']
-        #     result['audio'] = jmespath.search('max_by(data.dash.audio, &bandwidth).base_url', playinfo)
-
-        gather_results =  await asyncio.gather(*[
-            extract_video(result=result, user_agent=choice(UserAgent), session=session),
-            extract_video(result=result, user_agent=choice(android), session=session)
-        ])
-        result = {**result, **{**gather_results[0], **gather_results[1]}}
-
-        try:
-            base = 'https://'
-            result['author_url'] = os.path.join(base,
-                                                selector.css('#v_upinfo .u-face a::attr(href)').extract_first()[2:])
-        except:
-            traceback.print_exc()
-            result['author_url'] = None
-        else:
-            pass
-
-    return result
 
 
 async def extract_video(result, user_agent, session, chance_left=config.RETRY):
@@ -130,7 +73,6 @@ async def extract_video(result, user_agent, session, chance_left=config.RETRY):
                 return False
         try:
             jsondata = json.loads(jsonstr)
-            pprint(jsondata)
             if user_agent in android:
                 play_addr = jmespath.search('reduxAsyncConnect.videoInfo.initUrl', jsondata)
                 result['play_addr'] =  os.path.join('http://', play_addr[2:]) if play_addr.startswith('//') else play_addr
@@ -158,107 +100,9 @@ async def extract_video(result, user_agent, session, chance_left=config.RETRY):
                 result['duration'] = jmespath.search('videoData.duration', jsondata)
                 result['title'] = jmespath.search('videoData.title', jsondata)
             return result
-        except Exception as e:
-            print(e)
-            return None
-
-
-async def extract_user(author_id, session, chance_left=config.RETRY):
-    """
-    :return:返回这个用户最新更新的视频
-    """
-    # headers = {'Connection': 'keep-alive',
-    #            'Cache-Control': 'max-age=0',
-    #            'Upgrade-Insecure-Requests': '1',
-    #            'User-Agent': choice(UserAgent),
-    #            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-    #            'Accept-Encoding': 'gzip, deflate, br',
-    #            'Accept-Language': 'zh-CN,zh;q=0.9',
-    #            }
-    #
-    # response = requests.get('https://m.bilibili.com/space/177361244', headers=headers, cookies=cookies)
-
-    try:
-        headers = {'Connection': 'keep-alive',
-                   'Cache-Control': 'max-age=0',
-                   'Upgrade-Insecure-Requests': '1',
-                   'User-Agent': choice(UserAgent),
-                   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-                   'Referer': 'https://www.bilibili.com/',
-                   'Accept-Encoding': 'gzip, deflate, br',
-                   'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'}
-        user_space_api = f'https://space.bilibili.com/ajax/member/getSubmitVideos?mid={author_id}&pagesize=100&tid=0&page=1&keyword=&order=pubdate'
-        async with session.get(user_space_api, headers=headers, verify_ssl=False) as resp:
-            html = await resp.text(encoding='utf-8', errors='ignore')
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
-        if chance_left != 1:
-            return await extract_user(author_id=author_id, session=session, chance_left=chance_left - 1)
-        else:
-            return False
-    except:
-        traceback.print_exc()
-        return False
-    else:
-        respdata = json.loads(html)
-        from pprint import pprint
-        pprint(respdata)
-        # video_list = respdata.get('data', {}).get('vlist', [])
-        # for video in video_list:
-        #     videoitem = dict()
-        #     videoitem['description'] = video.get('description', '')
-        #     videoitem['comment_count'] = video.get('comment', None)
-        #     length = video.get('length', None)
-        #     if length:
-        #         videoitem['duration'] = get_duration(length)
-        #     videoitem['comment_count'] = video.get('comment', None)
-        #     videoitem['id'] = video.get('aid', None)
-        #     videoitem['upload_ts'] = video.get('created', None)
-        #     videoitem['view_count'] = video.get('play', None)
-        #     videoitem['cover'] = video.get('pic', None)
-        #     videoitem['title'] = video.get('title', None)
-        #     videoitem['from'] = config.agg_target_v2['bilibili']
-        #     videoitem['player'] = config.agg_target_v2['bilibili']
-        #     videoitem['player_id'] = videoitem['id']
-        #     videoitem['webpage_url'] = 'https://www.bilibili.com/video/av' + str(videoitem.get('id', ''))
-        #     if videoitem['cover']:
-        #         videoitem['cover'] = 'http' + videoitem['cover']
-        #     if videoitem['id']:
-        #         if videoitem['id'] in haved:  # 去重
-        #             return this_user_items
-        #         videoitem = await get_play_addr(videoitem, session)  #
-        #         if videoitem and check_item(videoitem):
-        #             this_user_items.append(videoitem.update(item) or videoitem)
-        # return this_user_items
-
-
-def get_duration(strl):
-    """
-
-    :param strl: 传入时间 如 "02：02"
-    :return: 返回秒
-    """
-    if ':' not in strl:
-        return None
-    else:
-        try:
-            return int(strl.split(':')[0]) * 60 + int(strl.split(':')[1])
         except:
-            return None
-
-
-def strptime(string):
-    if string not in {'null', 'undefined'} and string:
-        try:
-            struct_time = time.strptime(string, '%Y-%m-%d %H:%M:%S')
-        except ValueError:
-            return None
-        else:
-            ts = int(time.mktime(struct_time)) if string else None
-            return ts
-    else:
-        return None
+            traceback.print_exc()
+            return False
 
 
 if __name__ == '__main__':
@@ -266,9 +110,17 @@ if __name__ == '__main__':
     import aiohttp
     from pprint import pprint
 
-    "https://www.bilibili.com/video/av39303278?spm_id_from=333.334.b_62696c695f646f756761.3"
     "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4"
 
+
+    #
+    # def test():
+    #     return entrance(
+    #         webpage_url="https://www.youtube.com/watch?v=tofSaLB9kwE")
+    #
+    #
+    # pprint(test())
+    #
 
     async def test():
         async with aiohttp.ClientSession() as session_:

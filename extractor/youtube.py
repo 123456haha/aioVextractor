@@ -3,86 +3,27 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
-import youtube_dl
 import jmespath
 import traceback
-import time
 import ujson as json
+from extractor import common
 import config
-from utils.user_agent import UserAgent
 from scrapy import Selector
-from random import choice
 from aiohttp.client_exceptions import (ServerDisconnectedError, ServerConnectionError, ClientOSError,
                                        ClientConnectorCertificateError, ServerTimeoutError, ContentTypeError,
                                        ClientConnectorError, ClientPayloadError)
 
 
-async def entrance(webpage_url, session, chance_left=config.RETRY):
+async def entrance(webpage_url, session):
     try:
         gather_results = await asyncio.gather(*[
-            extract_info(webpage_url=webpage_url),
+            common.extract_info(webpage_url=webpage_url),
             extract_author(webpage_url=webpage_url, session=session)
         ])
-        return {**gather_results[0], **gather_results[1]}
-
-
-    except:
-        traceback.print_exc()
-        return False
-
-
-async def extract_info(webpage_url):
-    args = {"nocheckcertificate": True,
-            "ignoreerrors": True,
-            "quiet": True,
-            "nopart": True,
-            # "download_archive": "record.txt",
-            "no_warnings": True,
-            "youtube_include_dash_manifest": False,
-            'simulate': True
-            }
-    try:
-        with youtube_dl.YoutubeDL(args) as ydl:
-            try:
-                VideoJson = ydl.extract_info(webpage_url)
-                # pprint(VideoJson)
-            except:
-                traceback.print_exc()
-                return False
-            else:
-                result = dict()
-                result['webpage_url'] = webpage_url
-                result['author'] = jmespath.search('uploader', VideoJson)
-                result['cover'] = jmespath.search('thumbnail', VideoJson)
-                create_time = jmespath.search('upload_date', VideoJson)
-                result['upload_ts'] = int(
-                    time.mktime(time.strptime(create_time, '%Y%m%d'))) if create_time else create_time
-                result['description'] = jmespath.search('description', VideoJson)
-                duration = jmespath.search('duration', VideoJson)
-                result['duration'] = int(duration) if duration else duration
-                result['rating'] = jmespath.search('average_rating', VideoJson)
-                result['height'] = jmespath.search('height', VideoJson)
-                result['like_count'] = jmespath.search('like_count', VideoJson)
-                result['view_count'] = jmespath.search('view_count', VideoJson)
-                result['dislike_count'] = jmespath.search('dislike_count', VideoJson)
-                result['width'] = jmespath.search('width', VideoJson)
-                result['vid'] = jmespath.search('id', VideoJson)
-                cate = jmespath.search('categories', VideoJson)
-                result['category'] = ','.join(list(map(lambda x: x.replace(' & ', ','), cate))) if cate else cate
-                play_addr_list = dict()
-                for u, p, h in jmespath.search('formats[].[url, protocol, height]', VideoJson):
-                    if ('m3u8' not in u) and ('/../' not in u):
-                        play_addr_list[h] = u
-                if len(play_addr_list) == 1:
-                    result['play_addr'] = play_addr_list[max(play_addr_list)]
-                else:
-                    if None in play_addr_list:
-                        del play_addr_list[None]
-                    result['play_addr'] = play_addr_list[max(play_addr_list)]
-                result['title'] = jmespath.search('title', VideoJson)
-                video_tags = jmespath.search('tags', VideoJson)
-                result['tag'] = video_tags
-                return result
+        if all(gather_results):
+            return {**gather_results[0], **gather_results[1]}
+        else:
+            return False
     except:
         traceback.print_exc()
         return False
@@ -106,7 +47,7 @@ async def extract_author(webpage_url, session, chance_left=config.RETRY):
             ClientConnectorError, ClientPayloadError, ServerTimeoutError,
             ContentTypeError, ClientConnectorCertificateError, ClientOSError):
         if chance_left != 1:
-            return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
+            return await extract_author(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
         else:
             return False
     except:
@@ -120,11 +61,9 @@ async def extract_author(webpage_url, session, chance_left=config.RETRY):
         except TypeError:
             return False
         else:
-            # pprint(ytInitialData)
             author_avatar = jmespath.search('contents.twoColumnWatchNextResults.results.results.contents[1].videoSecondaryInfoRenderer.owner.videoOwnerRenderer.thumbnail.thumbnails[-1].url', ytInitialData)
         return {"author_avatar":author_avatar}
 
-FIELD_REMAIN = ['author_avatar', ]
 
 if __name__ == '__main__':
     import asyncio
@@ -132,7 +71,6 @@ if __name__ == '__main__':
     from pprint import pprint
 
     "https://www.youtube.com/watch?v=tofSaLB9kwE"
-    "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4"
 
 
     #
