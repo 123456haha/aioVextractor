@@ -44,7 +44,11 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
         traceback.print_exc()
         return False
     else:
-        selector = Selector(text=text)
+        try:
+            selector = Selector(text=text)
+        except:
+            traceback.print_exc()
+            return False
         result['webpage_url'] = webpage_url
         try:
             vid = re.compile('&vid=(.*?)&').findall(text)[0]
