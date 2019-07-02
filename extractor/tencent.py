@@ -99,10 +99,9 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
                         player_view_count = jmespath.search('view_today_count', COVER_INFO)
                     if not player_view_count or player_view_count == 'undefined':
                         player_view_count = None
-                    result['player_view_count'] = player_view_count
+                    result['view_count'] = player_view_count
             else:
-                result['view_count'] = selector.css(
-                    'head meta[itemprop*=interactionCount]::attr(content)').extract_first()
+                result['view_count'] = selector.css('head meta[itemprop*=interactionCount]::attr(content)').extract_first()
             if result['view_count'] == 'undefined':
                 result['view_count'] = None
             gather_results = await asyncio.gather(*[extract_comment_count(selector=selector, session=session),
@@ -342,8 +341,9 @@ if __name__ == '__main__':
     "https://v.qq.com/x/page/s0886ag14xn.html"
     "https://v.qq.com/x/page/n0864edqzkl.html"
     "https://v.qq.com/x/page/s08899ss07p.html"
+    "https://v.qq.com/x/cover/bzfkv5se8qaqel2.html"
     async def test():
         async with aiohttp.ClientSession() as session_:
-            return await entrance(webpage_url="https://v.qq.com/x/page/s08899ss07p.html",
+            return await entrance(webpage_url="https://v.qq.com/x/cover/bzfkv5se8qaqel2.html",
                                   session=session_)
     pprint(asyncio.run(test()))
