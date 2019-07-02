@@ -78,7 +78,6 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
                 traceback.print_exc()
                 return False
             else:
-                pprint(r_code_json)
                 code = jmespath.search('video.code', r_code_json)
                 result['webpage_url'] = webpage_url
                 result['id'] = code

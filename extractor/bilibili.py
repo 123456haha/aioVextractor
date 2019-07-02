@@ -16,7 +16,7 @@ import os
 import re
 from utils.MergeDict import merge_dicts
 from utils.exception import exception
-
+import asyncio
 
 async def entrance(webpage_url, session):
     try:

@@ -4,12 +4,11 @@
 # IDE: PyCharm
 
 
-import jmespath
 import traceback
-import ujson as json
+import asyncio
 from extractor import common
 import config
-from utils.user_agent import (UserAgent, android, safari)
+from utils.user_agent import safari
 from random import choice
 from scrapy import Selector
 from aiohttp.client_exceptions import (ServerDisconnectedError, ServerConnectionError, ClientOSError,

@@ -10,7 +10,7 @@ from extractor import common
 import config
 from scrapy import Selector
 from utils.exception import exception
-
+import asyncio
 
 async def entrance(webpage_url, session):
     try:
