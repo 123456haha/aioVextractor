@@ -56,7 +56,10 @@ async def extract_video(result, user_agent, session, chance_left=config.RETRY):
             ClientConnectorError, ClientPayloadError, ServerTimeoutError,
             ContentTypeError, ClientConnectorCertificateError, ClientOSError):
         if chance_left != 1:
-            return await extract_video(result=result, session=session, chance_left=chance_left - 1)
+            return await extract_video(result=result,
+                                       user_agent=user_agent,
+                                       session=session,
+                                       chance_left=chance_left - 1)
         else:
             return False
     except:

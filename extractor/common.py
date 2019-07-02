@@ -7,6 +7,7 @@ import youtube_dl
 import jmespath
 import traceback
 import time
+from urllib.parse import (parse_qs, urlparse)
 
 async def extract_info(webpage_url):
     args = {"nocheckcertificate": True,
@@ -27,13 +28,14 @@ async def extract_info(webpage_url):
                 traceback.print_exc()
                 return False
             else:
+                print(VideoJson)
                 result = dict()
                 result['webpage_url'] = webpage_url
                 result['author'] = jmespath.search('uploader', VideoJson)
-                result['cover'] = jmespath.search('thumbnail', VideoJson)
+                result['cover'] = check_cover(jmespath.search('thumbnail', VideoJson))
                 create_time = jmespath.search('upload_date', VideoJson)
-                result['upload_ts'] = int(
-                    time.mktime(time.strptime(create_time, '%Y%m%d'))) if create_time else create_time
+                upload_ts = int(time.mktime(time.strptime(create_time, '%Y%m%d'))) if create_time else create_time
+                result['upload_ts'] = upload_ts
                 result['description'] = jmespath.search('description', VideoJson)
                 duration = jmespath.search('duration', VideoJson)
                 result['duration'] = int(duration) if duration else duration
@@ -46,16 +48,17 @@ async def extract_info(webpage_url):
                 result['vid'] = jmespath.search('id', VideoJson)
                 cate = jmespath.search('categories', VideoJson)
                 result['category'] = ','.join(list(map(lambda x: x.replace(' & ', ','), cate))) if cate else cate
-                play_addr_list = dict()
-                for u, p, h in jmespath.search('formats[].[url, protocol, height]', VideoJson):
-                    if ('m3u8' not in u) and ('/../' not in u):
-                        play_addr_list[h] = u
-                if len(play_addr_list) == 1:
-                    result['play_addr'] = play_addr_list[max(play_addr_list)]
-                else:
-                    if None in play_addr_list:
-                        del play_addr_list[None]
-                    result['play_addr'] = play_addr_list[max(play_addr_list)]
+                formats = extract_play_addr(VideoJson)
+                # play_addr_list = dict()
+                # for u, p, h in jmespath.search('formats[].[url, protocol, height]', VideoJson):
+                #     if ('m3u8' not in u) and ('/../' not in u):
+                #         play_addr_list[h] = u
+                # if len(play_addr_list) == 1:
+                #     result['play_addr'] = play_addr_list[max(play_addr_list)]
+                # else:
+                #     if None in play_addr_list:
+                #         del play_addr_list[None]
+                result['play_addr'] = formats['url']
                 result['title'] = jmespath.search('title', VideoJson)
                 video_tags = jmespath.search('tags', VideoJson)
                 result['tag'] = video_tags
@@ -63,3 +66,38 @@ async def extract_info(webpage_url):
     except:
         traceback.print_exc()
         return False
+
+
+def check_cover(cover):
+    """
+    Some of the vimeo cover urls contain play_icon
+    This method try to extract the url that not
+    :param cover:
+    :return:
+    """
+    if urlparse(cover).path == '/filter/overlay':
+        try:
+            cover_ = parse_qs(urlparse(cover).query).get('src0')[0]
+        except IndexError:
+            return cover
+        if 'play_icon' in cover_:
+            return cover
+        elif cover_ is None:
+            return cover
+        else:
+            return cover_
+    else:
+        return cover
+
+def extract_play_addr(VideoJson):
+    video_list = jmespath.search('formats[]', VideoJson)
+    try:
+        try:
+            return sorted(filter(lambda x:x.get('protocol', '')  in {'https', 'http'}, video_list), key=lambda x:x['filesize'])[-1]
+        except KeyError:
+            return sorted(filter(lambda x:x.get('protocol', '')  in {'https', 'http'}, video_list), key=lambda x:x['height'])[-1]
+        except IndexError:
+            return jmespath.search('formats[-1]', VideoJson)
+    except:
+        # traceback.print_exc()
+        return jmespath.search('formats[-1]', VideoJson)
