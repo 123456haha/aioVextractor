@@ -3,11 +3,20 @@
 # Created by panos on 2019/7/2
 # IDE: PyCharm
 
-import asyncio
-import aiohttp
-from . import (config,distributor)
-import re
-from urllib.parse import urlsplit
+
+if __name__ == '__main__':
+    import asyncio
+    import aiohttp
+    import config
+    import distributor
+    import re
+    from urllib.parse import urlsplit
+else:
+    import asyncio
+    import aiohttp
+    from . import (config,distributor)
+    import re
+    from urllib.parse import urlsplit
 
 
 async def extract(webpage_url, session):
@@ -68,4 +77,4 @@ if __name__ == '__main__':
                 print('\n')
 
 
-    # asyncio.run(test())
+    asyncio.run(test())

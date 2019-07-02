@@ -8,10 +8,10 @@ import jmespath
 import time
 from urllib.parse import urlparse
 from asyncio import TimeoutError
-from .. import config
+import config
 import traceback
 import re
-from ..utils.exception import exception
+from utils.exception import exception
 
 now = lambda: time.time()
 

@@ -3,11 +3,10 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
-
-from ..utils.exception import exception
-from ..utils.user_agent import UserAgent
+from utils.exception import exception
+from utils.user_agent import UserAgent
 from random import choice
-from .. import config
+import config
 import traceback
 import ujson as json
 import jmespath

@@ -4,6 +4,6 @@
 # IDE: PyCharm
 
 
-from ..utils import *
+from utils import *
 
 __all__ = ['MergeDict', 'user_agent']

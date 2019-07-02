@@ -4,15 +4,16 @@
 # IDE: PyCharm
 
 
+
 import traceback
 import time, json
-from .. import config
+import config
 import jmespath
 from scrapy import Selector
 import asyncio
-from ..utils.user_agent import UserAgent
+from utils.user_agent import UserAgent
 from random import choice
-from ..utils.exception import exception
+from utils.exception import exception
 
 
 async def entrance(webpage_url, session, chance_left=config.RETRY):

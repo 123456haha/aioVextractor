@@ -3,9 +3,8 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
-
-from ..utils.user_agent import UserAgent
-from .. import config
+from utils.user_agent import UserAgent
+import config
 import time
 from random import choice
 from scrapy.selector import Selector
@@ -14,7 +13,7 @@ from urllib.parse import urlparse
 import traceback
 import jmespath
 import ujson as json
-from ..utils.exception import exception
+from utils.exception import exception
 import asyncio
 
 
