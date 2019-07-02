@@ -4,5 +4,6 @@
 # IDE: PyCharm
 
 
-if __name__ == '__main__':
-    pass
+import config
+import extract
+import extractor
