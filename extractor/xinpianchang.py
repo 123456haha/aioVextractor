@@ -43,6 +43,8 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
     else:
         webpage = await extract_publish(response=response_text)
         vid = webpage['vid']
+        if not vid:
+            return False
         video = await extract_video_info(referer=webpage_url, vid=vid, session=session)
         if all([webpage, video]):
             return {**webpage, **video}
@@ -247,12 +249,13 @@ if __name__ == '__main__':
     from pprint import pprint
 
     "https://www.xinpianchang.com/a10475334?from=ArticleList"
+    "https://www.xinpianchang.com/u10009204?from=userList"
 
 
     async def test():
         async with aiohttp.ClientSession() as session_:
             return await entrance(
-                webpage_url="https://www.xinpianchang.com/a10475334?from=ArticleList",
+                webpage_url="https://www.xinpianchang.com/u10009204?from=userList",
                 session=session_)
 
 
