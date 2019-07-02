@@ -28,7 +28,6 @@ async def extract_info(webpage_url):
                 traceback.print_exc()
                 return False
             else:
-                print(VideoJson)
                 result = dict()
                 result['webpage_url'] = webpage_url
                 result['author'] = jmespath.search('uploader', VideoJson)
