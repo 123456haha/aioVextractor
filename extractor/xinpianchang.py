@@ -5,8 +5,8 @@
 
 
 import jmespath
-from utils.user_agent import (UserAgent)
-import config
+from ..utils.user_agent import (UserAgent)
+from .. import config
 from random import choice
 from os.path import splitext
 from scrapy.selector import Selector
@@ -16,7 +16,7 @@ import emoji
 import dateutil.parser
 import traceback
 from urllib.parse import urlparse
-from utils.exception import exception
+from ..utils.exception import exception
 import os
 
 async def entrance(webpage_url, session, chance_left=config.RETRY):

@@ -8,14 +8,14 @@ I may need specific headers to play the video
 import jmespath
 import traceback
 import ujson as json
-from extractor import common
-import config
-from utils.user_agent import (UserAgent, android)
+from ..extractor import common
+from .. import config
+from ..utils.user_agent import (UserAgent, android)
 from random import choice
 import os
 import re
-from utils.MergeDict import merge_dicts
-from utils.exception import exception
+from ..utils.MergeDict import merge_dicts
+from ..utils.exception import exception
 import asyncio
 
 async def entrance(webpage_url, session):

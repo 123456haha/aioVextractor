@@ -4,10 +4,10 @@
 # IDE: PyCharm
 
 
-from utils.exception import exception
-from utils.user_agent import UserAgent
+from ..utils.exception import exception
+from ..utils.user_agent import UserAgent
 from random import choice
-import config
+from .. import config
 import traceback
 import ujson as json
 import jmespath

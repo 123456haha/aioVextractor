@@ -4,6 +4,6 @@
 # IDE: PyCharm
 
 
-import config
-import extract
-import extractor
+from . import config
+from . import extract
+from . import extractor

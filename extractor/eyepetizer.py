@@ -5,10 +5,10 @@
 
 import jmespath
 import re
-from utils.user_agent import UserAgent
-from utils.exception import exception
+from ..utils.user_agent import UserAgent
+from ..utils.exception import exception
 from random import choice
-import config
+from .. import config
 import traceback
 
 async def entrance(webpage_url, session, chance_left=config.RETRY):

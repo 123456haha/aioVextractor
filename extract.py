@@ -5,10 +5,9 @@
 
 import asyncio
 import aiohttp
-import config
+from . import (config,distributor)
 import re
 from urllib.parse import urlsplit
-import distributor
 
 
 async def extract(webpage_url, session):
@@ -69,4 +68,4 @@ if __name__ == '__main__':
                 print('\n')
 
 
-    asyncio.run(test())
+    # asyncio.run(test())

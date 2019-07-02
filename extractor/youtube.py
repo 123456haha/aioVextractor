@@ -6,10 +6,10 @@
 import jmespath
 import traceback
 import ujson as json
-from extractor import common
-import config
+from ..extractor import common
+from .. import config
 from scrapy import Selector
-from utils.exception import exception
+from ..utils.exception import exception
 import asyncio
 
 async def entrance(webpage_url, session):

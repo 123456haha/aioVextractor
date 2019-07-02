@@ -2,7 +2,19 @@
 # -*- coding: utf-8 -*-
 # Created by panos on 2019/6/20
 # IDE: PyCharm
-
+from . import *
+__all__ = [
+    'bilibili',
+    'common',
+    'douyin',
+    'eyepetizer',
+    'tencent',
+    'tvcf',
+    'vimeo',
+    'xinpianchang',
+    'youku',
+    'youtube',
+           ]
 
 FIELDS = ['品牌',
           '行业',
