@@ -11,9 +11,7 @@ from asyncio import TimeoutError
 import config
 import traceback
 import re
-from aiohttp.client_exceptions import (ServerDisconnectedError, ServerConnectionError, ClientOSError,
-                                       ClientConnectorCertificateError, ServerTimeoutError, ContentTypeError,
-                                       ClientConnectorError, ClientPayloadError)
+from utils.exception import exception
 
 now = lambda: time.time()
 
@@ -32,9 +30,7 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
     try:
         async with session.get(webpage_url, headers=download_headers, allow_redirects=False) as response_getinfo:
             Location = response_getinfo.headers['Location']
-    except (ServerDisconnectedError, ServerConnectionError, ClientOSError,
-            ClientConnectorCertificateError, ServerTimeoutError, ContentTypeError,
-            ClientConnectorError, ClientPayloadError, TimeoutError):
+    except exception:
         if chance_left != 1:
             return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
         else:
@@ -91,9 +87,7 @@ async def aweme_detail(aweme_id, session, chance_left=config.RETRY):
                                headers=aweme_detail_headers,
                                params=aweme_detail_params) as response:
             response_json = await response.json()
-    except (ServerDisconnectedError, ServerConnectionError, ClientOSError,
-            ClientConnectorCertificateError, ServerTimeoutError, ContentTypeError,
-            ClientConnectorError, ClientPayloadError, TimeoutError):
+    except exception:
         if chance_left != 1:
             return await aweme_detail(aweme_id=aweme_id,
                                       session=session,

@@ -4,6 +4,7 @@
 # IDE: PyCharm
 
 
+from utils.exception import exception
 from utils.user_agent import UserAgent
 from random import choice
 import config
@@ -17,9 +18,6 @@ import os
 from scrapy.selector import Selector
 import time
 import asyncio
-from aiohttp.client_exceptions import (ServerDisconnectedError, ServerConnectionError, ClientOSError,
-                                       ClientConnectorCertificateError, ServerTimeoutError, ContentTypeError,
-                                       ClientConnectorError, ClientPayloadError)
 
 
 # import uvloop
@@ -37,9 +35,7 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
                    'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
         async with session.get(webpage_url, headers=headers) as response:
             text = await response.text(encoding='utf8', errors='ignore')
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+    except exception:
         if chance_left != 1:
             return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
         else:
@@ -147,9 +143,7 @@ async def extract_comment_count(selector, session, chance_left=config.RETRY):
         try:
             async with session.get(api, headers=headers, params=params) as response:
                 response_json = await response.json()
-        except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-                ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-                ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+        except exception:
             if chance_left != 1:
                 return await extract_comment_count(selector=selector, session=session, chance_left=chance_left - 1)
             else:
@@ -179,9 +173,7 @@ async def extract_author_info(selector, session, chance_left=config.RETRY):
         async with session.get(user_page_url, headers=headers) as response:
             text = await response.text(encoding='utf8', errors='ignore')
             selector = Selector(text=text)
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+    except exception:
         if chance_left != 1:
             return await extract_author_info(selector=selector, session=session, chance_left=chance_left - 1)
         else:
@@ -276,9 +268,7 @@ async def extract_by_vkey(vid, url, session, chance_left=config.RETRY):
     try:
         async with session.get(api_get_info, headers=extract_by_vkey_headers, params=extract_by_vkey_params) as response_getinfo:
             response_getinfo_text = await response_getinfo.text(encoding='utf8', errors='ignore')
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+    except exception:
         if chance_left != 1:
             return await extract_by_vkey(vid=vid, url=url, session=session, chance_left=chance_left - 1)
         else:
@@ -329,9 +319,7 @@ async def extract_by_api(url, session, chance_left=config.RETRY):
             if not play_addr:
                 return False
             result = {'play_addr': play_addr}
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+    except exception:
         if chance_left != 1:
             return await extract_by_api(url=url, session=session, chance_left=chance_left - 1)
         else:

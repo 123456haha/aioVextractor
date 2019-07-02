@@ -15,9 +15,7 @@ from random import choice
 import os
 import re
 from utils.MergeDict import merge_dicts
-from aiohttp.client_exceptions import (ServerDisconnectedError, ServerConnectionError, ClientOSError,
-                                       ClientConnectorCertificateError, ServerTimeoutError, ContentTypeError,
-                                       ClientConnectorError, ClientPayloadError)
+from utils.exception import exception
 
 
 async def entrance(webpage_url, session):
@@ -52,9 +50,7 @@ async def extract_video(result, user_agent, session, chance_left=config.RETRY):
         av_url = f'https://m.bilibili.com/video/av{result["vid"]}.html'
         async with session.get(av_url, headers=headers) as resp:
             html = await resp.text(encoding='utf-8', errors='ignore')
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+    except exception:
         if chance_left != 1:
             return await extract_video(result=result,
                                        user_agent=user_agent,

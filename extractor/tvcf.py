@@ -14,10 +14,8 @@ from urllib.parse import urlparse
 import traceback
 import jmespath
 import ujson as json
+from utils.exception import exception
 import asyncio
-from aiohttp.client_exceptions import (ServerDisconnectedError, ServerConnectionError, ClientOSError,
-                                       ClientConnectorCertificateError, ServerTimeoutError, ContentTypeError,
-                                       ClientConnectorError, ClientPayloadError)
 
 
 async def entrance(webpage_url, session, chance_left=config.RETRY):
@@ -38,9 +36,7 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
             try:
                 async with session.get('http://www.tvcf.co.kr/YCf/V.asp', headers=headers, params=params) as response:
                     response_text = await response.text(encoding='utf8', errors='ignore')
-            except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-                    ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-                    ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+            except exception:
                 if chance_left != 1:
                     return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
                 else:
@@ -72,9 +68,7 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
                 async with session.get(api, headers=headers) as r_code:
                     response_text = await r_code.text()
                     r_code_json = json.loads(response_text)
-            except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-                    ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-                    ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+            except exception:
                 traceback.print_exc()
                 if chance_left != 1:
                     return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
@@ -270,8 +264,7 @@ async def get_tags(session, idx, chance_left=config.RETRY):
     try:
         async  with session.get(f'https://v.tvcf.co.kr/rest/api/player/tag/{idx}', headers=headers) as response:
             response_json = await response.json()
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError, ClientConnectorError,
-            ServerTimeoutError, ContentTypeError, ClientConnectorCertificateError, ClientOSError, ClientPayloadError):
+    except exception:
         if chance_left != 1:
             await get_tags(session=session, idx=idx, chance_left=chance_left - 1)
         else:
@@ -292,8 +285,7 @@ async def get_title(session, idx, chance_left=config.RETRY):
     try:
         async with session.get(f'https://v.tvcf.co.kr/rest/api/player/init2/{idx}', headers=headers) as response:
             response_json = await response.json()
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError, ClientConnectorError,
-            ServerTimeoutError, ContentTypeError, ClientConnectorCertificateError, ClientOSError, ClientPayloadError):
+    except exception:
         if chance_left != 1:
             await get_title(session=session, idx=idx, chance_left=chance_left - 1)
         else:
@@ -322,9 +314,7 @@ async def get_commit_num(vid, session, chance_left=config.RETRY):
         url = f'https://play.tvcf.co.kr/rest/api/player/ReplyMore/{vid}'
         async with session.get(url, headers=headers, params=params) as resp:
             html = await resp.text(encoding='utf-8')
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+    except exception:
         if chance_left != 1:  ## retry when encounter network error
             return await get_commit_num(vid=vid, session=session, chance_left=chance_left - 1)
         else:

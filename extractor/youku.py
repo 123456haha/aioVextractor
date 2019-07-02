@@ -12,9 +12,7 @@ from scrapy import Selector
 import asyncio
 from utils.user_agent import UserAgent
 from random import choice
-from aiohttp.client_exceptions import (ServerDisconnectedError, ServerConnectionError, ClientOSError,
-                                       ClientConnectorCertificateError, ServerTimeoutError, ContentTypeError,
-                                       ClientConnectorError, ClientPayloadError)
+from utils.exception import exception
 
 
 async def entrance(webpage_url, session, chance_left=config.RETRY):
@@ -37,9 +35,7 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
             async with session.get(yk_url, params=data, verify_ssl=False) as res:
                 html = await res.text(encoding='utf-8', errors='ignore')
                 customdata = json.loads(html.replace(data['callback'], '')[1:-2])
-        except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-                ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-                ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+        except exception:
             if chance_left != 1:
                 return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
             else:
@@ -101,9 +97,7 @@ async def extract_info(vid, sign, client_id, session, chance_left=config.RETRY):
         async with session.get(api, headers=headers, params=new_parm, verify_ssl=False) as response:
             html = await response.text(encoding='utf-8', errors='ignore')
             videodata = json.loads(html.replace(new_parm['callback'], '')[1:-1])
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+    except exception:
         if chance_left != 1:
             return await extract_info(vid=vid, sign=sign, client_id=client_id, session=session,
                                       chance_left=chance_left - 1)
@@ -160,9 +154,7 @@ async def extract_comment_count(vid, session, chance_left=config.RETRY):
         async with session.get(api, headers=headers, params=params, verify_ssl=False) as response:
             response_text = await response.text()
             response_json = json.loads(response_text[len('  n_commentList('):-1])
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+    except exception:
         if chance_left != 1:
             return await extract_comment_count(vid=vid, session=session, chance_left=chance_left - 1)
         else:
@@ -212,14 +204,12 @@ async def request_youku_page(url, session, chance_left=config.RETRY):
     try:
         async with session.get(url, headers=headers) as response:
             response_text = await response.text()
-    except (ServerDisconnectedError, ServerConnectionError, TimeoutError,
-            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+    except exception:
         if chance_left != 1:
             return await request_youku_page(url=url, session=session, chance_left=chance_left - 1)
         else:
             return False
-    except Exception:
+    except:
         traceback.print_exc()
         return False
     else:

@@ -9,9 +9,7 @@ import ujson as json
 from extractor import common
 import config
 from scrapy import Selector
-from aiohttp.client_exceptions import (ServerDisconnectedError, ServerConnectionError, ClientOSError,
-                                       ClientConnectorCertificateError, ServerTimeoutError, ContentTypeError,
-                                       ClientConnectorError, ClientPayloadError)
+from utils.exception import exception
 
 
 async def entrance(webpage_url, session):
@@ -43,9 +41,7 @@ async def extract_author(webpage_url, session, chance_left=config.RETRY):
 
         async with session.get(webpage_url, headers=headers) as response:
             text = await response.text(encoding='utf8', errors='ignore')
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
+    except exception:
         if chance_left != 1:
             return await extract_author(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
         else:
