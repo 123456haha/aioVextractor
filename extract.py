@@ -61,7 +61,8 @@ if __name__ == '__main__':
     async def test():
         async with aiohttp.ClientSession() as session_:
             for iiii in TEST_CASE:
-                print(await extract(webpage_url=iiii, session=session_))
+                result = await extract(webpage_url=iiii, session=session_)
+                print(result)
                 print('\n')
 
 
