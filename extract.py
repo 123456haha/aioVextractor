@@ -17,7 +17,7 @@ async def extract(webpage_url, session):
         url_list = re.findall(config.URL_REGEX, webpage_url)
         feed = []
         for num, url_to_parse in enumerate(url_list):
-            print(f"NUMBER {num + 1} URL: {url_to_parse}")
+            print(f"NUMBER {num} URL: {url_to_parse}")
             ParseResult = urlsplit(url_to_parse)
             netloc = ParseResult.netloc
             path = ParseResult.path
@@ -57,7 +57,7 @@ if __name__ == '__main__':
         # 'https://www.xinpianchang.com/a10475334?from=ArticleList',
         # 'https://v.youku.com/v_show/id_XMzg5Mjc5NDExMg==.html?spm=a2h0j.11185381.bpmodule-playpage-segments.5~5~A&&s=1f1b995a017c11df97c0',
         # 'https://www.youtube.com/watch?v=tofSaLB9kwE',
-        'https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4,http://v.douyin.com/hd9sb3/'
+        'https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4, http://v.douyin.com/hd9sb3/'
     ]
 
 
