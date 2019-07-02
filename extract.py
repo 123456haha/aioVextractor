@@ -11,28 +11,34 @@ from urllib.parse import urlsplit
 import distributor
 
 
-
 async def extract(webpage_url, session):
+    print(f"Extracting URL: {webpage_url}")
     if isinstance(webpage_url, str):
         url_list = re.findall(config.URL_REGEX, webpage_url)
-        results = []
-        for url_to_parse in url_list:
-            print(f"url_to_parse: {url_to_parse}")
+        feed = []
+        for num, url_to_parse in enumerate(url_list):
+            print(f"NUMBER {num} URL: {url_to_parse}")
             ParseResult = urlsplit(url_to_parse)
             netloc = ParseResult.netloc
             path = ParseResult.path
             if netloc in config.ALLOW_NETLOC:
-                yield await distributor.distribute(webpage_url=url_to_parse, netloc=netloc, path=path, session=session)
+                feed.append(distributor.distribute(webpage_url=url_to_parse,
+                                                   netloc=netloc,
+                                                   path=path,
+                                                   session=session))
             else:
-                yield f"The netloc({netloc}) \n" \
-                      f"of {url_to_parse} \n" \
-                      f"is not in ALLOW_NETLOC:{config.ALLOW_NETLOC}"
+                print(f"The netloc({netloc}) \n"
+                      f"of {url_to_parse} \n"
+                      f"is not in ALLOW_NETLOC:{config.ALLOW_NETLOC}")
                 continue
-            results.append(None)
+
         else:
-            yield results
+            gather_results = await asyncio.gather(*feed)
+            return gather_results
     else:
-        yield f'The webpage_url: {webpage_url} is not a string'
+        print(f'The URL: {webpage_url} \n'
+              f'is NOT a string')
+        return None
 
 
 if __name__ == '__main__':
@@ -55,7 +61,8 @@ if __name__ == '__main__':
     async def test():
         async with aiohttp.ClientSession() as session_:
             for iiii in TEST_CASE:
-                async for op in extract(webpage_url=iiii, session=session_):
-                    print(op)
+                print(await extract(webpage_url=iiii, session=session_))
                 print('\n')
+
+
     asyncio.run(test())
