@@ -3,20 +3,18 @@
 # Created by panos on 2019/7/2
 # IDE: PyCharm
 
+## add current path to system path temporary
+import sys, os
+curPath = os.path.abspath(os.path.dirname(__file__))
+rootPath = os.path.split(curPath)[0]
+sys.path.append(rootPath)
 
-if __name__ == '__main__':
-    import asyncio
-    import aiohttp
-    import config
-    import distributor
-    import re
-    from urllib.parse import urlsplit
-else:
-    import asyncio
-    import aiohttp
-    from . import (config,distributor)
-    import re
-    from urllib.parse import urlsplit
+import asyncio
+import aiohttp
+import config
+import distributor
+import re
+from urllib.parse import urlsplit
 
 
 async def extract(webpage_url, session):
