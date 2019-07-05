@@ -11,7 +11,7 @@ from asyncio import TimeoutError
 import config
 import traceback
 import re
-from utils.exception import exception
+from aioVextractor.utils.exception import exception
 
 now = lambda: time.time()
 

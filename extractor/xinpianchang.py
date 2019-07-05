@@ -5,7 +5,7 @@
 
 
 import jmespath
-from utils.user_agent import (UserAgent)
+from aioVextractor.utils.user_agent import (UserAgent)
 import config
 from random import choice
 from os.path import splitext
@@ -16,7 +16,7 @@ import emoji
 import dateutil.parser
 import traceback
 from urllib.parse import urlparse
-from utils.exception import exception
+from aioVextractor.utils.exception import exception
 import os
 
 async def entrance(webpage_url, session, chance_left=config.RETRY):

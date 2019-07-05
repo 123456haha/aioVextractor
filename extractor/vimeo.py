@@ -8,7 +8,7 @@ import traceback
 import asyncio
 from extractor import common
 import config
-from utils.user_agent import safari
+from aioVextractor.utils.user_agent import safari
 from random import choice
 from scrapy import Selector
 from aiohttp.client_exceptions import (ServerDisconnectedError, ServerConnectionError, ClientOSError,

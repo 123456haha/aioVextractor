@@ -5,8 +5,8 @@
 
 import jmespath
 import re
-from utils.user_agent import UserAgent
-from utils.exception import exception
+from aioVextractor.utils.user_agent import UserAgent
+from aioVextractor.utils.exception import exception
 from random import choice
 import config
 import traceback

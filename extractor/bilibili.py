@@ -11,12 +11,12 @@ import traceback
 import ujson as json
 from extractor import common
 import config
-from utils.user_agent import (UserAgent, android)
+from aioVextractor.utils.user_agent import (UserAgent, android)
 from random import choice
 import os
 import re
-from utils.MergeDict import merge_dicts
-from utils.exception import exception
+from aioVextractor.utils.MergeDict import merge_dicts
+from aioVextractor.utils.exception import exception
 import asyncio
 
 async def entrance(webpage_url, session):

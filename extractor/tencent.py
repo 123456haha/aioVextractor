@@ -3,8 +3,8 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
-from utils.exception import exception
-from utils.user_agent import UserAgent
+from aioVextractor.utils.exception import exception
+from aioVextractor.utils.user_agent import UserAgent
 from random import choice
 import config
 import traceback

@@ -7,7 +7,6 @@
 import sys, os
 curPath = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(curPath)
-
 from . import config
 from . import extract
 from . import extractor

@@ -11,9 +11,9 @@ import config
 import jmespath
 from scrapy import Selector
 import asyncio
-from utils.user_agent import UserAgent
+from aioVextractor.utils.user_agent import UserAgent
 from random import choice
-from utils.exception import exception
+from aioVextractor.utils.exception import exception
 
 
 async def entrance(webpage_url, session, chance_left=config.RETRY):
