@@ -14,37 +14,44 @@ import aiohttp
 import config
 import distributor
 import re
+import traceback
 from urllib.parse import urlsplit
 
 
 async def extract(webpage_url, session):
-    print(f"Extracting URL: {webpage_url}")
-    if isinstance(webpage_url, str):
-        url_list = re.findall(config.URL_REGEX, webpage_url)
-        feed = []
-        for num, url_to_parse in enumerate(url_list):
-            print(f"NUMBER {num} URL: {url_to_parse}")
-            ParseResult = urlsplit(url_to_parse)
-            netloc = ParseResult.netloc
-            path = ParseResult.path
-            if netloc in config.ALLOW_NETLOC:
-                feed.append(distributor.distribute(webpage_url=url_to_parse,
-                                                   netloc=netloc,
-                                                   path=path,
-                                                   session=session))
-            else:
-                print(f"The netloc({netloc}) \n"
-                      f"of {url_to_parse} \n"
-                      f"is not in ALLOW_NETLOC:{config.ALLOW_NETLOC}")
-                continue
+    try:
+        print(f"Extracting URL: {webpage_url}")
+        if isinstance(webpage_url, str):  ## determine weather if the webpage_url is a string
+            url_list = re.findall(config.URL_REGEX, webpage_url)  ## find all url in the string
+            feed = []  ## ur to be parsed
+            for num, url_to_parse in enumerate(url_list):
+                print(f"NUMBER {num} URL: {url_to_parse}")
+                ## construct necessary parms for identifying the url
+                ParseResult = urlsplit(url_to_parse)
+                netloc = ParseResult.netloc
+                path = ParseResult.path
+                ## identifying the url
+                if netloc in config.ALLOW_NETLOC:  ## determine weather if the netloc of the url is in ALLOW_NETLOC
+                    feed.append(distributor.distribute(webpage_url=url_to_parse,
+                                                       netloc=netloc,
+                                                       path=path,
+                                                       session=session))
+                else:
+                    print(f"The netloc({netloc}) \n"
+                          f"of {url_to_parse} \n"
+                          f"is not in ALLOW_NETLOC:{config.ALLOW_NETLOC}")
+                    continue
 
+            else:
+                gather_results = await asyncio.gather(*feed)
+                return gather_results
         else:
-            gather_results = await asyncio.gather(*feed)
-            return gather_results
-    else:
-        print(f'The URL: {webpage_url} \n'
-              f'is NOT a string')
-        return None
+            print(f'The URL: {webpage_url} \n'
+                  f'is NOT a string')
+            return None
+    except:
+        traceback.print_exc()
+        return False
 
 
 if __name__ == '__main__':
