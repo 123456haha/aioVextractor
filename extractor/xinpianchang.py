@@ -6,7 +6,7 @@
 
 import jmespath
 from aioVextractor.utils.user_agent import (UserAgent)
-import config
+from aioVextractor import config
 from random import choice
 from os.path import splitext
 from scrapy.selector import Selector

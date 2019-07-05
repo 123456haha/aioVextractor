@@ -6,7 +6,7 @@
 from aioVextractor.utils.exception import exception
 from aioVextractor.utils.user_agent import UserAgent
 from random import choice
-import config
+from aioVextractor import config
 import traceback
 import ujson as json
 import jmespath

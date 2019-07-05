@@ -7,7 +7,7 @@
 
 import traceback
 import time, json
-import config
+from aioVextractor import config
 import jmespath
 from scrapy import Selector
 import asyncio

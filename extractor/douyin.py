@@ -8,7 +8,7 @@ import jmespath
 import time
 from urllib.parse import urlparse
 from asyncio import TimeoutError
-import config
+from aioVextractor import config
 import traceback
 import re
 from aioVextractor.utils.exception import exception

@@ -12,6 +12,7 @@ sys.path.append(rootPath)
 import asyncio
 import aiohttp
 import config
+from aioVextractor import config
 import distributor
 import re
 import traceback
@@ -44,7 +45,7 @@ async def extract(webpage_url, session):
 
             else:
                 gather_results = await asyncio.gather(*feed)
-                return gather_results
+                return None if gather_results is [] else gather_results
         else:
             print(f'The URL: {webpage_url} \n'
                   f'is NOT a string')

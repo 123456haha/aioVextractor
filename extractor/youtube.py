@@ -7,7 +7,7 @@ import jmespath
 import traceback
 import ujson as json
 from extractor import common
-import config
+from aioVextractor import config
 from scrapy import Selector
 from aioVextractor.utils.exception import exception
 import asyncio

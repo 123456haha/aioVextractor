@@ -7,7 +7,7 @@
 import traceback
 import asyncio
 from extractor import common
-import config
+from aioVextractor import config
 from aioVextractor.utils.user_agent import safari
 from random import choice
 from scrapy import Selector

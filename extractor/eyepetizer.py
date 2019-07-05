@@ -8,7 +8,7 @@ import re
 from aioVextractor.utils.user_agent import UserAgent
 from aioVextractor.utils.exception import exception
 from random import choice
-import config
+from aioVextractor import config
 import traceback
 
 async def entrance(webpage_url, session, chance_left=config.RETRY):

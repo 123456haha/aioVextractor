@@ -4,7 +4,7 @@
 # IDE: PyCharm
 
 from aioVextractor.utils.user_agent import UserAgent
-import config
+from aioVextractor import config
 import time
 from random import choice
 from scrapy.selector import Selector
