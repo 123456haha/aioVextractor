@@ -11,10 +11,10 @@ sys.path.append(rootPath)
 
 import asyncio
 import aiohttp
-import config
 from aioVextractor import config
-import distributor
+from aioVextractor import distributor
 import re
+import youtube_dl
 import traceback
 from urllib.parse import (urlsplit, urlparse)
 
@@ -54,7 +54,8 @@ async def extract(webpage_url, session):
         traceback.print_exc()
         return False
 
-async def janitor
+async def janitor():
+    pass
 
 
 def is_playlist(webpage_url):
@@ -126,7 +127,7 @@ async def breakdown_playlist(webpage_url, cursor=0, offset=10):
 
 
 
-async def breakdown_xinpianchang(playlist_url, crawlist_id, page=1, chance_left=config.RETYR):
+async def breakdown_xinpianchang(playlist_url, crawlist_id, page=1, chance_left=config.RETRY):
     article_page_ids = []
     try:
         url = "https://www.xinpianchang.com/index.php"
@@ -185,7 +186,7 @@ async def breakdown_xinpianchang(playlist_url, crawlist_id, page=1, chance_left=
         return False
 
 
-async def breakdown_adsoftheworld(playlist_url, crawlist_id, page=0, Referer=None, chance_left=config.RETYR):
+async def breakdown_adsoftheworld(playlist_url, crawlist_id, page=0, Referer=None, chance_left=config.RETRY):
     article_page_ids = []
     try:
         url = playlist_url
