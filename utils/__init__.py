@@ -9,4 +9,5 @@ __all__ = ['MergeDict',
            'user_agent',
            'requests_retry',
            'exception',
+           'paging',
            ]
