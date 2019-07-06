@@ -3,7 +3,10 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
+from aioVextractor.utils import *
 
-from utils import *
-
-__all__ = ['MergeDict', 'user_agent']
+__all__ = ['MergeDict',
+           'user_agent',
+           'requests_retry',
+           'exception',
+           ]
