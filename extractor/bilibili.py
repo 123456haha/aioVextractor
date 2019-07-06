@@ -9,8 +9,8 @@ I may need specific headers to play the video
 import jmespath
 import traceback
 import ujson as json
-from extractor import common
-import config
+from aioVextractor. extractor import common
+from aioVextractor import config
 from aioVextractor.utils.user_agent import (UserAgent, android)
 from random import choice
 import os

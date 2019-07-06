@@ -6,7 +6,7 @@
 import jmespath
 import traceback
 import ujson as json
-from extractor import common
+from aioVextractor. extractor import common
 from aioVextractor import config
 from scrapy import Selector
 from aioVextractor.utils.exception import exception
