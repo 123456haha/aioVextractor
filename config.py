@@ -26,3 +26,12 @@ TEST_CASE = ['https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_626
 
 
 ALLOW_NETLOC = {urlsplit(url).netloc for url in TEST_CASE}
+
+
+PLAYLIST_TEST_CASE = ['https://vimeo.com/alitasmitmedia',
+                      'https://vimeo.com/channels/ceiga',
+                      'https://www.youtube.com/playlist?list=PLohYzz4btpaSt2T0rcfmF8wfQzuW_6JTv',
+                      'https://www.youtube.com/channel/UC36FGmBEGfmOV2T5QVNI9ew'
+                      ]
+
+# ALLOW_NETLOC_PLAYLIST = {urlsplit(url).netloc for url in PLAYLIST_TEST_CASE}
