@@ -7,6 +7,13 @@
 import sys, os
 curPath = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(curPath)
-from . import config
-from . import extract
-from . import extractor
+
+from aioVextractor import config
+from aioVextractor import extract
+from aioVextractor import extractor
+from aioVextractor import breakdown
+from aioVextractor import distributor
+from aioVextractor import breaker
+from aioVextractor import utils
+
+
