@@ -74,6 +74,10 @@ async def breakdown(webpage_url,
                         continue
                     else:
                         return results
+    else:
+        print(f"webpage_url: {webpage_url}\n"
+              f"does NOT MATCH any vimeo playlist pattern!")
+        return []
 
 
 @RequestRetry
