@@ -5,7 +5,6 @@
 
 from urllib.parse import urlsplit
 
-
 ## retry at most 3 times when encounters failure request
 RETRY = 3
 
@@ -24,14 +23,28 @@ TEST_CASE = ['https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_626
              'https://v.youku.com/v_show/id_XMzg5Mjc5NDExMg==.html?spm=a2h0j.11185381.bpmodule-playpage-segments.5~5~A&&s=1f1b995a017c11df97c0',
              'https://www.youtube.com/watch?v=tofSaLB9kwE']
 
-
 ALLOW_NETLOC = {urlsplit(url).netloc for url in TEST_CASE}
-
 
 PLAYLIST_TEST_CASE = ['https://vimeo.com/alitasmitmedia',
                       'https://vimeo.com/channels/ceiga',
                       'https://www.youtube.com/playlist?list=PLohYzz4btpaSt2T0rcfmF8wfQzuW_6JTv',
-                      'https://www.youtube.com/channel/UC36FGmBEGfmOV2T5QVNI9ew'
+                      'https://www.youtube.com/channel/UC36FGmBEGfmOV2T5QVNI9ew',
+                      'https://www.xinpianchang.com/u10539256?from=userList',
                       ]
+## how many videos retrieve from a playlist by default
+DEFAULT_CURSOR = 0
+DEFAULT_OFFSET = 10
+
+
+# BreakdownPlaylistArgs = {
+#     "nocheckcertificate": True,
+#     "ignoreerrors": True,
+#     "quiet": True,
+#     "nopart": True,
+#     # "download_archive": "record.txt",
+#     "no_warnings": True,
+#     "youtube_include_dash_manifest": False,
+#     'simulate': True
+# }
 
 # ALLOW_NETLOC_PLAYLIST = {urlsplit(url).netloc for url in PLAYLIST_TEST_CASE}
