@@ -4,15 +4,16 @@
 # IDE: PyCharm
 
 import traceback
-from extractor import (bilibili,
-                       douyin,
-                       eyepetizer,
-                       tencent,
-                       tvcf,
-                       vimeo,
-                       xinpianchang,
-                       youku,
-                       youtube)
+from aioVextractor.extractor import (bilibili,
+                                     douyin,
+                                     eyepetizer,
+                                     tencent,
+                                     tvcf,
+                                     vimeo,
+                                     xinpianchang,
+                                     youku,
+                                     youtube)
+
 
 async def distribute(webpage_url, netloc, path, session):
     try:
