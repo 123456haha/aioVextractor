@@ -11,7 +11,6 @@ from aioVextractor.utils.user_agent import UserAgent
 from random import choice
 from urllib.parse import urlsplit
 import jmespath
-from scrapy import Selector
 from aioVextractor.utils import paging
 import re
 
