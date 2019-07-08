@@ -145,6 +145,11 @@ async def extract_playlist_pageing_api(ResJson):
                               '"title": title.simpleText, '  ## need to be unescaped(html)
                               '"webpage_url": navigationEndpoint.commandMetadata.webCommandMetadata.url '  ## need to be joined  ## '/watch?v=PRT3FjaP71E&list=PLs54iBUqIopDv2wRhkqArl9AEV1PU-gmc&index=101&t=0s'
                               '}', ytInitialData)
+    if isinstance(results, list):
+        pass
+    else:
+        print(f"ResJson: {ResJson}")
+        yield None
     for ele in results:
         ele['title'] = unquote(html.unescape(ele['title']))
         ele['webpage_url'] = 'https://www.youtube.com/' + ele['webpage_url']
@@ -266,12 +271,14 @@ if __name__ == '__main__':
     #         # print(ele)
     #         print(type(ele))
     # _ = asyncio.run(test())
-
+    res = []
     async def test():
         async for ele in breakdown(
                 webpage_url='https://www.youtube.com/playlist?list=PLs54iBUqIopDv2wRhkqArl9AEV1PU-gmc'):
-            print(ele)
+            res.append(ele)
+        return res
             # print(type(ele))
 
 
     _ = asyncio.run(test())
+    print(res)
