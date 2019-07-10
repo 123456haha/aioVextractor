@@ -5,18 +5,16 @@
 
 import asyncio
 import aiohttp
-from aioVextractor import config
 from aiostream.stream import takewhile
 from aioVextractor.utils.requests_retry import RequestRetry
-from aioVextractor.utils.user_agent import (safari, UserAgent, android)
+from aioVextractor.utils.user_agent import safari
 from random import choice
 import ujson as json
 from scrapy import Selector
 from urllib.parse import (urlsplit, unquote)
 import jmespath
+import emoji
 import traceback
-# from itertools import takewhile
-from aioVextractor.utils import paging
 import re
 import html
 
@@ -31,18 +29,9 @@ async def breakdown(webpage_url,
     """
     ParseResult = urlsplit(webpage_url)
     path = ParseResult.path
-    # if all([isinstance(ele, int) for ele in [cursor, offset]]):
-    #     pass
-    # else:
-    #     print(f"The Type of cursor/offset is not integer: \n"
-    #           f"type(cursor) = {type(cursor)}\n"
-    #           f"type(offset) = {type(offset)}"
-    #           )
-    #     return False
-
     if re.match('/playlist', path):  ## https://www.youtube.com/playlist?list=PLohYzz4btpaSt2T0rcfmF8wfQzuW_6JTv
         webpage_content = await retrieve_webpapge(webpage_url=webpage_url)
-        async for ele in takewhile(extract_webpage(webpage_content),
+        async for ele in takewhile(extract_webpage(webpage_content, path='playlist'),
                                    lambda x: isinstance(x, (dict, tuple))):
             if isinstance(ele, dict):
                 yield ele
@@ -50,10 +39,10 @@ async def breakdown(webpage_url,
                 continuation, clickTrackingParams = ele
                 has_more = True
                 while has_more:
-                    next_content = await retrieve_playlist_pageing_api(referer=webpage_url,
-                                                                       continuation=continuation,
-                                                                       clickTrackingParams=clickTrackingParams)
-                    async for next_ele in extract_playlist_pageing_api(ResJson=next_content):
+                    next_content = await retrieve_youtube_pageing_api(referer=webpage_url,
+                                                                      continuation=continuation,
+                                                                      clickTrackingParams=clickTrackingParams)
+                    async for next_ele in extract_youtube_pageing_api(ResJson=next_content, path='playlist'):
                         if isinstance(next_ele, dict):
                             yield next_ele
                         elif isinstance(next_ele, tuple):
@@ -61,26 +50,31 @@ async def breakdown(webpage_url,
                             continue
                         else:
                             has_more = False
+                            break
 
     elif re.match('/channel/', path):  ## https://www.youtube.com/channel/UC36FGmBEGfmOV2T5QVNI9ew
-        pass
-        # api_step = 10
-        # results = []
-        # # offset = math.ceil(float(offset / 10)) * 10  ## limit it to be the integer multiple of 10
-        # while True:
-        #     clips_list = await asyncio.gather(*[retrieve_user_pageing_api(webpage_url=webpage_url,
-        #                                                                   page=page) for page in
-        #                                         paging.pager(cursor=cursor, offset=offset, step=api_step)])
-        #     for clips in clips_list:
-        #         results += await extract_user_page(ResponseJson=clips)
-        #         offset -= api_step
-        #         if offset <= 0:
-        #             return results
-        #         else:
-        #             if jmespath.search('clips_meta.has_next', clips):
-        #                 continue
-        #             else:
-        #                 return results
+        webpage_url += '' if webpage_url.endswith('/videos') else '/videos'
+        webpage_content = await retrieve_webpapge(webpage_url=webpage_url)
+        async for ele in takewhile(extract_webpage(webpage_content, path='channel'),
+                                   lambda x: isinstance(x, (dict, tuple))):
+            if isinstance(ele, dict):
+                yield ele
+            elif isinstance(ele, tuple):
+                continuation, clickTrackingParams = ele
+                has_more = True
+                while has_more:
+                    next_content = await retrieve_youtube_pageing_api(referer=webpage_url,
+                                                                      continuation=continuation,
+                                                                      clickTrackingParams=clickTrackingParams)
+                    async for next_ele in extract_youtube_pageing_api(ResJson=next_content, path='channel'):
+                        if isinstance(next_ele, dict):
+                            yield next_ele
+                        elif isinstance(next_ele, tuple):
+                            continuation, clickTrackingParams = next_ele
+                            continue
+                        else:
+                            has_more = False
+                            break
 
     elif re.match('/watch', path):
         yield []
@@ -91,7 +85,7 @@ async def breakdown(webpage_url,
 
 
 @RequestRetry
-async def retrieve_playlist_pageing_api(referer, continuation, clickTrackingParams):
+async def retrieve_youtube_pageing_api(referer, continuation, clickTrackingParams):
     """
     retrieve next page response.
     each response contains 100 element at most.
@@ -130,41 +124,86 @@ async def retrieve_playlist_pageing_api(referer, continuation, clickTrackingPara
             return await response.json()
 
 
-async def extract_playlist_pageing_api(ResJson):
+async def extract_youtube_pageing_api(ResJson, path='playlist'):
     """
     extract playlist webpage by extracting ytInitialData
     yield each element and follow by (continuation, clickTrackingParams) at last
     """
     ytInitialData = ResJson
     # print(ytInitialData)
-    results = jmespath.search('[1].response.continuationContents.playlistVideoListContinuation.'
-                              'contents[].playlistVideoRenderer.{'
-                              '"duration": lengthSeconds, '
-                              '"vid": videoId, '
-                              '"cover": thumbnail.thumbnails[-1].url, '
-                              '"title": title.simpleText, '  ## need to be unescaped(html)
-                              '"webpage_url": navigationEndpoint.commandMetadata.webCommandMetadata.url '  ## need to be joined  ## '/watch?v=PRT3FjaP71E&list=PLs54iBUqIopDv2wRhkqArl9AEV1PU-gmc&index=101&t=0s'
-                              '}', ytInitialData)
+    if path == 'playlist':
+        statement = '[1].' \
+                    'response.' \
+                    'continuationContents.' \
+                    'playlistVideoListContinuation.' \
+                    'contents[].playlistVideoRenderer.{' \
+                    '"duration": lengthSeconds, ' \
+                    '"view_count": viewCountText.simpleText, ' \
+                    '"vid": videoId, ' \
+                    '"cover": thumbnail.thumbnails[-1].url, ' \
+                    '"title": title.simpleText, ' \
+                    '"webpage_url": navigationEndpoint.commandMetadata.webCommandMetadata.url ' \
+                    '}'
+        results = jmespath.search(statement, ytInitialData)
+    else:  ## path == 'channel'
+        statement = '[1].' \
+                    'response.' \
+                    'continuationContents.' \
+                    'gridContinuation.' \
+                    'items[].gridVideoRenderer.{' \
+                    '"view_count": viewCountText.simpleText, ' \
+                    '"vid": videoId, ' \
+                    '"cover": thumbnail.thumbnails[-1].url, ' \
+                    '"title": title.simpleText, ' \
+                    '"webpage_url": navigationEndpoint.commandMetadata.webCommandMetadata.url ' \
+                    '}'
+        results = jmespath.search(statement, ytInitialData)
+        if results is None:
+            statement = 'response.' \
+                        'continuationContents.' \
+                        'gridContinuation.' \
+                        'items[].gridVideoRenderer.{' \
+                        '"view_count": viewCountText.simpleText, ' \
+                        '"vid": videoId, ' \
+                        '"cover": thumbnail.thumbnails[-1].url, ' \
+                        '"title": title.simpleText, ' \
+                        '"webpage_url": navigationEndpoint.commandMetadata.webCommandMetadata.url ' \
+                        '}'
+            results = jmespath.search(statement, ytInitialData)
     if isinstance(results, list):
         pass
     else:
-        print(f"ResJson: {ResJson}")
+        print(f"ytInitialData: {ytInitialData}")
+        print(f"results: {results}")
         yield None
+
     for ele in results:
-        ele['title'] = unquote(html.unescape(ele['title']))
+        ele['title'] = emoji.demojize(unquote(html.unescape(ele['title'])))
         ele['webpage_url'] = 'https://www.youtube.com/' + ele['webpage_url']
+        ele['view_count'] = ele['view_count'].replace(',', '').replace(' 次观看', '') if ele['view_count'] else None
         yield ele
     else:
         try:
-            continuation, clickTrackingParams = jmespath.search('[1].'
-                                                                'response.'
-                                                                'continuationContents.'
-                                                                'playlistVideoListContinuation.'
-                                                                'continuations[0].'
-                                                                'nextContinuationData.'
-                                                                '[continuation, clickTrackingParams]',
-                                                                ytInitialData)
+            if path == 'playlist':
+                statement = '[1].' \
+                            'response.' \
+                            'continuationContents.' \
+                            'playlistVideoListContinuation.' \
+                            'continuations[0].' \
+                            'nextContinuationData.' \
+                            '[continuation, clickTrackingParams]'
+            else:  ## path == 'channel'
+                statement = '[1].' \
+                            'response.' \
+                            'continuationContents.' \
+                            'gridContinuation.' \
+                            'continuations[0].' \
+                            'nextContinuationData.' \
+                            '[continuation, clickTrackingParams]'
+
+            continuation, clickTrackingParams = jmespath.search(statement, ytInitialData)
         except TypeError:  ## cannot unpack non-iterable NoneType object
+            traceback.print_exc()
             ## [continuation, clickTrackingParams] do not exist
             yield None
         else:
@@ -190,7 +229,7 @@ async def retrieve_webpapge(webpage_url):
             return await response.text()
 
 
-async def extract_webpage(ResText):
+async def extract_webpage(ResText, path='playlist'):
     """
     extract playlist webpage by extracting ytInitialData
     yield each element and follow by (continuation, clickTrackingParams) at last
@@ -209,49 +248,87 @@ async def extract_webpage(ResText):
             yield None  ## None is returned
         # print(ytInitialData)
         else:
-            results = jmespath.search('contents.'
-                                      'twoColumnBrowseResultsRenderer.'
-                                      'tabs[0].'
-                                      'tabRenderer.'
-                                      'content.'
-                                      'sectionListRenderer.'
-                                      'contents[0].'
-                                      'itemSectionRenderer.'
-                                      'contents[0].'
-                                      'playlistVideoListRenderer.'
-                                      'contents[].playlistVideoRenderer.{'
-                                      '"duration": lengthSeconds, '
-                                      '"vid": videoId, '
-                                      '"cover": thumbnail.thumbnails[-1].url, '
-                                      '"title": title.simpleText, '  ## need to be unescaped(html)
-                                      '"webpage_url": navigationEndpoint.commandMetadata.webCommandMetadata.url '  ## need to be joined  ## '/watch?v=PRT3FjaP71E&list=PLs54iBUqIopDv2wRhkqArl9AEV1PU-gmc&index=101&t=0s'
-                                      '}', ytInitialData)
+            if path == 'playlist':
+                statement = 'contents.' \
+                            'twoColumnBrowseResultsRenderer.' \
+                            'tabs[0].' \
+                            'tabRenderer.' \
+                            'content.' \
+                            'sectionListRenderer.' \
+                            'contents[0].' \
+                            'itemSectionRenderer.' \
+                            'contents[0].' \
+                            'playlistVideoListRenderer.' \
+                            'contents[].playlistVideoRenderer.{' \
+                            '"duration": lengthSeconds, ' \
+                            '"vid": videoId, ' \
+                            '"cover": thumbnail.thumbnails[-1].url, ' \
+                            '"title": title.simpleText, ' \
+                            '"webpage_url": navigationEndpoint.commandMetadata.webCommandMetadata.url ' \
+                            '}'
+            else:  ## path == 'channel':
+                statement = 'contents.' \
+                            'twoColumnBrowseResultsRenderer.' \
+                            'tabs[1].' \
+                            'tabRenderer.' \
+                            'content.' \
+                            'sectionListRenderer.' \
+                            'contents[0].' \
+                            'itemSectionRenderer.' \
+                            'contents[0].' \
+                            'gridRenderer.' \
+                            'items[].gridVideoRenderer.{' \
+                            '"vid": videoId, ' \
+                            '"cover": thumbnail.thumbnails[-1].url, ' \
+                            '"title": title.simpleText, ' \
+                            '"webpage_url": navigationEndpoint.commandMetadata.webCommandMetadata.url ' \
+                            '}'
+            results = jmespath.search(statement, ytInitialData)
             for ele in results:
                 ele['title'] = unquote(html.unescape(ele['title']))
                 ele['webpage_url'] = 'https://www.youtube.com/' + ele['webpage_url']
                 yield ele
             else:
-                continuation, clickTrackingParams = jmespath.search('contents.'
-                                                                    'twoColumnBrowseResultsRenderer.'
-                                                                    'tabs[0].'
-                                                                    'tabRenderer.'
-                                                                    'content.'
-                                                                    'sectionListRenderer.'
-                                                                    'contents[0].'
-                                                                    'itemSectionRenderer.'
-                                                                    'contents[0].'
-                                                                    'playlistVideoListRenderer.'
-                                                                    'continuations[0].'
-                                                                    'nextContinuationData.'
-                                                                    '[continuation, clickTrackingParams]',
-                                                                    ytInitialData)
-                # print(continuation, clickTrackingParams)
-                yield continuation, clickTrackingParams
+                if path == 'playlist':
+                    statement = 'contents.' \
+                                'twoColumnBrowseResultsRenderer.' \
+                                'tabs[0].' \
+                                'tabRenderer.' \
+                                'content.' \
+                                'sectionListRenderer.' \
+                                'contents[0].' \
+                                'itemSectionRenderer.' \
+                                'contents[0].' \
+                                'playlistVideoListRenderer.' \
+                                'continuations[0].' \
+                                'nextContinuationData.' \
+                                '[continuation, clickTrackingParams]'
+                else:  ## path == 'channel':
+                    statement = 'contents.' \
+                                'twoColumnBrowseResultsRenderer.' \
+                                'tabs[1].' \
+                                'tabRenderer.' \
+                                'content.' \
+                                'sectionListRenderer.' \
+                                'contents[0].' \
+                                'itemSectionRenderer.' \
+                                'contents[0].' \
+                                'gridRenderer.' \
+                                'continuations[0].' \
+                                'nextContinuationData.' \
+                                '[continuation, clickTrackingParams]'
+                try:
+                    continuation, clickTrackingParams = jmespath.search(statement, ytInitialData)
+                except TypeError:  ## cannot unpack non-iterable NoneType object\
+                    traceback.print_exc()
+                    yield None
+                else:
+                    # print(continuation, clickTrackingParams)
+                    yield continuation, clickTrackingParams
 
 
 if __name__ == '__main__':
     from pprint import pprint
-
 
     # _ = asyncio.run(retrieve_playlist_pageing_api(
     #     referer='https://www.youtube.com/playlist?list=PLs54iBUqIopDv2wRhkqArl9AEV1PU-gmc',
@@ -272,13 +349,20 @@ if __name__ == '__main__':
     #         print(type(ele))
     # _ = asyncio.run(test())
     res = []
+    "https://www.youtube.com/channel/UCSRpCBq2xomj7Sz0od73jWw/videos"
+    "https://www.youtube.com/channel/UCAyj5vEhoaw6fDFBpSbQvRg"
+    "https://www.youtube.com/playlist?list=PLs54iBUqIopDv2wRhkqArl9AEV1PU-gmc"
+
+
     async def test():
         async for ele in breakdown(
-                webpage_url='https://www.youtube.com/playlist?list=PLs54iBUqIopDv2wRhkqArl9AEV1PU-gmc'):
+                webpage_url='https://www.youtube.com/channel/UCSRpCBq2xomj7Sz0od73jWw/videos'):
+            print(ele)
             res.append(ele)
         return res
-            # print(type(ele))
+        # print(type(ele))
 
 
     _ = asyncio.run(test())
     print(res)
+    print(len(res))
