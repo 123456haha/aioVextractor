@@ -3,9 +3,24 @@
 # Created by panos on 2019/7/7
 # IDE: PyCharm
 
-from urllib.parse import urlsplit
 from aioVextractor import breaker
 import math
+import asyncio
+# import aiohttp
+# from aiostream.stream import takewhile
+# from aioVextractor.utils.requests_retry import RequestRetry
+# from aioVextractor.utils.user_agent import safari
+# from random import choice
+# import ujson as json
+# from scrapy import Selector
+from urllib.parse import (urlsplit, unquote)
+
+
+# import jmespath
+# import emoji
+# import traceback
+# import re
+# import html
 
 async def breakdown(webpage_url, cursor=0, offset=10):
     """
@@ -17,13 +32,32 @@ async def breakdown(webpage_url, cursor=0, offset=10):
     # path = ParseResult.path
     offset = math.ceil(float(offset / 10)) * 10  ## limit it to be the integer multiple of 10
     if netloc == 'vimeo.com':
-        return breaker.vimeo.breakdown(webpage_url=webpage_url, cursor=cursor, offset=offset)
+        for ele in await breaker.vimeo.breakdown(webpage_url=webpage_url,
+                                                 cursor=cursor,
+                                                 offset=offset):
+            yield ele
     elif netloc == 'www.youtube.com':
-        breaker.youtube.breakdown(webpage_url=webpage_url, cursor=cursor, offset=offset)
+        async for ele in breaker.youtube.breakdown(webpage_url=webpage_url):
+            yield ele
     elif netloc == 'www.xinpianchang.com':
-        breaker.xinpianchang.breakdown(webpage_url=webpage_url, cursor=cursor, offset=offset)
+        breaker.xinpianchang.breakdown(webpage_url=webpage_url,
+                                       cursor=cursor,
+                                       offset=offset)
     else:
         pass
 
+
 if __name__ == '__main__':
-    pass
+    "https://vimeo.com/plaidavenger"
+    "https://www.youtube.com/channel/UCSRpCBq2xomj7Sz0od73jWw/videos"
+    res = []
+
+
+    async def test():
+        async for ele in breakdown(webpage_url='https://vimeo.com/plaidavenger'):
+            print(ele)
+            res.append(ele['vid'])
+
+
+    print(f"res: {res}")
+    asyncio.run(test())

@@ -6,68 +6,192 @@
 import asyncio
 import aiohttp
 from aioVextractor import config
+import re
+from aiostream.stream import takewhile
+from aioVextractor.utils import paging
+from urllib.parse import (urlparse, unquote)
+import html
+import emoji
+import traceback
+from random import choice
+import jmespath
+from aioVextractor.utils.user_agent import (UserAgent)
+from aioVextractor.utils.requests_retry import RequestRetry
+from scrapy import Selector
+import time
 
 
-async def breakdown(webpage_url, chance_left=config.RETRY):
-    pass
+async def breakdown(webpage_url,
+                    cursor=config.DEFAULT_CURSOR,
+                    offset=config.DEFAULT_OFFSET):
+    """
+    cursor is the current place of the video
+    offset can only be the integer multiple of 10
+    :return: list of title and cover
+    """
 
-async def breakdown(playlist_url, crawlist_id, page=1, chance_left=config.RETRY):
-    article_page_ids = []
-    try:
+    if all([isinstance(ele, int) for ele in [cursor, offset]]):
+        pass
+    else:
+        print(f"The Type of cursor/offset is not integer: \n"
+              f"type(cursor) = {type(cursor)}\n"
+              f"type(offset) = {type(offset)}"
+              )
+        yield False
+
+    api_step = 28
+    # page = 1
+    results = []
+    clips_list = await asyncio.gather(*[retrieve_user_paging_api(webpage_url=webpage_url,
+                                                                 page=page) for page in
+                                        paging.pager(cursor=cursor, offset=offset, step=api_step)])
+    for clips in clips_list:
+        results += [ele async for ele in extract_user_pageing_api(ResText=clips)]
+        offset -= api_step
+        if offset <= 0:
+            yield results
+        else:
+            if jmespath.search('clips_meta.has_next', clips):
+                continue
+            else:
+                yield results
+    #
+    # webpage_content = await retrieve_user_paging_api(webpage_url=webpage_url, page=page)
+    # async for ele in takewhile(extract_user_pageing_api(ResText=webpage_content),
+    #                            lambda x: isinstance(x, (dict, int))):
+    #     if isinstance(ele, dict):
+    #         yield ele
+    #     elif isinstance(ele, tuple):
+    #         has_more = ele
+    #         while has_more:
+    #             page += 1
+    #             next_content = await retrieve_user_paging_api(webpage_url=webpage_url, page=page)
+    #             async for next_ele in extract_user_pageing_api(ResText=next_content):
+    #                 if isinstance(next_ele, dict):
+    #                     yield next_ele
+    #                 elif isinstance(next_ele, int):
+    #                     has_more = ele
+    #                     continue
+    #                 else:
+    #                     has_more = False
+    #                     break
+
+
+@RequestRetry
+async def retrieve_user_paging_api(webpage_url, page=1):
+    async with aiohttp.ClientSession() as session:
         url = "https://www.xinpianchang.com/index.php"
-        xinpianchang_user_ids = re.findall('/u(\d{8,12})', urlparse(playlist_url).path)
+        xinpianchang_user_id = webpage_url.split('?')[0].split('/u')[-1]
         headers = {'Origin': "https://www.xinpianchang.com",
                    'Accept-Encoding': "gzip, deflate, br",
                    'Accept-Language': "zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7",
                    'User-Agent': choice(UserAgent),
                    'Accept': "*/*",
-                   'Referer': playlist_url,
+                   'Referer': webpage_url,
                    'X-Requested-With': "XMLHttpRequest",
                    'cache-control': "no-cache"}
+        params = {"app": "user",
+                  "ac": "space",
+                  "ajax": "1",
+                  "id": xinpianchang_user_id,
+                  "d": "1",
+                  "sort": "pick",
+                  "cateid": "0",
+                  "audit": "1",
+                  "is_private": "0",
+                  "page": page}
+        async with session.post(url, headers=headers, params=params) as response:
+            response_text = await response.text()
+            return response_text
 
-        async with aiohttp.ClientSession() as session:
-            for xinpianchang_user_id in xinpianchang_user_ids:
-                params = {"app": "user",
-                          "ac": "space",
-                          "ajax": "1",
-                          "id": xinpianchang_user_id,
-                          "d": "1",
-                          "sort": "pick",
-                          "cateid": "0",
-                          "audit": "1",
-                          "is_private": "0",
-                          "page": page}
-                try:
-                    async with session.post(url, headers=headers, params=params) as response:
-                        response_text = await response.text()
-                except (ServerDisconnectedError, ServerConnectionError, ClientConnectorError, TimeoutError,
-                        ServerTimeoutError, ContentTypeError, ClientConnectorCertificateError, ClientOSError):
-                    if chance_left != 1:
-                        return await breakdown_xinpianchang(playlist_url=playlist_url, crawlist_id=crawlist_id,
-                                                            page=page, chance_left=chance_left - 1)
-                    else:
-                        return False
-                else:
-                    selector = Selector(text=response_text)
-                    article_page_ids = selector.css("li[data-articleid]::attr(data-articleid)").extract()
-                    has_more = selector.css("li[data-more]").extract()
-                    article_pages = list(
-                        map(lambda vid: f"https://www.xinpianchang.com/a{vid}?from=UserProfile", article_page_ids))
-                    if has_more:
-                        return article_pages + await breakdown_xinpianchang(playlist_url=playlist_url,
-                                                                            crawlist_id=crawlist_id,
-                                                                            page=page + 1)
-                    else:
-                        return article_pages
 
-    except RecursionError:
-        print(f'{crawlist_id} RecursionError occur in playlist_url: {playlist_url}\n'
-              f'{crawlist_id} format_exc(): {format_exc()}')
-        return article_page_ids if article_page_ids else False
-    except Exception as error:
-        print(f'{crawlist_id} Error occur: {error}\n'
-              f'{crawlist_id} format_exc(): {format_exc()}')
-        return False
+async def extract_user_pageing_api(ResText):
+    selector = Selector(text=ResText)
+    for article in selector.css("li[data-articleid]"):
+        ele = dict()
+        ele['vid'] = article.css('::attr(data-articleid)').extract_first()
+        ele['webpage_url'] = f"https://www.xinpianchang.com/a{ele['vid']}?from=UserProfile"
+        ele['cover'] = article.css('img[class*="lazy-img"]::attr(_src)').extract_first()
+        ele['upload_ts'] = format_upload_ts(article.css('.video-hover-con p[class*="fs_12"]::text').extract_first())
+        ele['duration'] = format_duration(article.css('.duration::text').extract_first())
+        ele['description'] = format_desc(article.css('.desc::text').extract_first())
+        ele['title'] = format_desc(article.css('.video-con-top p::text').extract_first())
+        ele['category'] = format_category(article.css('.new-cate .c_b_9 ::text').extract())
+        ele['view_count'] = article.css('.icon-play-volume::text').extract_first()
+        ele['like_count'] = article.css('.icon-like::text').extract_first()
+        ele['role'] = article.css('.user-info .role::text').extract_first()
+        yield ele
+    else:
+        has_more = selector.css("li[data-more]::attr(data-more)").extract_first()
+        yield has_more
+
+
+def format_duration(duration_str):
+    """
+    input: "17' 39''"
+    """
+    try:
+        t1 = time.strptime(duration_str, "%M' %S''")
+    except:
+        return None
+    t2 = time.struct_time((1900, 1, 1, 0, 0, 0, 0, 0, -1))
+    try:
+        duration = int(time.mktime(t1) - time.mktime(t2))
+    except Exception:
+        return None
+    else:
+        return duration
+
+
+def format_category(category):
+    """
+    input: ['\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t系列短视频\t\t\t\t\t\t\t', '\n\t\t\t\t\t\t\t纪录 - 亲情\t\t\t\t\t\t\t']
+    """
+    return ",".join(list(map(lambda x: x.strip(), category))) if category else None
+
+
+def format_upload_ts(upload_ts, detail=0):
+    """
+    input: '2019-05-14 发布'
+    input: '2019-05-19T22:11:39+08:00'
+
+    """
+    if detail == 0:
+        try:
+            return int(time.mktime(time.strptime(upload_ts, '%Y-%m-%d 发布'))) if upload_ts else None
+        except:
+            traceback.print_exc()
+            return None
+    else:
+        try:
+            # upload_ts[:-6] -> '2019-05-19T22:11:39'
+            return int(time.mktime(time.strptime(upload_ts[:-6], '%Y-%m-%dT%H:%M:%S'))) if upload_ts else None
+        except:
+            print(f"upload_ts: {upload_ts}")
+            traceback.print_exc()
+            return None
+
+
+def format_desc(desc):
+    try:
+        return emoji.demojize(html.unescape(unquote(desc)))
+    except:
+        return desc
+
 
 if __name__ == '__main__':
-    pass
+    "https://www.xinpianchang.com/u10014261?from=userList"
+    "https://www.xinpianchang.com/u10029931?from=userList"
+
+
+    # async def test():
+    #     res = await retrieve_user_paging_api("https://www.xinpianchang.com/u10029931?from=userList")
+    #     async for ele in extract_user_pageing_api(res):
+    #         print(ele)
+
+    async def test():
+        async for ele in breakdown("https://www.xinpianchang.com/u10029931?from=userList", 0, 29):
+            print(ele)
+
+
+    asyncio.run(test())
