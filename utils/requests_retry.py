@@ -13,6 +13,7 @@ def RequestRetry(func):
             try:
                 return await func(*args, **kwargs)
             except exception:
+                traceback.print_exc()
                 continue
             except:
                 traceback.print_exc()
