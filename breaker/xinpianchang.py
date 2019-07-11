@@ -106,8 +106,9 @@ async def extract_user_pageing_api(ResText):
             ele['description'] = format_desc(article.css('.desc::text').extract_first())
             ele['title'] = format_desc(article.css('.video-con-top p::text').extract_first())
             ele['category'] = format_category(article.css('.new-cate .c_b_9 ::text').extract())
-            ele['view_count'] = article.css('.icon-play-volume::text').extract_first()
-            ele['like_count'] = article.css('.icon-like::text').extract_first()
+            ele['view_count'] = format_count(article.css('.icon-play-volume::text').extract_first())
+            ele['like_count'] = format_count(article.css('.icon-like::text').extract_first())
+            print(f"like_count: {article.css('.icon-like::text').extract_first()}")
             ele['role'] = article.css('.user-info .role::text').extract_first()
             yield ele
         else:
@@ -166,6 +167,16 @@ def format_desc(desc):
         return emoji.demojize(html.unescape(unquote(desc)))
     except:
         return desc
+
+def format_count(num):
+    try:
+        if 'w' in num:
+            return int(float(num.replace('w', '')) * 10000)
+        else:
+            return num
+    except:
+        traceback.print_exc()
+        return num
 
 
 if __name__ == '__main__':
