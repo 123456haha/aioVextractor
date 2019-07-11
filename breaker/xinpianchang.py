@@ -108,7 +108,6 @@ async def extract_user_pageing_api(ResText):
             ele['category'] = format_category(article.css('.new-cate .c_b_9 ::text').extract())
             ele['view_count'] = format_count(article.css('.icon-play-volume::text').extract_first())
             ele['like_count'] = format_count(article.css('.icon-like::text').extract_first())
-            print(f"like_count: {article.css('.icon-like::text').extract_first()}")
             ele['role'] = article.css('.user-info .role::text').extract_first()
             yield ele
         else:
