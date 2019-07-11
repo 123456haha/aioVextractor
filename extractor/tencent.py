@@ -3,6 +3,7 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
+from aioVextractor.utils.requests_retry import RequestRetry
 from aioVextractor.utils.exception import exception
 from aioVextractor.utils.user_agent import UserAgent
 from random import choice
@@ -19,33 +20,22 @@ import time
 import asyncio
 
 
-# import uvloop
-# uvloop.install()
 
 
-async def entrance(webpage_url, session, chance_left=config.RETRY):
+@RequestRetry
+async def entrance(webpage_url, session):
     result = dict()
-    try:
-        headers = {'authority': 'v.qq.com',
-                   'upgrade-insecure-requests': '1',
-                   'user-agent': choice(UserAgent),
-                   'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-                   'accept-encoding': 'gzip, deflate, br',
-                   'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
-        async with session.get(webpage_url, headers=headers) as response:
-            text = await response.text(encoding='utf8', errors='ignore')
-    except exception:
-        if chance_left != 1:
-            return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
-        else:
-            return False
-    except:
-        traceback.print_exc()
-        return False
-    else:
+    headers = {'authority': 'v.qq.com',
+               'upgrade-insecure-requests': '1',
+               'user-agent': choice(UserAgent),
+               'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+               'accept-encoding': 'gzip, deflate, br',
+               'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
+    async with session.get(webpage_url, headers=headers) as response:
+        text = await response.text(encoding='utf8', errors='ignore')
         try:
             selector = Selector(text=text)
-        except:
+        except TypeError:
             traceback.print_exc()
             return False
         result['webpage_url'] = webpage_url
@@ -124,7 +114,8 @@ def extract_category_from_COVER_INFO(COVER_INFO):
         return None
 
 
-async def extract_comment_count(selector, session, chance_left=config.RETRY):
+@RequestRetry
+async def extract_comment_count(selector, session):
     try:
         COVER_INFO = json.loads(selector.css('script').re_first('var COVER_INFO = (.*?)\svar COLUMN_INFO ='))
         commentId = jmespath.search('commentId.comment_id', COVER_INFO)
@@ -142,25 +133,13 @@ async def extract_comment_count(selector, session, chance_left=config.RETRY):
         params = {'source': '0',
                   'targetids': commentId}
         api = 'https://video.coral.qq.com/article/batchcommentnumv2'
-        try:
-            async with session.get(api, headers=headers, params=params) as response:
-                response_json = await response.json()
-        except exception:
-            if chance_left != 1:
-                return await extract_comment_count(selector=selector, session=session, chance_left=chance_left - 1)
-            else:
-                return False
-        except:
-            traceback.print_exc()
-            if chance_left != 1:
-                return await extract_comment_count(selector=selector, session=session, chance_left=chance_left - 1)
-            else:
-                return False
-        else:
+        async with session.get(api, headers=headers, params=params) as response:
+            response_json = await response.json()
             return jmespath.search('data[0].commentnum', response_json)
 
 
-async def extract_author_info(selector, session, chance_left=config.RETRY):
+@RequestRetry(default_exception_return={})
+async def extract_author_info(selector, session):
     user_page_url = selector.css('.video_user a::attr(href)').extract_first()
     if not user_page_url or user_page_url == 'javascript:':
         return {}
@@ -171,16 +150,9 @@ async def extract_author_info(selector, session, chance_left=config.RETRY):
                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                'Accept-Encoding': 'gzip, deflate',
                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
-    try:
-        async with session.get(user_page_url, headers=headers) as response:
-            text = await response.text(encoding='utf8', errors='ignore')
-            selector = Selector(text=text)
-    except exception:
-        if chance_left != 1:
-            return await extract_author_info(selector=selector, session=session, chance_left=chance_left - 1)
-        else:
-            return {}  ## return empty dict if the page cannot be requested right now
-    else:
+    async with session.get(user_page_url, headers=headers) as response:
+        text = await response.text(encoding='utf8', errors='ignore')
+        selector = Selector(text=text)
         result = dict()
         result['author'] = extract_author_name(selector=selector)
         result['author_url'] = user_page_url
@@ -304,7 +276,8 @@ def createGUID():
         position += 1
     return guid
 
-async def extract_by_api(url, session, chance_left=config.RETRY):
+@RequestRetry
+async def extract_by_api(url, session):
 
     extract_by_api_headers = {'Accept-Encoding': 'gzip, deflate',
                                          'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
@@ -313,23 +286,13 @@ async def extract_by_api(url, session, chance_left=config.RETRY):
                                          'Referer': 'http://v.ranks.xin/',
                                          'X-Requested-With': 'XMLHttpRequest'}
     params = {'url': url}
-    try:
-        api = 'http://v.ranks.xin/video-parse.php'
-        async with session.get(api, headers=extract_by_api_headers, params=params) as response:
-            response_json = await response.json()
-            play_addr = jmespath.search('data[0].url', response_json)
-            if not play_addr:
-                return False
-            result = {'play_addr': play_addr}
-    except exception:
-        if chance_left != 1:
-            return await extract_by_api(url=url, session=session, chance_left=chance_left - 1)
-        else:
+    api = 'http://v.ranks.xin/video-parse.php'
+    async with session.get(api, headers=extract_by_api_headers, params=params) as response:
+        response_json = await response.json()
+        play_addr = jmespath.search('data[0].url', response_json)
+        if not play_addr:
             return False
-    except:
-        traceback.print_exc()
-        return False
-    else:
+        result = {'play_addr': play_addr}
         return result
 
 

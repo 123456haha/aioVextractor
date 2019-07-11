@@ -5,13 +5,13 @@
 
 import jmespath
 import re
+from aioVextractor.utils.requests_retry import RequestRetry
 from aioVextractor.utils.user_agent import UserAgent
-from aioVextractor.utils.exception import exception
 from random import choice
-from aioVextractor import config
 import traceback
 
-async def entrance(webpage_url, session, chance_left=config.RETRY):
+@RequestRetry
+async def entrance(webpage_url, session):
     try:
         vid = re.compile('vid=([\d]*)').search(webpage_url)[1]
     except (IndexError, TypeError):
@@ -25,18 +25,8 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
 
         params = {'f': 'web'}
         response_url = 'https://baobab.kaiyanapp.com/api/v1/video/{}'.format(vid)
-        try:
-            async with session.get(response_url, headers=download_headers, params=params) as response:
-                response_json = await response.json()
-        except exception:
-            if chance_left != 1:
-                return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
-            else:
-                return False
-        except:
-            traceback.print_exc()
-            return False
-        else:
+        async with session.get(response_url, headers=download_headers, params=params) as response:
+            response_json = await response.json()
             return extract(response_json)
 
 def extract(response_json):

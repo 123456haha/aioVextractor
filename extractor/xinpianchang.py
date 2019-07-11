@@ -5,8 +5,8 @@
 
 
 import jmespath
-from aioVextractor.utils.user_agent import (UserAgent)
-from aioVextractor import config
+from aioVextractor.utils.user_agent import UserAgent
+from aioVextractor.utils.requests_retry import RequestRetry
 from random import choice
 from os.path import splitext
 from scrapy.selector import Selector
@@ -16,10 +16,10 @@ import emoji
 import dateutil.parser
 import traceback
 from urllib.parse import urlparse
-from aioVextractor.utils.exception import exception
 import os
 
-async def entrance(webpage_url, session, chance_left=config.RETRY):
+@RequestRetry
+async def entrance(webpage_url, session):
     headers = {'Connection': 'keep-alive',
                'Cache-Control': 'max-age=0',
                'Upgrade-Insecure-Requests': '1',
@@ -28,19 +28,8 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
                'Accept-Encoding': 'gzip, deflate',
                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
     params = {'from': 'ArticleList'}
-
-    try:
-        async with session.get(webpage_url, headers=headers, params=params) as response:
-            response_text = await response.text(encoding='utf8', errors='ignore')
-    except exception:
-        if chance_left != 1:
-            return await entrance(webpage_url, session, chance_left=chance_left - 1)
-        else:
-            return False
-    except:
-        traceback.print_exc()
-        return False
-    else:
+    async with session.get(webpage_url, headers=headers, params=params) as response:
+        response_text = await response.text(encoding='utf8', errors='ignore')
         webpage = await extract_publish(response=response_text)
         vid = webpage['vid']
         if not vid:
@@ -160,21 +149,15 @@ async def extract_publish(response):
     return result
 
 
-async def extract_video_info(referer, vid, session, chance_left=config.RETRY):
+@RequestRetry
+async def extract_video_info(referer, vid, session):
     headers = {'User-Agent': choice(UserAgent),
                'Referer': referer,
                'Origin': 'http://www.xinpianchang.com'}
     params = {'expand': 'resource,resource_origin?'}
     extract_video_info_url = f'https://openapi-vtom.vmovier.com/v3/video/{vid}'
-    try:
-        async with session.get(extract_video_info_url, headers=headers, params=params) as response:
-            response_json = await response.json()
-    except exception:
-        if chance_left != 1:
-            return await extract_video_info(referer=referer, vid=vid, session=session, chance_left=chance_left - 1)
-        else:
-            return False
-    else:
+    async with session.get(extract_video_info_url, headers=headers, params=params) as response:
+        response_json = await response.json()
         result = dict()
         try:
             play_addr = jmespath.search('max_by(data.resource.progressive, &filesize).https_url', response_json)
@@ -255,7 +238,7 @@ if __name__ == '__main__':
     async def test():
         async with aiohttp.ClientSession() as session_:
             return await entrance(
-                webpage_url="https://www.xinpianchang.com/u10009204?from=userList",
+                webpage_url="https://www.xinpianchang.com/a10475334?from=ArticleList",
                 session=session_)
 
 

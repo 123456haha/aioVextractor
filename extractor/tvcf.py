@@ -3,21 +3,20 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
+from aioVextractor.utils.requests_retry import RequestRetry
 from aioVextractor.utils.user_agent import UserAgent
-from aioVextractor import config
 import time
 from random import choice
 from scrapy.selector import Selector
 import os
 from urllib.parse import urlparse
-import traceback
 import jmespath
 import ujson as json
-from aioVextractor.utils.exception import exception
 import asyncio
 
 
-async def entrance(webpage_url, session, chance_left=config.RETRY):
+@RequestRetry
+async def entrance(webpage_url, session):
     if 'code' in webpage_url.lower():  ## old version http://www.tvcf.co.kr/YCf/V.asp?Code=A000363280
         ParseResult = urlparse(webpage_url)
         try:
@@ -32,18 +31,8 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
                        'Upgrade-Insecure-Requests': '1',
                        'Cache-Control': 'max-age=0'}
             params = {'Code': code}
-            try:
-                async with session.get('http://www.tvcf.co.kr/YCf/V.asp', headers=headers, params=params) as response:
-                    response_text = await response.text(encoding='utf8', errors='ignore')
-            except exception:
-                if chance_left != 1:
-                    return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
-                else:
-                    return False
-            except:
-                traceback.print_exc()
-                return False
-            else:
+            async with session.get('http://www.tvcf.co.kr/YCf/V.asp', headers=headers, params=params) as response:
+                response_text = await response.text(encoding='utf8', errors='ignore')
                 result = dict()
                 result['webpage_url'] = webpage_url
                 result = await extract_old(response_text, code, result=result)
@@ -62,21 +51,10 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
                        'Accept': 'application/json, text/plain, */*',
                        'Referer': webpage_url,  ## https://v.tvcf.co.kr/738572
                        'Connection': 'keep-alive'}
-            try:
-                api = f'https://play.tvcf.co.kr/rest/api/player/init/{idx}'
-                async with session.get(api, headers=headers) as r_code:
-                    response_text = await r_code.text()
-                    r_code_json = json.loads(response_text)
-            except exception:
-                traceback.print_exc()
-                if chance_left != 1:
-                    return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
-                else:
-                    return False
-            except ValueError:
-                traceback.print_exc()
-                return False
-            else:
+            api = f'https://play.tvcf.co.kr/rest/api/player/init/{idx}'
+            async with session.get(api, headers=headers) as r_code:
+                response_text = await r_code.text()
+                r_code_json = json.loads(response_text)
                 code = jmespath.search('video.code', r_code_json)
                 result['webpage_url'] = webpage_url
                 result['id'] = code
@@ -250,47 +228,37 @@ async def extract_new(session, result, idx):
 #     return ext.split('@')[0]
 
 
-async def get_tags(session, idx, chance_left=config.RETRY):
+@RequestRetry(default_exception_return=[], default_other_exception_return=[])
+async def get_tags(session, idx):
     headers = {
         'Authorization': 'Bearer null',
         'Accept-Encoding': 'gzip, deflate, br',
-        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
         'User-Agent': choice(UserAgent),
         'Accept': 'application/json, text/plain, */*',
-        'Referer': f'https://v.tvcf.co.kr/{idx}',
+        'Referer': f'https://play.tvcf.co.kr/{idx}',
+        'Connection': 'keep-alive',
     }
-    try:
-        async  with session.get(f'https://v.tvcf.co.kr/rest/api/player/tag/{idx}', headers=headers) as response:
-            response_json = await response.json()
-    except exception:
-        if chance_left != 1:
-            await get_tags(session=session, idx=idx, chance_left=chance_left - 1)
-        else:
-            return None
-    except:
-        return False
-    else:
+    async  with session.get(f'https://play.tvcf.co.kr/rest/api/player/tag/{idx}', headers=headers) as response:
+        response_text = await response.text()
+        response_json = json.loads(response_text)
         return response_json
 
 
-async def get_title(session, idx, chance_left=config.RETRY):
-    headers = {'Authorization': 'Bearer null',
-               'Accept-Encoding': 'gzip, deflate, br',
-               'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
-               'User-Agent': choice(UserAgent),
-               'Accept': 'application/json, text/plain, */*',
-               'Referer': f'https://v.tvcf.co.kr/{idx}'}
-    try:
-        async with session.get(f'https://v.tvcf.co.kr/rest/api/player/init2/{idx}', headers=headers) as response:
-            response_json = await response.json()
-    except exception:
-        if chance_left != 1:
-            await get_title(session=session, idx=idx, chance_left=chance_left - 1)
-        else:
-            return None
-    except:
-        return False
-    else:
+@RequestRetry(default_exception_return='', default_other_exception_return='')
+async def get_title(session, idx):
+    headers = {
+        'Authorization': 'Bearer null',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+        'User-Agent': choice(UserAgent),
+        'Accept': 'application/json, text/plain, */*',
+        'Referer': f'https://play.tvcf.co.kr/{idx}',
+        'Connection': 'keep-alive',
+    }
+    async with session.get(f'https://play.tvcf.co.kr/rest/api/player/init2/{idx}', headers=headers) as response:
+        response_text = await response.text()
+        response_json = json.loads(response_text)
         title = jmespath.search('search.list[0].[title, chapter]', response_json)
         try:
             title = ':'.join(title)
@@ -300,7 +268,8 @@ async def get_title(session, idx, chance_left=config.RETRY):
             return title
 
 
-async def get_commit_num(vid, session, chance_left=config.RETRY):
+@RequestRetry
+async def get_commit_num(vid, session):
     headers = {'Authorization': 'Bearer null',
                'Accept-Encoding': 'gzip, deflate, br',
                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
@@ -308,19 +277,9 @@ async def get_commit_num(vid, session, chance_left=config.RETRY):
                'Accept': 'application/json, text/plain, */*'}
     params = {'skip': '0',
               'take': '5'}
-    try:
-        url = f'https://play.tvcf.co.kr/rest/api/player/ReplyMore/{vid}'
-        async with session.get(url, headers=headers, params=params) as resp:
-            html = await resp.text(encoding='utf-8')
-    except exception:
-        if chance_left != 1:  ## retry when encounter network error
-            return await get_commit_num(vid=vid, session=session, chance_left=chance_left - 1)
-        else:
-            return False
-    except:
-        traceback.print_exc()
-        return False
-    else:
+    url = f'https://play.tvcf.co.kr/rest/api/player/ReplyMore/{vid}'
+    async with session.get(url, headers=headers, params=params) as resp:
+        html = await resp.text(encoding='utf-8')
         try:
             data = json.loads(html)
             return data.get('total', 0)

@@ -35,16 +35,3 @@ PLAYLIST_TEST_CASE = ['https://vimeo.com/alitasmitmedia',
 DEFAULT_CURSOR = 0
 DEFAULT_OFFSET = 10
 
-
-# BreakdownPlaylistArgs = {
-#     "nocheckcertificate": True,
-#     "ignoreerrors": True,
-#     "quiet": True,
-#     "nopart": True,
-#     # "download_archive": "record.txt",
-#     "no_warnings": True,
-#     "youtube_include_dash_manifest": False,
-#     'simulate': True
-# }
-
-# ALLOW_NETLOC_PLAYLIST = {urlsplit(url).netloc for url in PLAYLIST_TEST_CASE}

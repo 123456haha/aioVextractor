@@ -15,11 +15,7 @@ import aiohttp
 from aioVextractor import config
 from aioVextractor import distributor
 import re
-import youtube_dl
 import traceback
-from itertools import takewhile
-import jmespath
-# import hashlib
 from urllib.parse import urlsplit
 
 
@@ -117,66 +113,6 @@ async def is_playlist(webpage_url):
 
         else:
             pass
-
-
-
-
-
-
-async def breakdown_adsoftheworld(playlist_url, crawlist_id, page=0, Referer=None, chance_left=config.RETRY):
-    article_page_ids = []
-    try:
-        url = playlist_url
-        if page == 0:
-            params = None
-        else:
-            params = {"page": page}
-
-        headers = {
-            'Upgrade-Insecure-Requests': "1",
-            'User-Agent': choice(UserAgent),
-            'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
-            'Accept-Encoding': "gzip, deflate, br",
-            'Accept-Language': "zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7",
-            'cache-control': "no-cache"
-        }
-
-        if Referer:
-            headers['Referer'] = Referer
-        async with aiohttp.ClientSession() as session:
-            try:
-                async with session.get(url, headers=headers, params=params) as response:
-                    response_text = await response.text()
-            except (ServerDisconnectedError, ServerConnectionError, ClientConnectorError, TimeoutError,
-                    ServerTimeoutError, ContentTypeError, ClientConnectorCertificateError, ClientOSError):
-                if chance_left != 1:
-                    return await breakdown_adsoftheworld(playlist_url=playlist_url, crawlist_id=crawlist_id, page=page,
-                                                         Referer=Referer, chance_left=chance_left - 1)
-                else:
-                    return False
-            else:
-                selector = Selector(text=response_text)
-                article_page_ids = selector.css('article[about]::attr(about)').re(
-                    '/media/(?!print).*')  ## filter print ads
-                has_more = selector.css('a[title*="Go to next page"]::attr(href)').extract_first()
-                article_pages = list(
-                    map(lambda trailing_path: f"https://www.adsoftheworld.com{trailing_path}", article_page_ids))
-                if has_more:
-                    next_page = f"https://www.adsoftheworld.com{has_more}"
-                    return article_pages + await breakdown_adsoftheworld(playlist_url=next_page,
-                                                                         crawlist_id=crawlist_id,
-                                                                         page=page + 1,
-                                                                         Referer=playlist_url)
-                else:
-                    return article_pages
-    except RecursionError:
-        print(f'{crawlist_id} RecursionError occur in playlist_url: {playlist_url}\n'
-              f'{crawlist_id} format_exc(): {format_exc()}')
-        return article_page_ids if article_page_ids else False
-    except Exception as error:
-        print(f'{crawlist_id} Error occur: {error}\n'
-              f'{crawlist_id} format_exc(): {format_exc()}')
-        return False
 
 
 if __name__ == '__main__':

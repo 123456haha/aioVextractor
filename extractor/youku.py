@@ -4,19 +4,18 @@
 # IDE: PyCharm
 
 
-
 import traceback
 import time, json
-from aioVextractor import config
 import jmespath
 from scrapy import Selector
 import asyncio
+from aioVextractor.utils.requests_retry import RequestRetry
 from aioVextractor.utils.user_agent import UserAgent
 from random import choice
-from aioVextractor.utils.exception import exception
 
 
-async def entrance(webpage_url, session, chance_left=config.RETRY):
+@RequestRetry
+async def entrance(webpage_url, session):
     try:
         vid_ = webpage_url.split('?')[0].split('/')[-1].split('.')[0].replace('id_', '').replace('==', '')
         # vid_ = vid_.split('?')[0]
@@ -32,19 +31,9 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
                 "version": "1.0",
                 "_t": "006315043435963385"}
         yk_url = 'https://api.youku.com/players/custom.json?'
-        try:
-            async with session.get(yk_url, params=data, verify_ssl=False) as res:
-                html = await res.text(encoding='utf-8', errors='ignore')
-                customdata = json.loads(html.replace(data['callback'], '')[1:-2])
-        except exception:
-            if chance_left != 1:
-                return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
-            else:
-                return False
-        except:
-            traceback.print_exc()
-            return False
-        else:
+        async with session.get(yk_url, params=data, verify_ssl=False) as res:
+            html = await res.text(encoding='utf-8', errors='ignore')
+            customdata = json.loads(html.replace(data['callback'], '')[1:-2])
             try:
                 stealsign = customdata['stealsign']
             except:
@@ -63,51 +52,42 @@ async def entrance(webpage_url, session, chance_left=config.RETRY):
                 return {**gather_results[2], **result}
 
 
-async def extract_info(vid, sign, client_id, session, chance_left=config.RETRY):
-    try:
-        new_parm = {'vid': vid,
-                    'ccode': '0512',
-                    'client_ip': '192.168.1.1',
-                    'utid': 'lwF+FVFsUk4CAXF3uLWWBhbj',
-                    'client_ts': str(int(time.time())),
-                    'r': sign,
-                    'ckey': 'DIl58SLFxFNndSV1GFNnMQVYkx1PP5tKe1siZu/86PR1u/Wh1Ptd+WOZsHHWxysSfAOhNJpdVWsdVJNsfJ8Sxd8WKVvNfAS8aS8fAOzYARzPyPc3JvtnPHjTdKfESTdnuTW6ZPvk2pNDh4uFzotgdMEFkzQ5wZVXl2Pf1/Y6hLK0OnCNxBj3+nb0v72gZ6b0td+WOZsHHWxysSo/0y9D2K42SaB8Y/+aD2K42SaB8Y/+ahU+WOZsHcrxysooUeND',
-                    'site': '1',
-                    'wintype': 'BDskin',
-                    'p': '1',
-                    'fu': '0',
-                    'vs': '1.0',
-                    'rst': 'mp4',
-                    'dq': 'mp4',
-                    'os': 'win',
-                    'osv': '',
-                    'd': '0',
-                    'bt': 'pc',
-                    'aw': 'w',
-                    'needbf': '1',
-                    'atm': '',
-                    'partnerid': client_id,
-                    'callback': f'youkuPlayer_call_{str(int(time.time() * 1000))}',
-                    '_t': '08079273092687054'
-                    }
-        headers = {'Host': 'ups.youku.com',
-                   'Referer': f'https://player.youku.com/embed/XNDIxNTA1MjEwNA==?client_id={client_id}&password=&autoplay=false',
-                   'User-Agent': choice(UserAgent),
-                   }
-        api = 'https://ups.youku.com/ups/get.json?'
-        async with session.get(api, headers=headers, params=new_parm, verify_ssl=False) as response:
-            html = await response.text(encoding='utf-8', errors='ignore')
-            videodata = json.loads(html.replace(new_parm['callback'], '')[1:-1])
-    except exception:
-        if chance_left != 1:
-            return await extract_info(vid=vid, sign=sign, client_id=client_id, session=session,
-                                      chance_left=chance_left - 1)
-        else:
-            return {}
-    except:
-        traceback.print_exc()
-        return {}
-    else:
+@RequestRetry(default_exception_return={},
+              default_other_exception_return={})
+async def extract_info(vid, sign, client_id, session):
+    new_parm = {'vid': vid,
+                'ccode': '0512',
+                'client_ip': '192.168.1.1',
+                'utid': 'lwF+FVFsUk4CAXF3uLWWBhbj',
+                'client_ts': str(int(time.time())),
+                'r': sign,
+                'ckey': 'DIl58SLFxFNndSV1GFNnMQVYkx1PP5tKe1siZu/86PR1u/Wh1Ptd+WOZsHHWxysSfAOhNJpdVWsdVJNsfJ8Sxd8WKVvNfAS8aS8fAOzYARzPyPc3JvtnPHjTdKfESTdnuTW6ZPvk2pNDh4uFzotgdMEFkzQ5wZVXl2Pf1/Y6hLK0OnCNxBj3+nb0v72gZ6b0td+WOZsHHWxysSo/0y9D2K42SaB8Y/+aD2K42SaB8Y/+ahU+WOZsHcrxysooUeND',
+                'site': '1',
+                'wintype': 'BDskin',
+                'p': '1',
+                'fu': '0',
+                'vs': '1.0',
+                'rst': 'mp4',
+                'dq': 'mp4',
+                'os': 'win',
+                'osv': '',
+                'd': '0',
+                'bt': 'pc',
+                'aw': 'w',
+                'needbf': '1',
+                'atm': '',
+                'partnerid': client_id,
+                'callback': f'youkuPlayer_call_{str(int(time.time() * 1000))}',
+                '_t': '08079273092687054'
+                }
+    headers = {'Host': 'ups.youku.com',
+               'Referer': f'https://player.youku.com/embed/XNDIxNTA1MjEwNA==?client_id={client_id}&password=&autoplay=false',
+               'User-Agent': choice(UserAgent),
+               }
+    api = 'https://ups.youku.com/ups/get.json?'
+    async with session.get(api, headers=headers, params=new_parm, verify_ssl=False) as response:
+        html = await response.text(encoding='utf-8', errors='ignore')
+        videodata = json.loads(html.replace(new_parm['callback'], '')[1:-1])
         item = dict()
         item['play_addr'] = jmespath.search('data.stream[0].m3u8_url', videodata)
         item['duration'] = jmespath.search('data.video.seconds', videodata)
@@ -131,8 +111,9 @@ async def extract_info(vid, sign, client_id, session, chance_left=config.RETRY):
             item['cdn_url'] = jmespath.search('data.stream[-1].segs[].cdn_url', videodata)
         return item
 
-
-async def extract_comment_count(vid, session, chance_left=config.RETRY):
+@RequestRetry(default_exception_return={},
+              default_other_exception_return={})
+async def extract_comment_count(vid, session):
     headers = {
         'authority': 'p.comments.youku.com',
         'cache-control': 'max-age=0',
@@ -151,19 +132,9 @@ async def extract_comment_count(vid, session, chance_left=config.RETRY):
         ('time', '1558691658'),
     )
     api = 'https://p.comments.youku.com/ycp/comment/pc/commentList'
-    try:
-        async with session.get(api, headers=headers, params=params, verify_ssl=False) as response:
-            response_text = await response.text()
-            response_json = json.loads(response_text[len('  n_commentList('):-1])
-    except exception:
-        if chance_left != 1:
-            return await extract_comment_count(vid=vid, session=session, chance_left=chance_left - 1)
-        else:
-            return {}
-    except Exception:
-        traceback.print_exc()
-        return {}
-    else:
+    async with session.get(api, headers=headers, params=params, verify_ssl=False) as response:
+        response_text = await response.text()
+        response_json = json.loads(response_text[len('  n_commentList('):-1])
         return {'comment_count': jmespath.search('data.totalSize', response_json)}
 
 
@@ -193,7 +164,8 @@ async def extract_webpage(url, session):
             return {'category': category, "tag": tag, "description": description}
 
 
-async def request_youku_page(url, session, chance_left=config.RETRY):
+@RequestRetry
+async def request_youku_page(url, session):
     headers = {'authority': 'v.youku.com',
                'cache-control': 'max-age=0',
                'upgrade-insecure-requests': '1',
@@ -202,18 +174,8 @@ async def request_youku_page(url, session, chance_left=config.RETRY):
                'referer': 'https://www.youku.com/',
                'accept-encoding': 'gzip, deflate, br',
                'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8'}
-    try:
-        async with session.get(url, headers=headers) as response:
-            response_text = await response.text()
-    except exception:
-        if chance_left != 1:
-            return await request_youku_page(url=url, session=session, chance_left=chance_left - 1)
-        else:
-            return False
-    except:
-        traceback.print_exc()
-        return False
-    else:
+    async with session.get(url, headers=headers) as response:
+        response_text = await response.text()
         return response_text
 
 

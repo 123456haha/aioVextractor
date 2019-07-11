@@ -7,44 +7,34 @@
 import jmespath
 import time
 from urllib.parse import urlparse
-from asyncio import TimeoutError
 from aioVextractor import config
-import traceback
 import re
-from aioVextractor.utils.exception import exception
+from aioVextractor.utils.requests_retry import RequestRetry
 
 now = lambda: time.time()
 
 
-async def entrance(webpage_url, session, chance_left=config.RETRY):
+@RequestRetry
+async def entrance(webpage_url, session):
     try:
         webpage_url = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]| [! *(),] |(?: %[0-9a-fA-F][0-9a-fA-F]))+', webpage_url)[0]
     except IndexError:
         return False
     download_headers = {'Connection': 'keep-alive',
-                            'Upgrade-Insecure-Requests': '1',
-                            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
-                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-                            'Accept-Encoding': 'gzip, deflate',
-                            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
-    try:
-        async with session.get(webpage_url, headers=download_headers, allow_redirects=False) as response_getinfo:
-            Location = response_getinfo.headers['Location']
-    except exception:
-        if chance_left != 1:
-            return await entrance(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
-        else:
-            return False
-    except:
-        traceback.print_exc()
-        return False
-    else:
+                        'Upgrade-Insecure-Requests': '1',
+                        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+                        'Accept-Encoding': 'gzip, deflate',
+                        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
+    async with session.get(webpage_url, headers=download_headers, allow_redirects=False) as response_getinfo:
+        Location = response_getinfo.headers['Location']
         get_aweme_id = lambda L: urlparse(L).path.strip('/').split('/')[-1]
         aweme_id = get_aweme_id(Location)
         return extract(response_json=await aweme_detail(aweme_id=aweme_id,
                                                         session=session))
 
 
+@RequestRetry
 async def aweme_detail(aweme_id, session, chance_left=config.RETRY):
     """
     get all info of the video
@@ -82,22 +72,10 @@ async def aweme_detail(aweme_id, session, chance_left=config.RETRY):
                            ('_rticket', int(now() * 1000)),
                            ('ts', int(now())),
                            ('js_sdk_version', '1.6.4'))
-    try:
-        async with session.get(api,
-                               headers=aweme_detail_headers,
-                               params=aweme_detail_params) as response:
-            response_json = await response.json()
-    except exception:
-        if chance_left != 1:
-            return await aweme_detail(aweme_id=aweme_id,
-                                      session=session,
-                                      chance_left=chance_left - 1)
-        else:
-            return False
-    except:
-        traceback.print_exc()
-        return False
-    else:
+    async with session.get(api,
+                           headers=aweme_detail_headers,
+                           params=aweme_detail_params) as response:
+        response_json = await response.json()
         return jmespath.search('aweme_detail', response_json)
 
 

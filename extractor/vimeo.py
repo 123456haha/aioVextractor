@@ -6,16 +6,11 @@
 
 import traceback
 import asyncio
-
+from aioVextractor.utils.requests_retry import RequestRetry
 from aioVextractor. extractor import common
-from aioVextractor import config
 from aioVextractor.utils.user_agent import safari
 from random import choice
 from scrapy import Selector
-from aiohttp.client_exceptions import (ServerDisconnectedError, ServerConnectionError, ClientOSError,
-                                       ClientConnectorCertificateError, ServerTimeoutError, ContentTypeError,
-                                       ClientConnectorError, ClientPayloadError)
-
 
 async def entrance(webpage_url, session):
     try:
@@ -32,33 +27,20 @@ async def entrance(webpage_url, session):
         return False
 
 
-async def extract_author(webpage_url, session, chance_left=config.RETRY):
-    try:
-        headers = {
-            'Connection': 'keep-alive',
-            'Cache-Control': 'max-age=0',
-            'Upgrade-Insecure-Requests': '1',
-            'User-Agent': choice(safari),
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-            'Referer': 'https://vimeo.com/search?q=alita',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Accept-Language': 'zh-CN,zh;q=0.9',
-        }
-        async with session.get(webpage_url, headers=headers) as response:
-            text = await response.text(encoding='utf8', errors='ignore')
-    except (ServerDisconnectedError, ServerConnectionError, asyncio.TimeoutError,
-            ClientConnectorError, ClientPayloadError, ServerTimeoutError,
-            ContentTypeError, ClientConnectorCertificateError, ClientOSError):
-        if chance_left != 1:
-            return await extract_author(webpage_url=webpage_url,
-                                        session=session,
-                                        chance_left=chance_left - 1)
-        else:
-            return False
-    except:
-        traceback.print_exc()
-        return False
-    else:
+@RequestRetry
+async def extract_author(webpage_url, session):
+    headers = {
+        'Connection': 'keep-alive',
+        'Cache-Control': 'max-age=0',
+        'Upgrade-Insecure-Requests': '1',
+        'User-Agent': choice(safari),
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+        'Referer': 'https://vimeo.com/search?q=alita',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Language': 'zh-CN,zh;q=0.9',
+    }
+    async with session.get(webpage_url, headers=headers) as response:
+        text = await response.text(encoding='utf8', errors='ignore')
         regex = '"portrait":\{"src":".*?",\s*"src_2x":"(.*?)"\},'
         selector = Selector(text=text)
         try:
