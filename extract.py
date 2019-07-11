@@ -75,41 +75,48 @@ async def is_playlist(webpage_url):
     async for url_to_parse, netloc, path in janitor(webpage_url):
         if netloc == 'vimeo.com':
             if re.match('/channels/.*', path):  ## do not supported
-                continue
+                # continue
+                return None
                 # print(f'IS playlist: {url_to_parse}')
                 # yield url_to_parse, netloc, path
             elif re.match('/[\d*]', path):
-                continue
+                # continue
+                return None
             elif re.match('[/.*]', path):
                 print(f'IS playlist: {url_to_parse}')
-                yield url_to_parse, netloc, path
+                return url_to_parse, netloc, path
             else:
                 print(f"url_to_parse: {url_to_parse}\n"
                       f"is NOT valid playlist url\n")
-                continue
+                # continue
+                return None
         elif netloc == 'www.youtube.com':
             if re.match('/playlist', path):
                 print(f'IS playlist: {url_to_parse}')
-                yield url_to_parse, netloc, path
+                return url_to_parse, netloc, path
             elif re.match('/channel/', path):
                 print(f'IS playlist: {url_to_parse}')
-                yield url_to_parse, netloc, path
+                return url_to_parse, netloc, path
             elif re.match('/watch', path):
-                continue
+                # continue
+                return None
             else:
                 print(f"url_to_parse: {url_to_parse}\n"
                       f"is NOT valid playlist url\n")
-                continue
+                # continue
+                return None
         elif netloc == 'www.xinpianchang.com':
             if re.match('/u\d*', path):
                 print(f'IS playlist: {url_to_parse}')
-                yield url_to_parse, netloc, path
+                return url_to_parse, netloc, path
             elif re.match('/a\d*', path):
-                continue
+                # continue
+                return None
             else:
                 print(f"url_to_parse: {url_to_parse}\n"
                       f"is NOT valid playlist url\n")
-                continue
+                # continue
+                return None
 
         else:
             pass
