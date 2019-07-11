@@ -106,7 +106,7 @@ async def retrieve_user_pageing_api(webpage_url, page=1):
 async def extract_user_page(ResponseJson):
     clips = ResponseJson
     try:  ## extract info from json/dict
-        return jmespath.search('clips[].{"title": title, '
+        results = jmespath.search('clips[].{"title": title, '
                                '"cover": thumbnail.src_8x, '
                                '"duration": duration.raw, '
                                '"vid": clip_id, '
@@ -122,6 +122,11 @@ async def extract_user_page(ResponseJson):
     except TypeError:
         print(f"This clips cannot be extracted by breaker.vimeo.breakdown: {clips}")
         return []
+    else:
+        for ele in results:
+            ele['author_url'] = "https://vimeo.com" + ele['author_url']
+            ele['url'] = "https://vimeo.com" + ele['url']
+        return results
 
 
 # @RequestRetry
