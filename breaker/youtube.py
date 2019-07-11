@@ -241,8 +241,12 @@ async def extract_webpage(ResText, path='playlist'):
         yield None  ## None is returned
     else:
         try:
-            ytInitialData = json.loads(selector.css('script').re_first(
-                'window\["ytInitialData"\] = ({[\s|\S]*?});[\s|\S]*?window\["ytInitialPlayerResponse"\]'))
+            ytInitialData = json.loads(json.
+                                       loads(selector.
+                                             css('script').
+                                             re_first('window\["ytInitialData"] = JSON.parse\((.*?)\);')))
+            # ytInitialData = json.loads(selector.css('script').re_first(
+            #     'window\["ytInitialData"\] = ({[\s|\S]*?});[\s|\S]*?window\["ytInitialPlayerResponse"\]'))
         except TypeError:
             traceback.print_exc()
             yield None  ## None is returned

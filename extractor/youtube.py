@@ -6,11 +6,11 @@
 import jmespath
 import traceback
 import ujson as json
-from aioVextractor. extractor import common
-from aioVextractor import config
+from aioVextractor.extractor import common
 from scrapy import Selector
-from aioVextractor.utils.exception import exception
+from aioVextractor.utils.requests_retry import RequestRetry
 import asyncio
+
 
 async def entrance(webpage_url, session):
     try:
@@ -26,39 +26,42 @@ async def entrance(webpage_url, session):
         traceback.print_exc()
         return False
 
+@RequestRetry
+async def extract_author(webpage_url, session):
+    headers = {'authority': 'www.youtube.com',
+               'upgrade-insecure-requests': '1',
+               'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
+               'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+               'accept-encoding': 'gzip, deflate, br',
+               'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
+               }
 
-async def extract_author(webpage_url, session, chance_left=config.RETRY):
-    try:
-        headers = {
-            'authority': 'www.youtube.com',
-            'cache-control': 'max-age=0',
-            'upgrade-insecure-requests': '1',
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36',
-            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'zh-CN,zh;q=0.9',
-        }
-
-        async with session.get(webpage_url, headers=headers) as response:
-            text = await response.text(encoding='utf8', errors='ignore')
-    except exception:
-        if chance_left != 1:
-            return await extract_author(webpage_url=webpage_url, session=session, chance_left=chance_left - 1)
-        else:
-            return False
-    except:
-        traceback.print_exc()
-        return False
-    else:
-        regex = 'window\["ytInitialData"\] = (.*?});'
-        selector = Selector(text=text)
+    async with session.get(webpage_url, headers=headers) as response:
+        text = await response.text(encoding='utf8', errors='ignore')
         try:
-            ytInitialData = json.loads(selector.css('script').re_first(regex))
+            selector = Selector(text=text)
+            ytInitialData = json.loads(json.
+                                       loads(selector.
+                                             css('script').
+                                             re_first('window\["ytInitialData"] = JSON.parse\((.*?)\);')))
         except TypeError:
+            traceback.print_exc()
             return False
         else:
-            author_avatar = jmespath.search('contents.twoColumnWatchNextResults.results.results.contents[1].videoSecondaryInfoRenderer.owner.videoOwnerRenderer.thumbnail.thumbnails[-1].url', ytInitialData)
-        return {"author_avatar":author_avatar}
+            author_avatar = jmespath.search('contents.'
+                                            'twoColumnWatchNextResults.'
+                                            'results.'
+                                            'results.'
+                                            'contents[1].'
+                                            'videoSecondaryInfoRenderer.'
+                                            'owner.'
+                                            'videoOwnerRenderer.'
+                                            'thumbnail.'
+                                            'thumbnails[-1].'
+                                            'url',
+                ytInitialData)
+            author_avatar = 'http:' + author_avatar if (author_avatar.startswith('//') and author_avatar) else None
+        return {"author_avatar": author_avatar}
 
 
 if __name__ == '__main__':
@@ -68,7 +71,6 @@ if __name__ == '__main__':
 
     "https://www.youtube.com/watch?v=tofSaLB9kwE"
 
-
     #
     # def test():
     #     return entrance(
@@ -77,11 +79,15 @@ if __name__ == '__main__':
     #
     # pprint(test())
     #
+    "https://www.youtube.com/watch?v=tofSaLB9kwE"
+    "https://www.youtube.com/watch?v=pgN-vvVVxMA"
+    "https://www.youtube.com/watch?v=iAeYPfrXwk4"
+
 
     async def test():
         async with aiohttp.ClientSession() as session_:
             return await entrance(
-                webpage_url="https://www.youtube.com/watch?v=tofSaLB9kwE",
+                webpage_url="https://www.youtube.com/watch?v=iAeYPfrXwk4",
                 session=session_)
 
 
