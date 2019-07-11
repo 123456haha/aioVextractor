@@ -40,9 +40,11 @@ async def breakdown(webpage_url, cursor=0, offset=10):
         async for ele in breaker.youtube.breakdown(webpage_url=webpage_url):
             yield ele
     elif netloc == 'www.xinpianchang.com':
-        breaker.xinpianchang.breakdown(webpage_url=webpage_url,
-                                       cursor=cursor,
-                                       offset=offset)
+
+        async for ele in breaker.xinpianchang.breakdown(webpage_url=webpage_url,
+                                                        cursor=cursor,
+                                                        offset=offset):
+            yield ele
     else:
         pass
 
@@ -50,14 +52,15 @@ async def breakdown(webpage_url, cursor=0, offset=10):
 if __name__ == '__main__':
     "https://vimeo.com/plaidavenger"
     "https://www.youtube.com/channel/UCSRpCBq2xomj7Sz0od73jWw/videos"
+    "https://www.xinpianchang.com/u10002513?from=userList"
     res = []
 
 
     async def test():
-        async for ele in breakdown(webpage_url='https://vimeo.com/plaidavenger'):
+        async for ele in breakdown(webpage_url='https://www.xinpianchang.com/u10002513?from=userList'):
             print(ele)
             res.append(ele['vid'])
 
 
-    print(f"res: {res}")
     asyncio.run(test())
+    print(f"res: {res}")
