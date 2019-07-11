@@ -41,40 +41,25 @@ async def breakdown(webpage_url,
 
     api_step = 28
     # page = 1
-    results = []
+    # results = []
     clips_list = await asyncio.gather(*[retrieve_user_paging_api(webpage_url=webpage_url,
                                                                  page=page) for page in
                                         paging.pager(cursor=cursor, offset=offset, step=api_step)])
+    # print([page for page in paging.pager(cursor=cursor, offset=offset, step=api_step)])
     for clips in clips_list:
-        results += [ele async for ele in extract_user_pageing_api(ResText=clips)]
-        offset -= api_step
-        if offset <= 0:
-            yield results
-        else:
-            if jmespath.search('clips_meta.has_next', clips):
-                continue
-            else:
-                yield results
-    #
-    # webpage_content = await retrieve_user_paging_api(webpage_url=webpage_url, page=page)
-    # async for ele in takewhile(extract_user_pageing_api(ResText=webpage_content),
-    #                            lambda x: isinstance(x, (dict, int))):
-    #     if isinstance(ele, dict):
-    #         yield ele
-    #     elif isinstance(ele, tuple):
-    #         has_more = ele
-    #         while has_more:
-    #             page += 1
-    #             next_content = await retrieve_user_paging_api(webpage_url=webpage_url, page=page)
-    #             async for next_ele in extract_user_pageing_api(ResText=next_content):
-    #                 if isinstance(next_ele, dict):
-    #                     yield next_ele
-    #                 elif isinstance(next_ele, int):
-    #                     has_more = ele
-    #                     continue
-    #                 else:
-    #                     has_more = False
-    #                     break
+        # results += [ele async for ele in extract_user_pageing_api(ResText=clips)]
+        async for ele in takewhile(extract_user_pageing_api(ResText=clips), lambda x: isinstance(x, (dict, int))):
+            yield ele
+            # offset -= 1
+            # if offset <= 0:
+            #     break
+            # yield results
+        # else:
+        #     if jmespath.search('clips_meta.has_next', clips):
+        #         continue
+        #     else:
+        #         break
+        # yield results
 
 
 @RequestRetry
@@ -106,24 +91,28 @@ async def retrieve_user_paging_api(webpage_url, page=1):
 
 
 async def extract_user_pageing_api(ResText):
-    selector = Selector(text=ResText)
-    for article in selector.css("li[data-articleid]"):
-        ele = dict()
-        ele['vid'] = article.css('::attr(data-articleid)').extract_first()
-        ele['webpage_url'] = f"https://www.xinpianchang.com/a{ele['vid']}?from=UserProfile"
-        ele['cover'] = article.css('img[class*="lazy-img"]::attr(_src)').extract_first()
-        ele['upload_ts'] = format_upload_ts(article.css('.video-hover-con p[class*="fs_12"]::text').extract_first())
-        ele['duration'] = format_duration(article.css('.duration::text').extract_first())
-        ele['description'] = format_desc(article.css('.desc::text').extract_first())
-        ele['title'] = format_desc(article.css('.video-con-top p::text').extract_first())
-        ele['category'] = format_category(article.css('.new-cate .c_b_9 ::text').extract())
-        ele['view_count'] = article.css('.icon-play-volume::text').extract_first()
-        ele['like_count'] = article.css('.icon-like::text').extract_first()
-        ele['role'] = article.css('.user-info .role::text').extract_first()
-        yield ele
+    try:
+        selector = Selector(text=ResText)
+    except TypeError:
+        yield None
     else:
-        has_more = selector.css("li[data-more]::attr(data-more)").extract_first()
-        yield has_more
+        for article in selector.css("li[data-articleid]"):
+            ele = dict()
+            ele['vid'] = article.css('::attr(data-articleid)').extract_first()
+            ele['webpage_url'] = f"https://www.xinpianchang.com/a{ele['vid']}?from=UserProfile"
+            ele['cover'] = article.css('img[class*="lazy-img"]::attr(_src)').extract_first()
+            ele['upload_ts'] = format_upload_ts(article.css('.video-hover-con p[class*="fs_12"]::text').extract_first())
+            ele['duration'] = format_duration(article.css('.duration::text').extract_first())
+            ele['description'] = format_desc(article.css('.desc::text').extract_first())
+            ele['title'] = format_desc(article.css('.video-con-top p::text').extract_first())
+            ele['category'] = format_category(article.css('.new-cate .c_b_9 ::text').extract())
+            ele['view_count'] = article.css('.icon-play-volume::text').extract_first()
+            ele['like_count'] = article.css('.icon-like::text').extract_first()
+            ele['role'] = article.css('.user-info .role::text').extract_first()
+            yield ele
+        else:
+            has_more = selector.css("li[data-more]::attr(data-more)").extract_first()
+            yield has_more
 
 
 def format_duration(duration_str):
@@ -182,6 +171,7 @@ def format_desc(desc):
 if __name__ == '__main__':
     "https://www.xinpianchang.com/u10014261?from=userList"
     "https://www.xinpianchang.com/u10029931?from=userList"
+    "https://www.xinpianchang.com/u10002513?from=userList"
 
 
     # async def test():
@@ -190,7 +180,7 @@ if __name__ == '__main__':
     #         print(ele)
 
     async def test():
-        async for ele in breakdown("https://www.xinpianchang.com/u10029931?from=userList", 0, 29):
+        async for ele in breakdown("https://www.xinpianchang.com/u10002513?from=userList", 0, 29):
             print(ele)
 
 
