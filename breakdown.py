@@ -30,7 +30,7 @@ async def breakdown(webpage_url, cursor=0, offset=10):
     ParseResult = urlsplit(webpage_url)
     netloc = ParseResult.netloc
     # path = ParseResult.path
-    offset = math.ceil(float(offset / 10)) * 10  ## limit it to be the integer multiple of 10
+    offset = math.ceil(float(int(offset) / 10)) * 10  ## limit it to be the integer multiple of 10
     if netloc == 'vimeo.com':
         for ele in await breaker.vimeo.breakdown(webpage_url=webpage_url,
                                                  cursor=cursor,

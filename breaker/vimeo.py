@@ -33,7 +33,6 @@ async def breakdown(webpage_url,
               f"type(offset) = {type(offset)}"
               )
         return False
-
     if re.match('/channels/.*', path):  ## https://vimeo.com/channels/ceiga
         ## do not supported
         return []
