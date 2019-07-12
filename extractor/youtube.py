@@ -40,10 +40,14 @@ async def extract_author(webpage_url, session):
         text = await response.text(encoding='utf8', errors='ignore')
         try:
             selector = Selector(text=text)
-            ytInitialData = json.loads(json.
-                                       loads(selector.
-                                             css('script').
-                                             re_first('window\["ytInitialData"] = JSON.parse\((.*?)\);')))
+            try:
+                ytInitialData = json.loads(json.
+                                           loads(selector.
+                                                 css('script').
+                                                 re_first('window\["ytInitialData"] = JSON.parse\((.*?)\);')))
+            except TypeError:
+                ytInitialData = json.loads(selector.css('script').re_first(
+                    'window\["ytInitialData"\] = ({[\s|\S]*?});[\s|\S]*?window\["ytInitialPlayerResponse"\]'))
         except TypeError:
             traceback.print_exc()
             return False
