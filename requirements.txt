@@ -9,4 +9,4 @@ Scrapy==1.6.0
 ujson==1.35
 uvloop==0.12.2
 wrapt==1.11.2
-youtube-dl==2019.6.8
+youtube-dl
