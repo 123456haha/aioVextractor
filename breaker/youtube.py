@@ -291,7 +291,10 @@ async def extract_webpage(ResText, path='playlist'):
                             '}'
             results = jmespath.search(statement, ytInitialData)
             for ele in results:
-                ele['title'] = unquote(html.unescape(ele['title']))
+                try:
+                    ele['title'] = unquote(html.unescape(ele['title']))
+                except TypeError:
+                    pass
                 ele['webpage_url'] = 'https://www.youtube.com/' + ele['webpage_url']
                 yield ele
             else:
