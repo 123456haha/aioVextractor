@@ -42,7 +42,7 @@ async def janitor(webpage_url):
             url_list = re.findall(config.URL_REGEX, webpage_url)  ## find all url in the string
             # feed = []  ## ur to be parsed
             for num, url_to_parse in enumerate(url_list):
-                print(f"NUMBER {num} URL: {url_to_parse}\n"
+                print(f"NUMBER {num} URL: {url_to_parse}"
                       # f"IN webpage_url {webpage_url}"
                       )
                 ## construct necessary parms for identifying the url
@@ -51,6 +51,7 @@ async def janitor(webpage_url):
                 path = ParseResult.path
                 ## identifying the url
                 if netloc in config.ALLOW_NETLOC:  ## determine weather if the netloc of the url is in ALLOW_NETLOC
+                    print(f"NUMBER {num} URL: IS ALLOWED")
                     yield url_to_parse, netloc, path
                     # feed.append(execution(**kwargs))
                 else:
