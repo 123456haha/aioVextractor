@@ -57,7 +57,7 @@ async def entrance(webpage_url, session):
                 r_code_json = json.loads(response_text)
                 code = jmespath.search('video.code', r_code_json)
                 result['webpage_url'] = webpage_url
-                result['id'] = code
+                result['vid'] = code
                 result['cover'] = jmespath.search('video.cut', r_code_json)
                 result['title'] = jmespath.search('video.title', r_code_json)
                 result['description'] = jmespath.search('video.copy', r_code_json)
