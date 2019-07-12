@@ -61,6 +61,8 @@ async def janitor(webpage_url):
         else:
             print(f'The URL: {webpage_url} \n'
                   f'is NOT a string')
+    except GeneratorExit:
+        pass
     except:
         traceback.print_exc()
 
