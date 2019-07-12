@@ -170,7 +170,7 @@ def format_desc(desc):
 def format_count(num):
     try:
         if 'w' in num:
-            return int(float(num.replace('w', '')) * 10000)
+            return str(int(float(num.replace('w', '')) * 10000))
         else:
             return num
     except:
