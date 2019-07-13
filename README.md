@@ -34,7 +34,6 @@ print(res)
 
 PLAYLIST_TEST_CASE：
 1. 'https://vimeo.com/alitasmitmedia'
-2. 'https://vimeo.com/channels/ceiga'
 3. 'https://www.youtube.com/playlist?list=PLohYzz4btpaSt2T0rcfmF8wfQzuW_6JTv'
 4. 'https://www.youtube.com/channel/UC36FGmBEGfmOV2T5QVNI9ew'
 5. 'https://www.xinpianchang.com/u10539256?from=userList'
