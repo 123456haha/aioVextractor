@@ -3,6 +3,7 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 from . import *
+
 __all__ = [
     'bilibili',
     'common',
@@ -14,7 +15,7 @@ __all__ = [
     'xinpianchang',
     'youku',
     'youtube',
-           ]
+]
 
 FIELDS = ['品牌',
           '行业',
@@ -62,6 +63,44 @@ FIELDS_CONVERTED = ['author',
                     'avatar_path'
                     ]
 
+FIELD_HAVING = ['author',
+                'author_attention',
+                'author_avatar',
+                'author_birthday',
+                'author_description',
+                'author_follwer_count',
+                'author_follwing_count',
+                'author_gender',
+                'author_id',
+                'author_sign',
+                'author_url',
+                'author_videoNum',
+                'category',
+                'cdn_url',
+                'comment_count',
+                'cover',
+                'description',
+                'dislike_count',
+                'download_count',
+                'duration',
+                'forward_count',
+                'gender',
+                'height',
+                'language',
+                'like_count',
+                'play_addr',
+                'rating',
+                'region',
+                'share_count',
+                'tag',
+                'tags',
+                'title',
+                'upload_date',
+                'upload_ts',
+                'vid',
+                'view_count',
+                'webpage_url',
+                'width']
 
 if __name__ == '__main__':
     pass
