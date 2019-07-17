@@ -200,5 +200,5 @@ if __name__ == '__main__':
                 webpage_url="https://v.youku.com/v_show/id_XNDEyNDE5NzQ1Mg==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5NzQ1Mg%3D%3D",
                 session=session_)
 
-
-    pprint(asyncio.run(test()))
+    loop = asyncio.get_event_loop()
+    pprint(loop.run_until_complete(test()))

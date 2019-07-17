@@ -129,4 +129,6 @@ if __name__ == '__main__':
         async with aiohttp.ClientSession() as session_:
             return await entrance(webpage_url="#在抖音，记录美好生活#球球老婆怀孕之后就爱睡这个洗脸巢 睡姿也太可爱了8#猫 http://v.douyin.com/hd9sb3/ 复制此链接，打开【抖音短视频】，直接观看视频！",
                                   session=session_)
-    pprint(asyncio.run(test()))
+
+    loop = asyncio.get_event_loop()
+    pprint(loop.run_until_complete(test()))

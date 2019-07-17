@@ -114,5 +114,6 @@ if __name__ == '__main__':
                 webpage_url="https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4",
                 session=session_)
 
+    loop = asyncio.get_event_loop()
+    pprint(loop.run_until_complete(test()))
 
-    pprint(asyncio.run(test()))

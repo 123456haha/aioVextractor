@@ -308,4 +308,6 @@ if __name__ == '__main__':
         async with aiohttp.ClientSession() as session_:
             return await entrance(webpage_url="https://v.qq.com/x/cover/bzfkv5se8qaqel2.html",
                                   session=session_)
-    pprint(asyncio.run(test()))
+
+    loop = asyncio.get_event_loop()
+    pprint(loop.run_until_complete(test()))

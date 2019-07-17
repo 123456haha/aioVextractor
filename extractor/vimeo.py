@@ -77,4 +77,5 @@ if __name__ == '__main__':
                 session=session_)
 
 
-    pprint(asyncio.run(test()))
+    loop = asyncio.get_event_loop()
+    pprint(loop.run_until_complete(test()))
