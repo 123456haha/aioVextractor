@@ -146,7 +146,7 @@ async def entrance(webpage_url, session):
 async def extract_old(response, code, result):
     selector = Selector(text=response)
     title = selector.css('.player_title::text').extract_first()
-    result['id'] = code
+    result['vid'] = code
     result['comment_count'] = selector.css('#replyAreaTab span span::text').extract_first()
     result['cover'] = selector.css('.hidden link::attr(href)').extract_first()
     create_time = selector.css('.onair::text').extract_first()
