@@ -9,7 +9,7 @@ I may need specific headers to play the video
 import jmespath
 import traceback
 import ujson as json
-from aioVextractor. extractor import common
+from aioVextractor.extractor import common
 from aioVextractor.utils.user_agent import (UserAgent, android)
 from random import choice
 import os
@@ -17,6 +17,7 @@ import re
 from aioVextractor.utils.requests_retry import RequestRetry
 from aioVextractor.utils.MergeDict import merge_dicts
 import asyncio
+
 
 async def entrance(webpage_url, session):
     try:
@@ -59,13 +60,14 @@ async def extract_video(result, user_agent, session):
             jsondata = json.loads(jsonstr)
             if user_agent in android:
                 play_addr = jmespath.search('reduxAsyncConnect.videoInfo.initUrl', jsondata)
-                result['play_addr'] =  os.path.join('http://', play_addr[2:]) if play_addr.startswith('//') else play_addr
-                result['dislike_count'] =  jmespath.search('reduxAsyncConnect.videoInfo.stat.dislike', jsondata)
-                result['collect_count'] =  jmespath.search('reduxAsyncConnect.videoInfo.stat.like', jsondata)
-                result['like_count'] =  jmespath.search('reduxAsyncConnect.videoInfo.stat.like', jsondata)
-                result['share_count'] =  jmespath.search('reduxAsyncConnect.videoInfo.stat.share', jsondata)
-                result['view_count'] =  jmespath.search('reduxAsyncConnect.videoInfo.stat.view', jsondata)
-                result['category'] =  jmespath.search('reduxAsyncConnect.videoInfo.toptype', jsondata)
+                result['play_addr'] = os.path.join('http://', play_addr[2:]) if play_addr.startswith(
+                    '//') else play_addr
+                result['dislike_count'] = jmespath.search('reduxAsyncConnect.videoInfo.stat.dislike', jsondata)
+                result['collect_count'] = jmespath.search('reduxAsyncConnect.videoInfo.stat.like', jsondata)
+                result['like_count'] = jmespath.search('reduxAsyncConnect.videoInfo.stat.like', jsondata)
+                result['share_count'] = jmespath.search('reduxAsyncConnect.videoInfo.stat.share', jsondata)
+                result['view_count'] = jmespath.search('reduxAsyncConnect.videoInfo.stat.view', jsondata)
+                result['category'] = jmespath.search('reduxAsyncConnect.videoInfo.toptype', jsondata)
             elif user_agent in user_agent:
                 result['comment_count'] = jmespath.search('comment.count', jsondata)
                 result['tag'] = jmespath.search('tags[].tag_name', jsondata)
