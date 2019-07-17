@@ -162,9 +162,10 @@ if __name__ == '__main__':
     async def test():
         async with aiohttp.ClientSession() as session_:
             for iiii in PLAYLIST_TEST_CASE:
-                async for result in is_playlist(webpage_url=iiii):
-                    print(f"result:{result}")
-                    print('\n')
+                result = await is_playlist(webpage_url=iiii)
+                # async for result in is_playlist(webpage_url=iiii):
+                print(f"result:{result}")
+                print('\n')
 
 
     asyncio.run(test())
