@@ -179,7 +179,7 @@ async def extract_youtube_pageing_api(ResJson, path='playlist'):
 
     for ele in results:
         ele['title'] = emoji.demojize(unquote(html.unescape(ele['title'])))
-        ele['webpage_url'] = 'https://www.youtube.com/' + ele['webpage_url']
+        ele['webpage_url'] = 'https://www.youtube.com' + ele['webpage_url']
         ele['view_count'] = ele['view_count'].replace(',', '').replace(' 次观看', '') if ele['view_count'] else None
         yield ele
     else:
@@ -295,7 +295,7 @@ async def extract_webpage(ResText, path='playlist'):
                     ele['title'] = unquote(html.unescape(ele['title']))
                 except TypeError:
                     pass
-                ele['webpage_url'] = 'https://www.youtube.com/' + ele['webpage_url']
+                ele['webpage_url'] = 'https://www.youtube.com' + ele['webpage_url']
                 yield ele
             else:
                 if path == 'playlist':
