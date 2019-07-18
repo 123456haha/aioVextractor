@@ -272,6 +272,7 @@ async def extract_webpage(ResText, path='playlist'):
                             '"title": title.simpleText, ' \
                             '"webpage_url": navigationEndpoint.commandMetadata.webCommandMetadata.url ' \
                             '}'
+                results = jmespath.search(statement, ytInitialData)
             else:  ## path == 'channel':
                 statement = 'contents.' \
                             'twoColumnBrowseResultsRenderer.' \
@@ -289,7 +290,28 @@ async def extract_webpage(ResText, path='playlist'):
                             '"title": title.simpleText, ' \
                             '"webpage_url": navigationEndpoint.commandMetadata.webCommandMetadata.url ' \
                             '}'
-            results = jmespath.search(statement, ytInitialData)
+                results = jmespath.search(statement, ytInitialData)
+                if results is None:
+                    statement = 'contents.' \
+                                'twoColumnBrowseResultsRenderer.' \
+                                'tabs[0].' \
+                                'tabRenderer.' \
+                                'content.' \
+                                'sectionListRenderer.' \
+                                'contents[0].' \
+                                'itemSectionRenderer.' \
+                                'contents[0].' \
+                                'shelfRenderer.' \
+                                'content.' \
+                                'horizontalListRenderer.' \
+                                'items[].gridVideoRenderer.{' \
+                                '"vid": videoId, ' \
+                                '"cover": thumbnail.thumbnails[-1].url, ' \
+                                '"title": title.simpleText, ' \
+                                '"webpage_url": navigationEndpoint.commandMetadata.webCommandMetadata.url ' \
+                                '}'
+                    results = jmespath.search(statement, ytInitialData)
+            print(f"ytInitialData: {ytInitialData}")
             for ele in results:
                 try:
                     ele['title'] = unquote(html.unescape(ele['title']))
@@ -326,6 +348,24 @@ async def extract_webpage(ResText, path='playlist'):
                                 'continuations[0].' \
                                 'nextContinuationData.' \
                                 '[continuation, clickTrackingParams]'
+                    result = jmespath.search(statement, ytInitialData)
+                    if results is None:
+                        statement = 'contents.' \
+                                    'twoColumnBrowseResultsRenderer.' \
+                                    'tabs[0].' \
+                                    'tabRenderer.' \
+                                    'content.' \
+                                    'sectionListRenderer.' \
+                                    'contents[0].' \
+                                    'itemSectionRenderer.' \
+                                    'contents[0].' \
+                                    'shelfRenderer.' \
+                                    'content.' \
+                                    'horizontalListRenderer.' \
+                                    'continuations[0].' \
+                                    'nextContinuationData.' \
+                                    '[continuation, clickTrackingParams]'
+
                 try:
                     continuation, clickTrackingParams = jmespath.search(statement, ytInitialData)
                 except TypeError:  ## cannot unpack non-iterable NoneType object\
