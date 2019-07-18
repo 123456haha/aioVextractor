@@ -31,6 +31,7 @@ async def entrance(webpage_url, session):
 
 def extract(response_json):
     result = dict()
+    result['from'] = "开眼"
     result['title'] = jmespath.search('title', response_json)
     result['author'] = jmespath.search('author.name', response_json)
     result['author_description'] = jmespath.search('author.description', response_json)
