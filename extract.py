@@ -167,5 +167,5 @@ if __name__ == '__main__':
                 print(f"result:{result}")
                 print('\n')
 
-
-    asyncio.run(test())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(test())
