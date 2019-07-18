@@ -9,6 +9,7 @@ import traceback
 import time
 from urllib.parse import (parse_qs, urlparse)
 
+
 async def extract_info(webpage_url):
     args = {"nocheckcertificate": True,
             "ignoreerrors": True,
@@ -91,13 +92,19 @@ def check_cover(cover):
     else:
         return cover
 
+
 def extract_play_addr(VideoJson):
     video_list = jmespath.search('formats[]', VideoJson)
     try:
         try:
-            return sorted(filter(lambda x:x.get('protocol', '')  in {'https', 'http'}, video_list), key=lambda x:x['filesize'])[-1]
+            # return sorted(filter(lambda x:x.get('protocol', '')  in {'https', 'http'}, video_list), key=lambda x:x['filesize'])[-1]
+            return sorted(filter(
+                lambda x: (x.get('protocol', '') in {'https', 'http'}) and x.get('acodec') != 'none' and x.get(
+                    'vcodec') != 'none', video_list), key=lambda x: x['filesize'])[-1]
         except KeyError:
-            return sorted(filter(lambda x:x.get('protocol', '')  in {'https', 'http'}, video_list), key=lambda x:x['height'])[-1]
+            return sorted(filter(
+                lambda x: x.get('protocol', '') in {'https', 'http'} and x.get('acodec') != 'none' and x.get(
+                    'vcodec') != 'none', video_list), key=lambda x: x['height'])[-1]
         except IndexError:
             return jmespath.search('formats[-1]', VideoJson)
     except:

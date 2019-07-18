@@ -95,7 +95,7 @@ if __name__ == '__main__':
     async def test():
         async with aiohttp.ClientSession() as session_:
             return await entrance(
-                webpage_url="https://www.youtube.com/watch?v=iAeYPfrXwk4",
+                webpage_url="https://www.youtube.com/watch?v=DfG6VKnjrVw",
                 session=session_)
 
 
