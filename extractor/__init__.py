@@ -15,6 +15,7 @@ __all__ = [
     'xinpianchang',
     'youku',
     'youtube',
+    'FIELD_HAVING',
 ]
 
 FIELDS = ['品牌',
@@ -84,6 +85,7 @@ FIELD_HAVING = ['author',
                 'download_count',
                 'duration',
                 'forward_count',
+                'from',
                 'gender',
                 'height',
                 'language',

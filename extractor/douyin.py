@@ -87,6 +87,7 @@ def extract(response_json):
         return False
     else:
         result = dict()
+        result['from'] = "抖音"
         result['author'] = jmespath.search('author.nickname', response_json)
         result['author_avatar'] = jmespath.search('author.avatar_larger.url_list[0]', response_json)
         result['author_description'] = jmespath.search('author.signature', response_json)

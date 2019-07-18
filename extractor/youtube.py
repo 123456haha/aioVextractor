@@ -65,7 +65,9 @@ async def extract_author(webpage_url, session):
                                             'url',
                 ytInitialData)
             author_avatar = 'http:' + author_avatar if (author_avatar.startswith('//') and author_avatar) else None
-        return {"author_avatar": author_avatar}
+        return {"author_avatar": author_avatar,
+                'from' : "youtube"
+        }
 
 
 if __name__ == '__main__':

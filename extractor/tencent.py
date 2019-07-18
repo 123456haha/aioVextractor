@@ -54,6 +54,7 @@ async def entrance(webpage_url, session):
             except AttributeError:
                 result['title'] = selector.css('.player_title a::text').extract_first()
             tags = selector.css("head meta[name*='keywords']::attr(content)").extract_first()
+            result['from'] = "腾讯视频"
             result['description'] = selector.css("._video_summary::text").extract_first()
             result['tags'] = tags.split(',') if tags else None
             category = selector.css('.site_channel .channel_nav[class~="current"]::text').extract()
