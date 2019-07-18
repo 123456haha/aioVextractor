@@ -35,6 +35,7 @@ async def entrance(webpage_url, session):
                 response_text = await response.text(encoding='utf8', errors='ignore')
                 result = dict()
                 result['webpage_url'] = webpage_url
+                result['from'] = "tvcf"
                 result = await extract_old(response_text, code, result=result)
                 return result
     else:  ## new version https://v.tvcf.co.kr/728764

@@ -145,12 +145,12 @@ if __name__ == '__main__':
     ]
     #
     #
-    # async def test():
-    #     async with aiohttp.ClientSession() as session_:
-    #         for iiii in TEST_CASE:
-    #             result = await extract(webpage_url=iiii, session=session_)
-    #             print(result)
-    #             print('\n')
+    async def test():
+        async with aiohttp.ClientSession() as session_:
+            for iiii in TEST_CASE:
+                result = await extract(webpage_url=iiii, session=session_)
+                print(result)
+                print('\n')
     PLAYLIST_TEST_CASE = ['https://vimeo.com/alitasmitmedia',
                           'https://vimeo.com/channels/ceiga',
                           'https://www.youtube.com/playlist?list=PLohYzz4btpaSt2T0rcfmF8wfQzuW_6JTv',
@@ -159,13 +159,13 @@ if __name__ == '__main__':
                           ]
 
 
-    async def test():
-        async with aiohttp.ClientSession() as session_:
-            for iiii in PLAYLIST_TEST_CASE:
-                result = await is_playlist(webpage_url=iiii)
-                # async for result in is_playlist(webpage_url=iiii):
-                print(f"result:{result}")
-                print('\n')
+    # async def test():
+    #     async with aiohttp.ClientSession() as session_:
+    #         for iiii in PLAYLIST_TEST_CASE:
+    #             result = await is_playlist(webpage_url=iiii)
+    #             # async for result in is_playlist(webpage_url=iiii):
+    #             print(f"result:{result}")
+    #             print('\n')
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(test())
