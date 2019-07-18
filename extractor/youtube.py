@@ -13,6 +13,7 @@ import asyncio
 
 
 async def entrance(webpage_url, session):
+    webpage_url = webpage_url.split('&')[0]
     try:
         gather_results = await asyncio.gather(*[
             common.extract_info(webpage_url=webpage_url),
