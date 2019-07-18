@@ -44,7 +44,7 @@ def extract(response_json):
     result['duration'] = jmespath.search('duration', response_json)
     result['vid'] = jmespath.search('id', response_json)
     result['play_addr'] = jmespath.search('max_by(playInfo, &height).url', response_json)
-    result['tags'] = jmespath.search('tags[*].name', response_json)
+    result['tag'] = jmespath.search('tags[*].name', response_json)
     result['cover'] = jmespath.search('coverForFeed', response_json)
     return result
 

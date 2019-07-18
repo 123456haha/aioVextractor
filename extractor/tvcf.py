@@ -155,7 +155,7 @@ async def extract_old(response, code, result):
     result['upload_ts'] = int(time.mktime(time.strptime(create_time, '%Y-%m-%d'))) if create_time else None
     result['rating'] = selector.css('#scoreArea strong').re_first("\d{1,5}")
     result['title'] = title.strip() if title else title
-    result['tags'] = selector.css('.tag::text').extract()
+    result['tag'] = selector.css('.tag::text').extract()
     try:
         fn = os.path.split(result['cover'])[-1].split('.')[0]
     except TypeError:
@@ -176,7 +176,7 @@ async def extract_new(session, result, idx):
     :param idx:
     :return:
     """
-    result['title'], result['tags'] = await asyncio.gather(*[get_title(session=session, idx=idx),
+    result['title'], result['tag'] = await asyncio.gather(*[get_title(session=session, idx=idx),
                                                              get_tags(session=session, idx=idx)])
     return result
 

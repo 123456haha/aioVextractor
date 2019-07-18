@@ -56,7 +56,7 @@ async def entrance(webpage_url, session):
             tags = selector.css("head meta[name*='keywords']::attr(content)").extract_first()
             result['from'] = "腾讯视频"
             result['description'] = selector.css("._video_summary::text").extract_first()
-            result['tags'] = tags.split(',') if tags else None
+            result['tag'] = tags.split(',') if tags else None
             category = selector.css('.site_channel .channel_nav[class~="current"]::text').extract()
             result['category'] = ','.join(category) if category else None
             result['cover'] = 'http://vpic.video.qq.com/0/{vid}.png'.format(vid=vid)

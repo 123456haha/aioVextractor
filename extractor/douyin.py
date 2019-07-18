@@ -105,7 +105,7 @@ def extract(response_json):
         result['title'] = jmespath.search('desc', response_json)
         result['vid'] = jmespath.search('aweme_id', response_json)
         result['cover'] = jmespath.search('video.cover.url_list[0]', response_json)
-        result['tags'] = jmespath.search('text_extra[].hashtag_name', response_json)
+        result['tag'] = jmespath.search('text_extra[].hashtag_name', response_json)
         result['language'] = jmespath.search('desc_language', response_json)
         result['region'] = jmespath.search('region', response_json)
         result['upload_ts'] = jmespath.search('create_time', response_json)
