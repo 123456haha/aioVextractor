@@ -5,34 +5,17 @@
 
 import asyncio
 import aiohttp
-from aioVextractor import config
 from aioVextractor.utils.requests_retry import RequestRetry
 from aioVextractor.utils.user_agent import UserAgent
 from random import choice
 from urllib.parse import urlsplit
 import jmespath
-from aioVextractor.utils import paging
 import re
 
 
-async def breakdown(webpage_url,
-                    cursor=config.DEFAULT_CURSOR,
-                    offset=config.DEFAULT_OFFSET):
-    """
-    cursor is the current place of the video
-    offset can only be the integer multiple of 10
-    :return: list of title and cover
-    """
+async def breakdown(webpage_url, page = 1, params=None):
     ParseResult = urlsplit(webpage_url)
     path = ParseResult.path
-    if all([isinstance(ele, int) for ele in [cursor, offset]]):
-        pass
-    else:
-        print(f"The Type of cursor/offset is not integer: \n"
-              f"type(cursor) = {type(cursor)}\n"
-              f"type(offset) = {type(offset)}"
-              )
-        return False
     if re.match('/channels/.*', path):  ## https://vimeo.com/channels/ceiga
         ## do not supported
         return []
@@ -56,23 +39,12 @@ async def breakdown(webpage_url,
     elif re.match('/[\d*]', path):  ## https://vimeo.com/281493330  ## this is single
         return []
     elif re.match('[/.*]', path):  ## https://vimeo.com/alitasmitmedia
-        api_step = 10
-        results = []
-        # offset = math.ceil(float(offset / 10)) * 10  ## limit it to be the integer multiple of 10
         while True:
-            clips_list = await asyncio.gather(*[retrieve_user_pageing_api(webpage_url=webpage_url,
-                                                                          page=page) for page in
-                                                paging.pager(cursor=cursor, offset=offset, step=api_step)])
+            clips_list = await asyncio.gather(*[retrieve_user_pageing_api(webpage_url=webpage_url, page=page)])
             for clips in clips_list:
-                results += await extract_user_page(ResponseJson=clips)
-                offset -= api_step
-                if offset <= 0:
-                    return results
-                else:
-                    if jmespath.search('clips_meta.has_next', clips):
-                        continue
-                    else:
-                        return results
+                results = await extract_user_page(ResponseJson=clips)
+                has_next = jmespath.search('clips_meta.has_next', clips)
+                return results, has_next, {}
     else:
         print(f"webpage_url: {webpage_url}\n"
               f"does NOT MATCH any vimeo playlist pattern!")
@@ -165,10 +137,8 @@ async def extract_user_page(ResponseJson):
 if __name__ == '__main__':
     # print(asyncio.run(retrieve_user_page("https://vimeo.com/alitasmitmedia", 1)))
     from pprint import pprint
-
-    # _ = asyncio.run(breakdown("https://vimeo.com/alitasmitmedia", offset=30))
-    _ = asyncio.run(breakdown("https://vimeo.com/plaidavenger", cursor=10, offset=8))
-    # _ = asyncio.run(retrieve_channel_page("https://vimeo.com/channels/ceiga/page:1"))
-    # _ = asyncio.run(retrieve_channel_page("https://vimeo.com/channels/revengepromos"))
+    loop = asyncio.get_event_loop()
+    _ = loop.run_until_complete(breakdown(webpage_url='https://vimeo.com/hellounion', page=1))
     pprint(_)
-    print(len(_))
+    print(sorted(jmespath.search('[0][].vid', list(_))))
+    print(len(_[0]))
