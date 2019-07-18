@@ -349,7 +349,7 @@ async def extract_webpage(ResText, path='playlist'):
                                 'nextContinuationData.' \
                                 '[continuation, clickTrackingParams]'
                     result = jmespath.search(statement, ytInitialData)
-                    if results is None:
+                    if result is None:
                         statement = 'contents.' \
                                     'twoColumnBrowseResultsRenderer.' \
                                     'tabs[0].' \
