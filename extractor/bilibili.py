@@ -62,7 +62,6 @@ async def extract_video(result, user_agent, session):
                 play_addr = jmespath.search('reduxAsyncConnect.videoInfo.initUrl', jsondata)
                 result['play_addr'] = os.path.join('http://', play_addr[2:]) if play_addr.startswith(
                     '//') else play_addr
-                result['from'] = "bilibili"
                 result['dislike_count'] = jmespath.search('reduxAsyncConnect.videoInfo.stat.dislike', jsondata)
                 result['collect_count'] = jmespath.search('reduxAsyncConnect.videoInfo.stat.like', jsondata)
                 result['like_count'] = jmespath.search('reduxAsyncConnect.videoInfo.stat.like', jsondata)
@@ -86,6 +85,7 @@ async def extract_video(result, user_agent, session):
                 result['description'] = jmespath.search('videoData.desc', jsondata)
                 result['duration'] = jmespath.search('videoData.duration', jsondata)
                 result['title'] = jmespath.search('videoData.title', jsondata)
+            result['from'] = "bilibili"
             return result
         except:
             traceback.print_exc()
