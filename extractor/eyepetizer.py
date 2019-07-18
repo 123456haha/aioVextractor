@@ -27,7 +27,7 @@ async def entrance(webpage_url, session):
         response_url = 'https://baobab.kaiyanapp.com/api/v1/video/{}'.format(vid)
         async with session.get(response_url, headers=download_headers, params=params) as response:
             response_json = await response.json()
-            return extract(response_json)
+            return {**extract(response_json), **{"webpage_url", webpage_url}}
 
 def extract(response_json):
     result = dict()
