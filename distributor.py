@@ -13,11 +13,13 @@ from aioVextractor.extractor import (bilibili,
                                      vimeo,
                                      xinpianchang,
                                      youku,
-                                     youtube)
+                                     youtube,
+                                     tvcbook)
 
 
 async def distribute(webpage_url, netloc, path, session):
     try:
+        print("netloc", netloc)
         if netloc == 'www.bilibili.com':
             if '/video' in path:
                 return await bilibili.entrance(webpage_url=webpage_url, session=session)
@@ -45,6 +47,9 @@ async def distribute(webpage_url, netloc, path, session):
         elif netloc == 'www.youtube.com':
             if constrain(path, '/watch'):
                 return await youtube.entrance(webpage_url=webpage_url, session=session)
+        elif "www.tvcbook.com" == netloc:
+            res = await tvcbook.entrance(webpage_url=webpage_url, session=session)
+            return res
         else:
             print(f'URL is not SUPPORTED {webpage_url}')
             return None

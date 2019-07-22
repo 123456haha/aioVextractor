@@ -16,6 +16,7 @@ __all__ = [
     'youku',
     'youtube',
     'FIELD_HAVING',
+    "tvcbook",
 ]
 
 FIELDS = ['品牌',

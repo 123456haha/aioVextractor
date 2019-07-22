@@ -170,7 +170,7 @@ if __name__ == '__main__':
     "https://www.xinpianchang.com/u10014261?from=userList"
     "https://www.xinpianchang.com/u10029931?from=userList"
     "https://www.xinpianchang.com/u10002513?from=userList"
-    from pprint import pprint
+
 
     # async def test():
     #     res = await retrieve_user_paging_api("https://www.xinpianchang.com/u10029931?from=userList")
@@ -178,11 +178,9 @@ if __name__ == '__main__':
     #         print(ele)
 
     async def test():
-        return await breakdown("https://www.xinpianchang.com/u10002513?from=userList", page=2)
+        return await breakdown("https://www.xinpianchang.com/u10002513?from=userList", page=1)
 
     loop = asyncio.get_event_loop()
-    _ = loop.run_until_complete(test())
-
-    pprint(_)
-    print(sorted(jmespath.search('[0][].vid', list(_))))
-    print(len(_[0]))
+    _res = loop.run_until_complete(test())
+    from pprint import pprint
+    pprint(_res)
