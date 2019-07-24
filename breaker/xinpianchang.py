@@ -21,35 +21,21 @@ from scrapy import Selector
 import time
 
 
+
 async def breakdown(webpage_url,
-                    cursor=config.DEFAULT_CURSOR,
-                    offset=config.DEFAULT_OFFSET):
+                    page = 1,
+                    params=None):
     """
     cursor is the current place of the video
     offset can only be the integer multiple of 10
     :return: list of title and cover
     """
-
-    if all([isinstance(ele, int) for ele in [cursor, offset]]):
-        pass
-    else:
-        print(f"The Type of cursor/offset is not integer: \n"
-              f"type(cursor) = {type(cursor)}\n"
-              f"type(offset) = {type(offset)}"
-              )
-        yield False
-
-    api_step = 28
-    # page = 1
-    # results = []
-    clips_list = await asyncio.gather(*[retrieve_user_paging_api(webpage_url=webpage_url,
-                                                                 page=page) for page in
-                                        paging.pager(cursor=cursor, offset=offset, step=api_step)])
-    # print([page for page in paging.pager(cursor=cursor, offset=offset, step=api_step)])
+    clips_list = await asyncio.gather(*[retrieve_user_paging_api(webpage_url=webpage_url, page=page)])
     for clips in clips_list:
-        # results += [ele async for ele in extract_user_pageing_api(ResText=clips)]
-        async for ele in takewhile(extract_user_pageing_api(ResText=clips), lambda x: isinstance(x, (dict, int))):
-            yield ele
+        results = await extract_user_pageing_api(ResText=clips)
+        return results
+        # async for ele in takewhile(extract_user_pageing_api(ResText=clips), lambda x: isinstance(x, (dict, int))):
+        #     yield ele
             # offset -= 1
             # if offset <= 0:
             #     break
@@ -94,8 +80,9 @@ async def extract_user_pageing_api(ResText):
     try:
         selector = Selector(text=ResText)
     except TypeError:
-        yield None
+        return None
     else:
+        output = []
         for article in selector.css("li[data-articleid]"):
             ele = dict()
             ele['vid'] = article.css('::attr(data-articleid)').extract_first()
@@ -109,10 +96,11 @@ async def extract_user_pageing_api(ResText):
             ele['view_count'] = format_count(article.css('.icon-play-volume::text').extract_first())
             ele['like_count'] = format_count(article.css('.icon-like::text').extract_first())
             ele['role'] = article.css('.user-info .role::text').extract_first()
-            yield ele
+            output.append(ele)
+            # yield ele
         else:
             has_more = selector.css("li[data-more]::attr(data-more)").extract_first()
-            yield has_more
+            return output, has_more, {}
 
 
 def format_duration(duration_str):
@@ -190,8 +178,9 @@ if __name__ == '__main__':
     #         print(ele)
 
     async def test():
-        async for ele in breakdown("https://www.xinpianchang.com/u10002513?from=userList", 0, 29):
-            print(ele)
+        return await breakdown("https://www.xinpianchang.com/u10002513?from=userList", page=1)
 
-
-    asyncio.run(test())
+    loop = asyncio.get_event_loop()
+    _res = loop.run_until_complete(test())
+    from pprint import pprint
+    pprint(_res)

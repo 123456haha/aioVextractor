@@ -35,6 +35,7 @@ async def entrance(webpage_url, session):
                 response_text = await response.text(encoding='utf8', errors='ignore')
                 result = dict()
                 result['webpage_url'] = webpage_url
+                result['from'] = "tvcf"
                 result = await extract_old(response_text, code, result=result)
                 return result
     else:  ## new version https://v.tvcf.co.kr/728764
@@ -56,6 +57,7 @@ async def entrance(webpage_url, session):
                 response_text = await r_code.text()
                 r_code_json = json.loads(response_text)
                 code = jmespath.search('video.code', r_code_json)
+                result['from'] = "tvcf"
                 result['webpage_url'] = webpage_url
                 result['vid'] = code
                 result['cover'] = jmespath.search('video.cut', r_code_json)
@@ -146,14 +148,14 @@ async def entrance(webpage_url, session):
 async def extract_old(response, code, result):
     selector = Selector(text=response)
     title = selector.css('.player_title::text').extract_first()
-    result['id'] = code
+    result['vid'] = code
     result['comment_count'] = selector.css('#replyAreaTab span span::text').extract_first()
     result['cover'] = selector.css('.hidden link::attr(href)').extract_first()
     create_time = selector.css('.onair::text').extract_first()
     result['upload_ts'] = int(time.mktime(time.strptime(create_time, '%Y-%m-%d'))) if create_time else None
     result['rating'] = selector.css('#scoreArea strong').re_first("\d{1,5}")
     result['title'] = title.strip() if title else title
-    result['tags'] = selector.css('.tag::text').extract()
+    result['tag'] = selector.css('.tag::text').extract()
     try:
         fn = os.path.split(result['cover'])[-1].split('.')[0]
     except TypeError:
@@ -174,7 +176,7 @@ async def extract_new(session, result, idx):
     :param idx:
     :return:
     """
-    result['title'], result['tags'] = await asyncio.gather(*[get_title(session=session, idx=idx),
+    result['title'], result['tag'] = await asyncio.gather(*[get_title(session=session, idx=idx),
                                                              get_tags(session=session, idx=idx)])
     return result
 
@@ -302,4 +304,5 @@ if __name__ == '__main__':
                                   session=session_)
 
 
-    pprint(asyncio.run(test()))
+    loop = asyncio.get_event_loop()
+    pprint(loop.run_until_complete(test()))

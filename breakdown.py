@@ -22,7 +22,9 @@ from urllib.parse import (urlsplit, unquote)
 # import re
 # import html
 
-async def breakdown(webpage_url, cursor=0, offset=10):
+async def breakdown(webpage_url,
+                    page = 1,
+                    params=None):
     """
     breakdown each url from webpage_url which is a playlist url
     return title and cover of videos under webpage_url limit to certain range (cursor, offset)
@@ -30,21 +32,24 @@ async def breakdown(webpage_url, cursor=0, offset=10):
     ParseResult = urlsplit(webpage_url)
     netloc = ParseResult.netloc
     # path = ParseResult.path
-    offset = math.ceil(float(int(offset) / 10)) * 10  ## limit it to be the integer multiple of 10
+    # offset = math.ceil(float(int(offset) / 10)) * 10  ## limit it to be the integer multiple of 10
     if netloc == 'vimeo.com':
-        for ele in await breaker.vimeo.breakdown(webpage_url=webpage_url,
-                                                 cursor=cursor,
-                                                 offset=offset):
-            yield ele
+        results = await breaker.vimeo.breakdown(webpage_url=webpage_url, page=page, params=params)
+        return results ## results, has_next, None
+        # for ele in await breaker.vimeo.breakdown(webpage_url=webpage_url, page=page, params=params):
+        #     yield ele  ## ele, has_more, params
     elif netloc == 'www.youtube.com':
-        async for ele in breaker.youtube.breakdown(webpage_url=webpage_url):
-            yield ele
+        results = await breaker.youtube.breakdown(webpage_url=webpage_url, page=page, params=params)
+        return results ## results, has_next, None
+        # async for ele in breaker.youtube.breakdown(webpage_url=webpage_url, page=page, params=params):
+        #     pass
+            # yield ele  ## ele, has_more, params
     elif netloc == 'www.xinpianchang.com':
-
-        async for ele in breaker.xinpianchang.breakdown(webpage_url=webpage_url,
-                                                        cursor=cursor,
-                                                        offset=offset):
-            yield ele
+        results = await breaker.xinpianchang.breakdown(webpage_url=webpage_url, page=page, params=params)
+        return results ## results, has_next, None
+        # async for ele in breaker.xinpianchang.breakdown(webpage_url=webpage_url, page=page, params=params):
+        #     pass
+            # yield ele  ## ele, has_more, params
     else:
         pass
 
@@ -53,14 +58,9 @@ if __name__ == '__main__':
     "https://vimeo.com/plaidavenger"
     "https://www.youtube.com/channel/UCSRpCBq2xomj7Sz0od73jWw/videos"
     "https://www.xinpianchang.com/u10002513?from=userList"
-    res = []
-
-
     async def test():
-        async for ele in breakdown(webpage_url='https://www.xinpianchang.com/u10002513?from=userList'):
-            print(ele)
-            res.append(ele['vid'])
-
-
-    asyncio.run(test())
-    print(f"res: {res}")
+        res = await breakdown(webpage_url='https://www.xinpianchang.com/u10002513?from=userList')
+        return res
+    loop = asyncio.get_event_loop()
+    _ = loop.run_until_complete(test())
+    print(f"res: {_}")

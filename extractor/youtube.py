@@ -13,6 +13,7 @@ import asyncio
 
 
 async def entrance(webpage_url, session):
+    webpage_url = webpage_url.split('&')[0]
     try:
         gather_results = await asyncio.gather(*[
             common.extract_info(webpage_url=webpage_url),
@@ -64,8 +65,11 @@ async def extract_author(webpage_url, session):
                                             'thumbnails[-1].'
                                             'url',
                 ytInitialData)
-            author_avatar = 'http:' + author_avatar if (author_avatar.startswith('//') and author_avatar) else None
-        return {"author_avatar": author_avatar}
+
+            author_avatar = 'http:' + author_avatar if (author_avatar and author_avatar.startswith('//')) else None
+        return {"author_avatar": author_avatar,
+                'from' : "youtube"
+        }
 
 
 if __name__ == '__main__':
@@ -91,8 +95,9 @@ if __name__ == '__main__':
     async def test():
         async with aiohttp.ClientSession() as session_:
             return await entrance(
-                webpage_url="https://www.youtube.com/watch?v=iAeYPfrXwk4",
+                webpage_url="https://www.youtube.com/watch?v=DfG6VKnjrVw",
                 session=session_)
 
 
-    pprint(asyncio.run(test()))
+    loop = asyncio.get_event_loop()
+    pprint(loop.run_until_complete(test()))

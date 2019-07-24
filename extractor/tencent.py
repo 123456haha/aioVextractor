@@ -54,8 +54,9 @@ async def entrance(webpage_url, session):
             except AttributeError:
                 result['title'] = selector.css('.player_title a::text').extract_first()
             tags = selector.css("head meta[name*='keywords']::attr(content)").extract_first()
+            result['from'] = "腾讯视频"
             result['description'] = selector.css("._video_summary::text").extract_first()
-            result['tags'] = tags.split(',') if tags else None
+            result['tag'] = tags.split(',') if tags else None
             category = selector.css('.site_channel .channel_nav[class~="current"]::text').extract()
             result['category'] = ','.join(category) if category else None
             result['cover'] = 'http://vpic.video.qq.com/0/{vid}.png'.format(vid=vid)
@@ -308,4 +309,6 @@ if __name__ == '__main__':
         async with aiohttp.ClientSession() as session_:
             return await entrance(webpage_url="https://v.qq.com/x/cover/bzfkv5se8qaqel2.html",
                                   session=session_)
-    pprint(asyncio.run(test()))
+
+    loop = asyncio.get_event_loop()
+    pprint(loop.run_until_complete(test()))

@@ -87,6 +87,7 @@ def extract(response_json):
         return False
     else:
         result = dict()
+        result['from'] = "抖音"
         result['author'] = jmespath.search('author.nickname', response_json)
         result['author_avatar'] = jmespath.search('author.avatar_larger.url_list[0]', response_json)
         result['author_description'] = jmespath.search('author.signature', response_json)
@@ -104,7 +105,7 @@ def extract(response_json):
         result['title'] = jmespath.search('desc', response_json)
         result['vid'] = jmespath.search('aweme_id', response_json)
         result['cover'] = jmespath.search('video.cover.url_list[0]', response_json)
-        result['tags'] = jmespath.search('text_extra[].hashtag_name', response_json)
+        result['tag'] = jmespath.search('text_extra[].hashtag_name', response_json)
         result['language'] = jmespath.search('desc_language', response_json)
         result['region'] = jmespath.search('region', response_json)
         result['upload_ts'] = jmespath.search('create_time', response_json)
@@ -129,4 +130,6 @@ if __name__ == '__main__':
         async with aiohttp.ClientSession() as session_:
             return await entrance(webpage_url="#在抖音，记录美好生活#球球老婆怀孕之后就爱睡这个洗脸巢 睡姿也太可爱了8#猫 http://v.douyin.com/hd9sb3/ 复制此链接，打开【抖音短视频】，直接观看视频！",
                                   session=session_)
-    pprint(asyncio.run(test()))
+
+    loop = asyncio.get_event_loop()
+    pprint(loop.run_until_complete(test()))

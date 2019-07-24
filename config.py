@@ -21,7 +21,8 @@ TEST_CASE = ['https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_626
              'https://vimeo.com/281493330',
              'https://www.xinpianchang.com/a10475334?from=ArticleList',
              'https://v.youku.com/v_show/id_XMzg5Mjc5NDExMg==.html?spm=a2h0j.11185381.bpmodule-playpage-segments.5~5~A&&s=1f1b995a017c11df97c0',
-             'https://www.youtube.com/watch?v=tofSaLB9kwE']
+             'https://www.youtube.com/watch?v=tofSaLB9kwE',
+             "https://www.tvcbook.com/showVideo.html?vid=544444"]
 
 ALLOW_NETLOC = {urlsplit(url).netloc for url in TEST_CASE}
 

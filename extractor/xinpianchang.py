@@ -107,6 +107,7 @@ async def extract_publish(response):
         traceback.print_exc()
         return False
     vid = selector.css('body script').re_first('vid: "([\s|\S]*?)",')
+    result['from'] = "新片场"
     result['vid'] = vid
     try:
         result['author'] = emoji.demojize(selector.css('.creator-info .name::text').extract_first().strip())
@@ -242,4 +243,5 @@ if __name__ == '__main__':
                 session=session_)
 
 
-    pprint(asyncio.run(test()))
+    loop = asyncio.get_event_loop()
+    pprint(loop.run_until_complete(test()))

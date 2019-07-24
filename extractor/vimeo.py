@@ -49,7 +49,9 @@ async def extract_author(webpage_url, session):
             return False
         else:
             avatar = clip_page_config.replace('\\/', '/')
-        return {"author_avatar": avatar}
+        return {"author_avatar": avatar,
+                'from' : "vimeo"
+                }
 
 
 if __name__ == '__main__':
@@ -77,4 +79,5 @@ if __name__ == '__main__':
                 session=session_)
 
 
-    pprint(asyncio.run(test()))
+    loop = asyncio.get_event_loop()
+    pprint(loop.run_until_complete(test()))
