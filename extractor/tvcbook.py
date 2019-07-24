@@ -4,19 +4,33 @@
 # IDE: PyCharm
 
 
+import jmespath
+from aioVextractor.utils.user_agent import UserAgent
 from aioVextractor.utils.requests_retry import RequestRetry
+from random import choice
 import time
+from os.path import splitext
+from scrapy.selector import Selector
+import asyncio
+import html
+import emoji
+import dateutil.parser
+import traceback
+from urllib.parse import urlparse
+import os
 
 @RequestRetry
 async def entrance(webpage_url, session):
     vid = webpage_url.split("vid=")[1]
     video = await extract_video_info(vid=vid, session=session)
+    # print(video)
     video['webpage_url'] = webpage_url
     return video
 
 
 async def extract_video_info( vid, session):
     extract_video_info_url = f'https://api.tvcbook.com/video/{vid}?access-token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYXBpeC50dmNib29rLmNvbVwvYXBpXC9hY2NvdW50XC9sb2dpbiIsImlhdCI6MTU2MzQyMDk3MCwiZXhwIjoxNTY0MDI1NzcwLCJuYmYiOjE1NjM0MjA5NzAsImp0aSI6IkcyTkFaNEtQTVJLUE0wNjciLCJzdWIiOjQ5MywicHJ2IjoiZmZmNjVkZGQ1NzJmZTQyOGIwMzg0MmVlNTI1NGE3OWVmYWJhNTk1MiJ9.cxIaxwdaVvG7JmGDa4Oq12CSQuzPdnGm8HfIpW_n8Ys&expand=media,user,tags,type_id&code=e877ETnlT03MmzcoDHuw0zAiBpmQn5aErZMpG4r50GPvjO_P0gLn'
+    # print(extract_video_info_url)
     headers = {
         'authority': 'api.tvcbook.com',
         'cache-control': 'max-age=0',
@@ -30,7 +44,6 @@ async def extract_video_info( vid, session):
         response_json = await response.json()
         result = dict()
         videoitem = response_json.get('data',{}).get('data')
-
         result['title'] = videoitem.get('title','')
         result['vid'] = vid
         result['created_at'] = videoitem.get('created_at','')
