@@ -204,6 +204,7 @@ async def extract_youtube_pageing_api(ResJson, path='playlist'):
             pass
         ele['webpage_url'] = 'https://www.youtube.com' + ele['webpage_url']
         ele['view_count'] = ele['view_count'].replace(',', '').replace(' 次观看', '') if ele['view_count'] else None
+        ele['from'] = 'youtube'
         output.append(ele)
         # yield ele
     else:
