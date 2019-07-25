@@ -19,7 +19,6 @@ from aioVextractor.extractor import (bilibili,
 
 async def distribute(webpage_url, netloc, path, session):
     try:
-        print("netloc", netloc)
         if netloc == 'www.bilibili.com':
             if '/video' in path:
                 return await bilibili.entrance(webpage_url=webpage_url, session=session)
