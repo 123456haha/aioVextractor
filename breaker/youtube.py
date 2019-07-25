@@ -347,6 +347,7 @@ async def extract_webpage(ResText, path='playlist'):
                 except TypeError:
                     pass
                 ele['webpage_url'] = 'https://www.youtube.com' + ele['webpage_url']
+                ele['from'] = 'youtube'
                 output.append(ele)
                 # yield ele
             else:
