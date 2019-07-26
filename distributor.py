@@ -35,7 +35,7 @@ async def distribute(webpage_url, netloc, path, session):
             if constrain(path, '/YCf/V.asp', '/'):
                 return await tvcf.entrance(webpage_url=webpage_url, session=session)
         elif netloc == 'vimeo.com':
-            if re.match('/[\d*]', path):
+            if re.match('/\d{6,11}', path):
                 return await vimeo.entrance(webpage_url=webpage_url, session=session)
         elif netloc == 'www.xinpianchang.com':
             if constrain(path, '/a'):

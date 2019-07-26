@@ -82,7 +82,7 @@ async def is_playlist(webpage_url):
                 return None
                 # print(f'IS playlist: {url_to_parse}')
                 # yield url_to_parse, netloc, path
-            elif re.match('/[\d*]', path):
+            elif re.match('/\d{6,11}', path):
                 # continue
                 return None
             elif re.match('[/.*]', path):
