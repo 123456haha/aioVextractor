@@ -36,7 +36,7 @@ async def breakdown(webpage_url, page = 1, params=None):
         #                 continue
         #             else:
         #                 return results
-    elif re.match('/[\d*]', path):  ## https://vimeo.com/281493330  ## this is single
+    elif re.match('/\d{6,11}', path):  ## https://vimeo.com/281493330  ## this is single
         return []
     elif re.match('[/.*]', path):  ## https://vimeo.com/alitasmitmedia
         while True:
