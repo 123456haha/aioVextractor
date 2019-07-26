@@ -98,6 +98,7 @@ async def extract_user_page(ResponseJson):
             ele['author_url'] = "https://vimeo.com" + ele['author_url']
             ele['webpage_url'] = "https://vimeo.com" + ele['url']
             ele['from'] = "vimeo"
+            ele.pop('url', None)
         return results
 
 
