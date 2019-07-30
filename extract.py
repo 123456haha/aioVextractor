@@ -100,6 +100,9 @@ async def is_playlist(webpage_url):
             elif re.match('/channel/', path):
                 print(f'IS playlist: {url_to_parse}')
                 return url_to_parse, netloc, path
+            elif re.match('/user/.*?/videos', path):
+                print(f'IS playlist: {url_to_parse}')
+                return url_to_parse, netloc, path
             elif re.match('/watch', path):
                 # continue
                 return None
