@@ -146,7 +146,7 @@ async def extract_publish(response):
         result['like_count'] = int(selector.css('.like-counts::text').extract_first().replace(',', ''))
     except (ValueError, AttributeError):
         result['like_count'] = None
-    result['cover'] = selector.css('.social-share::attr(data-image)').extract_first()
+    result['cover'] = selector.css('script').re_first("cover: '([\s|\S]*?)',")
     return result
 
 
