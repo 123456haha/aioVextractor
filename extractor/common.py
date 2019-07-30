@@ -30,6 +30,7 @@ async def extract_info(webpage_url):
                 return False
             else:
                 if VideoJson:
+                    print(VideoJson)
                     result = dict()
                     result['webpage_url'] = webpage_url
                     result['author'] = jmespath.search('uploader', VideoJson)
@@ -60,6 +61,7 @@ async def extract_info(webpage_url):
                     #     if None in play_addr_list:
                     #         del play_addr_list[None]
                     result['play_addr'] = formats['url']
+                    result['from'] = VideoJson.get('extractor', None).lower() if VideoJson.get('extractor', None) else urlparse(webpage_url).netloc
                     result['title'] = jmespath.search('title', VideoJson)
                     video_tags = jmespath.search('tags', VideoJson)
                     result['tag'] = video_tags
@@ -110,3 +112,16 @@ def extract_play_addr(VideoJson):
     except:
         # traceback.print_exc()
         return jmespath.search('formats[-1]', VideoJson)
+
+
+if __name__ == '__main__':
+    import asyncio
+    from pprint import pprint
+    async def test():
+        return await extract_info(
+            webpage_url="https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4")
+
+    loop = asyncio.get_event_loop()
+    pprint(loop.run_until_complete(test()))
+
+
