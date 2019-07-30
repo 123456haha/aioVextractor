@@ -32,6 +32,13 @@ async def extract(webpage_url, session):
             janitor(webpage_url=webpage_url)]
 
     gather_results = await asyncio.gather(*feed)
+    final_result = []
+    for ele in gather_results:
+        if isinstance(ele, dict):
+            final_result.append(ele)
+        elif isinstance(ele, list):
+            for i in ele:
+                final_result.append(i)
     return None if gather_results is [] else gather_results
 
 

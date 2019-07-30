@@ -52,8 +52,8 @@ async def distribute(webpage_url, netloc, path, session):
             res = await tvcbook.entrance(webpage_url=webpage_url, session=session)
             return res
         else:
-            res = await common.extract_info(webpage_url)
-            if isinstance(res, dict):
+            res = await common.extract_info(webpage_url, collaborate=False)
+            if isinstance(res, (dict, list)):
                 return res
             else:
                 print(f'URL is not SUPPORTED {webpage_url}')
