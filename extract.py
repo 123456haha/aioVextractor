@@ -39,7 +39,7 @@ async def extract(webpage_url, session):
         elif isinstance(ele, list):
             for i in ele:
                 final_result.append(i)
-    return None if gather_results is [] else gather_results
+    return None if final_result is [] else final_result
 
 
 async def janitor(webpage_url):
