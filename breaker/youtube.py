@@ -61,7 +61,7 @@ async def breakdown(webpage_url,
         #                     has_more = False
         #                     break
 
-    elif re.match('/channel/', path):  ## https://www.youtube.com/channel/UC36FGmBEGfmOV2T5QVNI9ew
+    elif re.match('/channel/', path) or re.match('/user/', path):  ## https://www.youtube.com/channel/UC36FGmBEGfmOV2T5QVNI9ew
         if params:
             webpage_content = await retrieve_youtube_pageing_api(referer=webpage_url,
                                                                  continuation=params['continuation'],

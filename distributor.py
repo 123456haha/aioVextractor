@@ -6,6 +6,7 @@
 import traceback
 import re
 from aioVextractor.extractor import (bilibili,
+                                     common,
                                      douyin,
                                      eyepetizer,
                                      tencent,
@@ -14,7 +15,8 @@ from aioVextractor.extractor import (bilibili,
                                      xinpianchang,
                                      youku,
                                      youtube,
-                                     tvcbook)
+                                     tvcbook,
+                                     )
 
 
 async def distribute(webpage_url, netloc, path, session):
@@ -50,8 +52,12 @@ async def distribute(webpage_url, netloc, path, session):
             res = await tvcbook.entrance(webpage_url=webpage_url, session=session)
             return res
         else:
-            print(f'URL is not SUPPORTED {webpage_url}')
-            return None
+            res = await common.extract_info(webpage_url, collaborate=False)
+            if isinstance(res, (dict, list)):
+                return res
+            else:
+                print(f'URL is not SUPPORTED {webpage_url}')
+                return None
     except:
         traceback.print_exc()
         return False

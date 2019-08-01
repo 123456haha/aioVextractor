@@ -78,7 +78,8 @@ async def extract_user_page(ResponseJson, webpage_url):
     clips = ResponseJson
     try:  ## extract info from json/dict
         results = jmespath.search('clips[].{"title": title, '
-                               '"cover": thumbnail.src_8x, '
+                               '"cover": thumbnail.src, '
+                               # '"cover": thumbnail.src_8x, '
                                '"duration": duration.raw, '
                                '"vid": clip_id, '
                                '"url": url, '

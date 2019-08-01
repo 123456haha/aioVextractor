@@ -10,7 +10,7 @@ import time
 from urllib.parse import (parse_qs, urlparse)
 
 
-async def extract_info(webpage_url):
+async def extract_info(webpage_url, collaborate=True):
     args = {"nocheckcertificate": True,
             "ignoreerrors": True,
             "quiet": True,
@@ -24,46 +24,24 @@ async def extract_info(webpage_url):
         with youtube_dl.YoutubeDL(args) as ydl:
             try:
                 VideoJson = ydl.extract_info(webpage_url)
-                # pprint(VideoJson)
             except:
                 traceback.print_exc()
                 return False
             else:
                 if VideoJson:
-                    result = dict()
-                    result['webpage_url'] = webpage_url
-                    result['author'] = jmespath.search('uploader', VideoJson)
-                    result['cover'] = check_cover(jmespath.search('thumbnail', VideoJson))
-                    create_time = jmespath.search('upload_date', VideoJson)
-                    upload_ts = int(time.mktime(time.strptime(create_time, '%Y%m%d'))) if create_time else create_time
-                    result['upload_ts'] = upload_ts
-                    result['description'] = jmespath.search('description', VideoJson)
-                    duration = jmespath.search('duration', VideoJson)
-                    result['duration'] = int(duration) if duration else duration
-                    result['rating'] = jmespath.search('average_rating', VideoJson)
-                    result['height'] = jmespath.search('height', VideoJson)
-                    result['like_count'] = jmespath.search('like_count', VideoJson)
-                    result['view_count'] = jmespath.search('view_count', VideoJson)
-                    result['dislike_count'] = jmespath.search('dislike_count', VideoJson)
-                    result['width'] = jmespath.search('width', VideoJson)
-                    result['vid'] = jmespath.search('id', VideoJson)
-                    cate = jmespath.search('categories', VideoJson)
-                    result['category'] = ','.join(list(map(lambda x: x.replace(' & ', ','), cate))) if cate else cate
-                    formats = extract_play_addr(VideoJson)
-                    # play_addr_list = dict()
-                    # for u, p, h in jmespath.search('formats[].[url, protocol, height]', VideoJson):
-                    #     if ('m3u8' not in u) and ('/../' not in u):
-                    #         play_addr_list[h] = u
-                    # if len(play_addr_list) == 1:
-                    #     result['play_addr'] = play_addr_list[max(play_addr_list)]
-                    # else:
-                    #     if None in play_addr_list:
-                    #         del play_addr_list[None]
-                    result['play_addr'] = formats['url']
-                    result['title'] = jmespath.search('title', VideoJson)
-                    video_tags = jmespath.search('tags', VideoJson)
-                    result['tag'] = video_tags
-                    return result
+                    if collaborate:
+                        result = extract_single(VideoJson=VideoJson, webpage_url=webpage_url)
+                        return result
+                    else:  ## webpage extracting using only youtube-dl
+                        if 'entries' in VideoJson:
+                            result = []
+                            for entry in jmespath.search('entries[]', VideoJson):
+                                element = extract_single(VideoJson=entry, webpage_url=webpage_url)
+                                result.append(element)
+                            return result
+                        else:
+                            result = extract_single(VideoJson=VideoJson, webpage_url=webpage_url)
+                            return result
                 else:
                     return False
     except:
@@ -110,3 +88,56 @@ def extract_play_addr(VideoJson):
     except:
         # traceback.print_exc()
         return jmespath.search('formats[-1]', VideoJson)
+
+
+def extract_single(VideoJson, webpage_url):
+    result = dict()
+    result['webpage_url'] = webpage_url
+    result['author'] = jmespath.search('uploader', VideoJson)
+    result['cover'] = check_cover(jmespath.search('thumbnail', VideoJson))
+    create_time = jmespath.search('upload_date', VideoJson)
+    upload_ts = int(time.mktime(time.strptime(create_time, '%Y%m%d'))) if create_time else create_time
+    result['upload_ts'] = upload_ts
+    result['description'] = jmespath.search('description', VideoJson)
+    duration = jmespath.search('duration', VideoJson)
+    result['duration'] = int(duration) if duration else duration
+    result['rating'] = jmespath.search('average_rating', VideoJson)
+    result['height'] = jmespath.search('height', VideoJson)
+    result['like_count'] = jmespath.search('like_count', VideoJson)
+    result['view_count'] = jmespath.search('view_count', VideoJson)
+    result['dislike_count'] = jmespath.search('dislike_count', VideoJson)
+    result['width'] = jmespath.search('width', VideoJson)
+    result['vid'] = jmespath.search('id', VideoJson)
+    cate = jmespath.search('categories', VideoJson)
+    result['category'] = ','.join(list(map(lambda x: x.replace(' & ', ','), cate))) if cate else cate
+    formats = extract_play_addr(VideoJson)
+    # play_addr_list = dict()
+    # for u, p, h in jmespath.search('formats[].[url, protocol, height]', VideoJson):
+    #     if ('m3u8' not in u) and ('/../' not in u):
+    #         play_addr_list[h] = u
+    # if len(play_addr_list) == 1:
+    #     result['play_addr'] = play_addr_list[max(play_addr_list)]
+    # else:
+    #     if None in play_addr_list:
+    #         del play_addr_list[None]
+    result['play_addr'] = formats['url']
+    result['from'] = VideoJson.get('extractor', None).lower() if VideoJson.get('extractor', None) else urlparse(
+        webpage_url).netloc
+    result['title'] = jmespath.search('title', VideoJson)
+    video_tags = jmespath.search('tags', VideoJson)
+    result['tag'] = video_tags
+    return result
+
+
+if __name__ == '__main__':
+    import asyncio
+    from pprint import pprint
+
+
+    async def test():
+        return await extract_info(
+            webpage_url="https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4")
+
+
+    loop = asyncio.get_event_loop()
+    pprint(loop.run_until_complete(test()))

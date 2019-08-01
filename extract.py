@@ -32,7 +32,14 @@ async def extract(webpage_url, session):
             janitor(webpage_url=webpage_url)]
 
     gather_results = await asyncio.gather(*feed)
-    return None if gather_results is [] else gather_results
+    final_result = []
+    for ele in gather_results:
+        if isinstance(ele, dict):
+            final_result.append(ele)
+        elif isinstance(ele, list):
+            for i in ele:
+                final_result.append(i)
+    return None if final_result is [] else final_result
 
 
 async def janitor(webpage_url):
@@ -98,6 +105,9 @@ async def is_playlist(webpage_url):
                 print(f'IS playlist: {url_to_parse}')
                 return url_to_parse, netloc, path
             elif re.match('/channel/', path):
+                print(f'IS playlist: {url_to_parse}')
+                return url_to_parse, netloc, path
+            elif re.match('/user/.*?/videos', path):
                 print(f'IS playlist: {url_to_parse}')
                 return url_to_parse, netloc, path
             elif re.match('/watch', path):
