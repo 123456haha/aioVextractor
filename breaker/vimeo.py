@@ -42,7 +42,7 @@ async def breakdown(webpage_url, page = 1, params=None):
         while True:
             clips_list = await asyncio.gather(*[retrieve_user_pageing_api(webpage_url=webpage_url, page=page)])
             for clips in clips_list:
-                results = await extract_user_page(ResponseJson=clips)
+                results = await extract_user_page(ResponseJson=clips, webpage_url=webpage_url)
                 has_next = jmespath.search('clips_meta.has_next', clips)
                 return results, has_next, {}
     else:
@@ -74,7 +74,7 @@ async def retrieve_user_pageing_api(webpage_url, page=1):
             return await response.json()
 
 
-async def extract_user_page(ResponseJson):
+async def extract_user_page(ResponseJson, webpage_url):
     clips = ResponseJson
     try:  ## extract info from json/dict
         results = jmespath.search('clips[].{"title": title, '
@@ -97,6 +97,7 @@ async def extract_user_page(ResponseJson):
         for ele in results:
             ele['author_url'] = "https://vimeo.com" + ele['author_url']
             ele['webpage_url'] = "https://vimeo.com" + ele['url']
+            ele['playlist_url'] = webpage_url
             ele['from'] = "vimeo"
             ele.pop('url', None)
         return results

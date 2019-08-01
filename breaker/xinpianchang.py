@@ -32,7 +32,7 @@ async def breakdown(webpage_url,
     """
     clips_list = await asyncio.gather(*[retrieve_user_paging_api(webpage_url=webpage_url, page=page)])
     for clips in clips_list:
-        results = await extract_user_pageing_api(ResText=clips)
+        results = await extract_user_pageing_api(ResText=clips, webpage_url=webpage_url)
         return results
         # async for ele in takewhile(extract_user_pageing_api(ResText=clips), lambda x: isinstance(x, (dict, int))):
         #     yield ele
@@ -76,7 +76,7 @@ async def retrieve_user_paging_api(webpage_url, page=1):
             return response_text
 
 
-async def extract_user_pageing_api(ResText):
+async def extract_user_pageing_api(ResText, webpage_url):
     try:
         selector = Selector(text=ResText)
     except TypeError:
@@ -91,6 +91,7 @@ async def extract_user_pageing_api(ResText):
             ele['upload_ts'] = format_upload_ts(article.css('.video-hover-con p[class*="fs_12"]::text').extract_first())
             ele['duration'] = format_duration(article.css('.duration::text').extract_first())
             ele['description'] = format_desc(article.css('.desc::text').extract_first())
+            ele['playlist_url'] = webpage_url
             ele['title'] = format_desc(article.css('.video-con-top p::text').extract_first())
             ele['category'] = format_category(article.css('.new-cate .c_b_9 ::text').extract())
             ele['view_count'] = format_count(article.css('.icon-play-volume::text').extract_first())

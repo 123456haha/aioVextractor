@@ -33,11 +33,12 @@ async def breakdown(webpage_url,
             webpage_content = await retrieve_youtube_pageing_api(referer=webpage_url,
                                                                  continuation=params['continuation'],
                                                                  clickTrackingParams=params['clickTrackingParams'])
-            results = await extract_youtube_pageing_api(ResJson=webpage_content, path='playlist')
+            results = await extract_youtube_pageing_api(ResJson=webpage_content, path='playlist',
+                                                        webpage_url=webpage_url)
             return results
         else:
             webpage_content = await retrieve_webpapge(webpage_url=webpage_url)
-            results = await extract_webpage(webpage_content, path='playlist')
+            results = await extract_webpage(webpage_content, webpage_url=webpage_url, path='playlist')
             return results
         # async for ele in takewhile(extract_webpage(webpage_content, path='playlist'),
         #                            lambda x: isinstance(x, (dict, tuple))):
@@ -65,12 +66,12 @@ async def breakdown(webpage_url,
             webpage_content = await retrieve_youtube_pageing_api(referer=webpage_url,
                                                                  continuation=params['continuation'],
                                                                  clickTrackingParams=params['clickTrackingParams'])
-            results = await extract_youtube_pageing_api(ResJson=webpage_content, path='channel')
+            results = await extract_youtube_pageing_api(ResJson=webpage_content,webpage_url=webpage_url, path='channel')
             return results
         else:
             webpage_url += '' if webpage_url.endswith('/videos') else '/videos'
             webpage_content = await retrieve_webpapge(webpage_url=webpage_url)
-            results = await extract_webpage(webpage_content, path='channel')
+            results = await extract_webpage(webpage_content,webpage_url=webpage_url, path='channel')
             return results
         # if isinstance(results, tuple):
         # # async for ele in takewhile(extract_webpage(webpage_content, path='channel'),
@@ -142,7 +143,7 @@ async def retrieve_youtube_pageing_api(referer, continuation, clickTrackingParam
             return await response.json()
 
 
-async def extract_youtube_pageing_api(ResJson, path='playlist'):
+async def extract_youtube_pageing_api(ResJson, webpage_url, path='playlist'):
     """
     extract playlist webpage by extracting ytInitialData
     yield each element and follow by (continuation, clickTrackingParams) at last
@@ -205,6 +206,7 @@ async def extract_youtube_pageing_api(ResJson, path='playlist'):
         ele['webpage_url'] = 'https://www.youtube.com' + ele['webpage_url']
         ele['view_count'] = ele['view_count'].replace(',', '').replace(' 次观看', '') if ele['view_count'] else None
         ele['from'] = 'youtube'
+        ele['playlist_url'] = webpage_url
         output.append(ele)
         # yield ele
     else:
@@ -255,7 +257,7 @@ async def retrieve_webpapge(webpage_url):
             return await response.text()
 
 
-async def extract_webpage(ResText, path='playlist'):
+async def extract_webpage(ResText,webpage_url, path='playlist'):
     """
     extract playlist webpage by extracting ytInitialData
     yield each element and follow by (continuation, clickTrackingParams) at last
@@ -348,6 +350,7 @@ async def extract_webpage(ResText, path='playlist'):
                     pass
                 ele['webpage_url'] = 'https://www.youtube.com' + ele['webpage_url']
                 ele['from'] = 'youtube'
+                ele['playlist_url'] = webpage_url
                 output.append(ele)
                 # yield ele
             else:
@@ -420,8 +423,8 @@ if __name__ == '__main__':
         breakdown(webpage_url='https://www.youtube.com/playlist?list=PLs54iBUqIopDv2wRhkqArl9AEV1PU-gmc',
                   page=2,
                   params={'clickTrackingParams': 'CEEQybcCIhMIrKLi9_C-4wIVW28qCh3phwWaKPos',
-  'continuation': '4qmFsgI2EiRWTFBMczU0aUJVcUlvcER2MndSaGtxQXJsOUFFVjFQVS1nbWMaDmVnWlFWRHBEUjFFJTNE'}
-    ))
+                          'continuation': '4qmFsgI2EiRWTFBMczU0aUJVcUlvcER2MndSaGtxQXJsOUFFVjFQVS1nbWMaDmVnWlFWRHBEUjFFJTNE'}
+                  ))
     pprint(_)
     print(sorted(jmespath.search('[0][].vid', list(_))))
     print(len(_[0]))
