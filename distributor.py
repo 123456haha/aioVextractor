@@ -15,7 +15,6 @@ from aioVextractor.extractor import (bilibili,
                                      xinpianchang,
                                      youku,
                                      youtube,
-                                     tvcbook,
                                      )
 
 
@@ -48,9 +47,6 @@ async def distribute(webpage_url, netloc, path, session):
         elif netloc == 'www.youtube.com':
             if constrain(path, '/watch'):
                 return await youtube.entrance(webpage_url=webpage_url, session=session)
-        elif "www.tvcbook.com" == netloc:
-            res = await tvcbook.entrance(webpage_url=webpage_url, session=session)
-            return res
         else:
             res = await common.extract_info(webpage_url, collaborate=False)
             if isinstance(res, (dict, list)):

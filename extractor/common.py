@@ -8,6 +8,8 @@ import jmespath
 import traceback
 import time
 from urllib.parse import (parse_qs, urlparse)
+from aioVextractor.utils.user_agent import UserAgent
+from random import choice
 
 
 async def extract_info(webpage_url, collaborate=True):
@@ -18,7 +20,8 @@ async def extract_info(webpage_url, collaborate=True):
             # "download_archive": "record.txt",
             "no_warnings": True,
             "youtube_include_dash_manifest": False,
-            'simulate': True
+            'simulate': True,
+            'user-agent': choice(UserAgent),
             }
     try:
         with youtube_dl.YoutubeDL(args) as ydl:
@@ -100,7 +103,7 @@ def extract_single(VideoJson, webpage_url):
     result['upload_ts'] = upload_ts
     result['description'] = jmespath.search('description', VideoJson)
     duration = jmespath.search('duration', VideoJson)
-    result['duration'] = int(duration) if duration else duration
+    result['duration'] = int(duration) if duration else 0
     result['rating'] = jmespath.search('average_rating', VideoJson)
     result['height'] = jmespath.search('height', VideoJson)
     result['like_count'] = jmespath.search('like_count', VideoJson)

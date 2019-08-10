@@ -58,6 +58,9 @@ async def entrance(webpage_url, session):
                 r_code_json = json.loads(response_text)
                 code = jmespath.search('video.code', r_code_json)
                 result['from'] = "tvcf"
+                result['duration'] = jmespath.search('video.duration', r_code_json)
+                result['width'] = jmespath.search('video.width', r_code_json)
+                result['height'] = jmespath.search('video.height', r_code_json)
                 result['webpage_url'] = webpage_url
                 result['vid'] = code
                 result['cover'] = jmespath.search('video.cut', r_code_json)
@@ -75,7 +78,7 @@ async def entrance(webpage_url, session):
                         time.mktime(time.strptime(upload_date, '%Y%m%d'))) if upload_date else None
                 except:
                     result['upload_ts'] = None
-                result['rating'] = None
+                result['rating'] = jmespath.search('evaluate.value', r_code_json)
                 return await extract_new(session=session, result=result, idx=idx)
 
 
@@ -176,8 +179,11 @@ async def extract_new(session, result, idx):
     :param idx:
     :return:
     """
-    result['title'], result['tag'] = await asyncio.gather(*[get_title(session=session, idx=idx),
-                                                             get_tags(session=session, idx=idx)])
+    result['title'], result['tag'], result['comment_count'] = await asyncio.gather(
+        *[get_title(session=session, idx=idx),
+          get_tags(session=session, idx=idx),
+          get_comment_num(session=session, idx=idx),
+          ])
     return result
 
 
@@ -271,7 +277,7 @@ async def get_title(session, idx):
 
 
 @RequestRetry
-async def get_commit_num(vid, session):
+async def get_comment_num(idx, session):
     headers = {'Authorization': 'Bearer null',
                'Accept-Encoding': 'gzip, deflate, br',
                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
@@ -279,7 +285,7 @@ async def get_commit_num(vid, session):
                'Accept': 'application/json, text/plain, */*'}
     params = {'skip': '0',
               'take': '5'}
-    url = f'https://play.tvcf.co.kr/rest/api/player/ReplyMore/{vid}'
+    url = f'https://play.tvcf.co.kr/rest/api/player/ReplyMore/{idx}'
     async with session.get(url, headers=headers, params=params) as resp:
         html = await resp.text(encoding='utf-8')
         try:
@@ -296,11 +302,12 @@ if __name__ == '__main__':
 
     "http://www.tvcf.co.kr/YCf/V.asp?Code=A000363280"
     "https://play.tvcf.co.kr/750556"
+    "https://play.tvcf.co.kr/755843"
 
 
     async def test():
         async with aiohttp.ClientSession() as session_:
-            return await entrance(webpage_url="https://play.tvcf.co.kr/750556",
+            return await entrance(webpage_url="https://play.tvcf.co.kr/755843",
                                   session=session_)
 
 

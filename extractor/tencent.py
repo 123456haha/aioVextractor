@@ -63,6 +63,8 @@ async def entrance(webpage_url, session):
             video_create_time = selector.css('head meta[itemprop="datePublished"]::attr(content)').extract_first()
             upload_ts, upload_date = strptime(video_create_time)
             result['upload_ts'] = upload_ts
+            if upload_ts is None:
+                result['upload_ts'] = strptime(selector.css(".video_info .date::text").extract_first())[0]
             video_duration = selector.css('head meta[itemprop="duration"]::attr(content)').extract_first()
             video_duration = cal_duration(video_duration)
             if video_duration is None:
@@ -175,11 +177,13 @@ def strptime(string):
         try:
             struct_time = time.strptime(string[:10], '%Y-%m-%d')
         except ValueError:
-            return None, None
-        else:
-            ts = int(time.mktime(struct_time)) if string else None
-            upload_date = time.strftime("%Y%m%d", struct_time) if string else None
-            return ts, upload_date
+            try:
+                struct_time = time.strptime(string, '%Y年%m月%d日发布')
+            except ValueError:
+                return None, None
+        ts = int(time.mktime(struct_time)) if string else None
+        upload_date = time.strftime("%Y%m%d", struct_time) if string else None
+        return ts, upload_date
     else:
         return None, None
 
