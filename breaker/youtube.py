@@ -5,9 +5,8 @@
 
 import asyncio
 import aiohttp
-from aiostream.stream import takewhile
-from aioVextractor.utils.requests_retry import RequestRetry
-from aioVextractor.utils.user_agent import safari
+from ..utils.requests_retry import RequestRetry
+from ..utils.user_agent import safari
 from random import choice
 import ujson as json
 from scrapy import Selector
@@ -40,60 +39,21 @@ async def breakdown(webpage_url,
             webpage_content = await retrieve_webpapge(webpage_url=webpage_url)
             results = await extract_webpage(webpage_content, webpage_url=webpage_url, path='playlist')
             return results
-        # async for ele in takewhile(extract_webpage(webpage_content, path='playlist'),
-        #                            lambda x: isinstance(x, (dict, tuple))):
-        #     if isinstance(ele, dict):
-        #         yield ele
-        #     elif isinstance(ele, tuple):
-        #         continuation, clickTrackingParams = ele
-        #         has_more = True
-        #         while has_more:
-        #             next_content = await retrieve_youtube_pageing_api(referer=webpage_url,
-        #                                                               continuation=continuation,
-        #                                                               clickTrackingParams=clickTrackingParams)
-        #             async for next_ele in extract_youtube_pageing_api(ResJson=next_content, path='playlist'):
-        #                 if isinstance(next_ele, dict):
-        #                     yield next_ele
-        #                 elif isinstance(next_ele, tuple):
-        #                     continuation, clickTrackingParams = next_ele
-        #                     continue
-        #                 else:
-        #                     has_more = False
-        #                     break
 
-    elif re.match('/channel/', path) or re.match('/user/', path):  ## https://www.youtube.com/channel/UC36FGmBEGfmOV2T5QVNI9ew
+    elif re.match('/channel/', path) or re.match('/user/',
+                                                 path):  ## https://www.youtube.com/channel/UC36FGmBEGfmOV2T5QVNI9ew
         if params:
             webpage_content = await retrieve_youtube_pageing_api(referer=webpage_url,
                                                                  continuation=params['continuation'],
                                                                  clickTrackingParams=params['clickTrackingParams'])
-            results = await extract_youtube_pageing_api(ResJson=webpage_content,webpage_url=webpage_url, path='channel')
+            results = await extract_youtube_pageing_api(ResJson=webpage_content, webpage_url=webpage_url,
+                                                        path='channel')
             return results
         else:
             webpage_url += '' if webpage_url.endswith('/videos') else '/videos'
             webpage_content = await retrieve_webpapge(webpage_url=webpage_url)
-            results = await extract_webpage(webpage_content,webpage_url=webpage_url, path='channel')
+            results = await extract_webpage(webpage_content, webpage_url=webpage_url, path='channel')
             return results
-        # if isinstance(results, tuple):
-        # # async for ele in takewhile(extract_webpage(webpage_content, path='channel'),
-        # #                            lambda x: isinstance(x, (dict, tuple))):
-        #     if isinstance(ele, dict):
-        #         yield ele
-        #     elif isinstance(ele, tuple):
-        #         continuation, clickTrackingParams = ele
-        #         has_more = True
-        #         while has_more:
-        #             next_content = await retrieve_youtube_pageing_api(referer=webpage_url,
-        #                                                               continuation=continuation,
-        #                                                               clickTrackingParams=clickTrackingParams)
-        #             async for next_ele in extract_youtube_pageing_api(ResJson=next_content, path='channel'):
-        #                 if isinstance(next_ele, dict):
-        #                     yield next_ele
-        #                 elif isinstance(next_ele, tuple):
-        #                     continuation, clickTrackingParams = next_ele
-        #                     continue
-        #                 else:
-        #                     has_more = False
-        #                     break
 
     elif re.match('/watch', path):
         return []
@@ -113,17 +73,10 @@ async def retrieve_youtube_pageing_api(referer, continuation, clickTrackingParam
     async with aiohttp.ClientSession(raise_for_status=True) as session:
         headers = {'accept-encoding': 'gzip, deflate, br',
                    'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
-                   # 'x-youtube-page-label': 'youtube.ytfe.desktop_20190701_7_RC1',
-                   # 'x-youtube-page-cl': '256172872',
                    'x-spf-referer': referer,
-                   ## https://www.youtube.com/playlist?list=PLs54iBUqIopDv2wRhkqArl9AEV1PU-gmc
-                   # 'x-youtube-utc-offset': '480',
                    'x-spf-previous': referer,
-                   ## ## https://www.youtube.com/playlist?list=PLs54iBUqIopDv2wRhkqArl9AEV1PU-gmc
-                   # 'cookie': 'YSC=HB8KtiI_O00; PREF=f1=50000000; GPS=1; VISITOR_INFO1_LIVE=k4wIJmME_Ws',
                    'x-youtube-client-version': '2.20190702',
                    'user-agent': choice(safari),
-                   # 'x-youtube-variants-checksum': '97e19b7118dfdcc87ffff0d189fb17db',
                    'accept': '*/*',
                    'referer': 'https://www.youtube.com/playlist?list=PLs54iBUqIopDv2wRhkqArl9AEV1PU-gmc',
                    'x-youtube-client-name': '1',
@@ -257,7 +210,7 @@ async def retrieve_webpapge(webpage_url):
             return await response.text()
 
 
-async def extract_webpage(ResText,webpage_url, path='playlist'):
+async def extract_webpage(ResText, webpage_url, path='playlist'):
     """
     extract playlist webpage by extracting ytInitialData
     yield each element and follow by (continuation, clickTrackingParams) at last

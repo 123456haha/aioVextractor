@@ -3,7 +3,11 @@
 # Created by panos on 2019/7/6
 # IDE: PyCharm
 
-from aioVextractor.breaker import (vimeo,
-                                   xinpianchang,
-                                   youtube
-                                   )
+from . import *
+
+__all__ = [
+    "vimeo",
+    "xinpianchang",
+    "youtube",
+    "instagram",
+    "pinterest", ]

@@ -3,11 +3,12 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
-from aioVextractor.utils import *
+from . import *
 
-__all__ = ['MergeDict',
-           'user_agent',
-           'requests_retry',
-           'exception',
-           'paging',
-           ]
+__all__ = [
+    'exception',
+    'MergeDict',
+    'paging',
+    'requests_retry',
+    'user_agent',
+]

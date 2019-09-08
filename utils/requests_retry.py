@@ -5,26 +5,7 @@
 
 from aioVextractor import config
 import traceback
-from aioVextractor.utils.exception import exception
-
-# def RequestRetry(default_exception_return=False,
-#                  default_other_exception_return=False):
-#     async def _wrapper(func, *args, **kwargs):
-#         for _ in range(config.RETRY):
-#             try:
-#                 return await func(*args, **kwargs)
-#             except exception:
-#                 traceback.print_exc()
-#                 continue
-#             except:
-#                 traceback.print_exc()
-#                 return default_other_exception_return
-#         else:
-#             return default_exception_return
-#
-#     return _wrapper
-
-
+from aioVextractor.utils.exception import http_exception
 import wrapt
 import functools
 
@@ -43,7 +24,7 @@ def RequestRetry(wrapped=None,
         for _ in range(config.RETRY):
             try:
                 return await func(*args, **kwargs)
-            except exception:
+            except http_exception:
                 traceback.print_exc()
                 continue
             except:

@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 # Created by panos on 2019/6/20
 # IDE: PyCharm
-
 from aioVextractor.utils.requests_retry import RequestRetry
 from aioVextractor.utils.exception import http_exception
 from aioVextractor.utils.user_agent import UserAgent
 from random import choice
+from urllib.parse import urlparse, parse_qs
 from aioVextractor import config
 import traceback
 import ujson as json
@@ -21,7 +21,12 @@ import asyncio
 
 
 @RequestRetry
-async def entrance(webpage_url, session):
+async def entrance(iframe_url, session):
+    try:
+        vid = parse_qs(urlparse(iframe_url).query).get('vid')[0]
+    except IndexError:
+        return 'url does not contain `vid`'
+    webpage_url = 'https://v.qq.com/x/page/{vid}.html'.format(vid=vid)
     result = dict()
     headers = {'authority': 'v.qq.com',
                'upgrade-insecure-requests': '1',
@@ -301,21 +306,19 @@ async def extract_by_api(url, session):
         return result
 
 
-TEST_CASE = [
-    "https://v.qq.com/x/page/s0886ag14xn.html",
-    "https://v.qq.com/x/page/n0864edqzkl.html",
-    "https://v.qq.com/x/page/s08899ss07p.html",
-    "https://v.qq.com/x/cover/bzfkv5se8qaqel2.html",
-    "https://v.qq.com/x/page/x0888utz1ni.html",
-]
 if __name__ == '__main__':
     import aiohttp
     from pprint import pprint
 
+    "https://v.qq.com/x/page/s0886ag14xn.html"
+    "https://v.qq.com/x/page/n0864edqzkl.html"
+    "https://v.qq.com/x/page/s08899ss07p.html"
+    "https://v.qq.com/x/cover/bzfkv5se8qaqel2.html"
+
 
     async def test():
         async with aiohttp.ClientSession() as session_:
-            return await entrance(webpage_url="https://v.qq.com/x/page/x0888utz1ni.html",
+            return await entrance(webpage_url="https://v.qq.com/x/cover/bzfkv5se8qaqel2.html",
                                   session=session_)
 
 

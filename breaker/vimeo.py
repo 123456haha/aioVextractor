@@ -5,8 +5,8 @@
 
 import asyncio
 import aiohttp
-from aioVextractor.utils.requests_retry import RequestRetry
-from aioVextractor.utils.user_agent import UserAgent
+from ..utils.requests_retry import RequestRetry
+from ..utils.user_agent import UserAgent
 from random import choice
 from urllib.parse import urlsplit
 import jmespath
@@ -19,23 +19,6 @@ async def breakdown(webpage_url, page = 1, params=None):
     if re.match('/channels/.*', path):  ## https://vimeo.com/channels/ceiga
         ## do not supported
         return []
-        # api_step = 5
-        # results = []
-        # # offset = math.ceil(float(offset / 10)) * 10  ## limit it to be the integer multiple of 10
-        # while True:
-        #     page_list = await asyncio.gather(*[retrieve_channel_page(webpage_url=webpage_url,
-        #                                                               page=page) for page in
-        #                                         paging.pager(cursor=cursor, offset=offset, step=api_step)])
-        #     for page in page_list:
-        #         results += await extract_channel_page(ResponseText=page)
-        #         offset -= api_step
-        #         if offset <= 0:
-        #             return results
-        #         else:
-        #             if jmespath.search('clips_meta.has_next', clips):
-        #                 continue
-        #             else:
-        #                 return results
     elif re.match('/\d{6,11}', path):  ## https://vimeo.com/281493330  ## this is single
         return []
     elif re.match('[/.*]', path):  ## https://vimeo.com/alitasmitmedia

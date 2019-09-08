@@ -92,13 +92,12 @@ async def extract_video(result, user_agent, session):
             return False
 
 
+TEST_CASE = [
+    "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4",
+]
 if __name__ == '__main__':
-    import asyncio
     import aiohttp
     from pprint import pprint
-
-    "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4"
-
 
     #
     # def test():
@@ -115,6 +114,6 @@ if __name__ == '__main__':
                 webpage_url="https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4",
                 session=session_)
 
+
     loop = asyncio.get_event_loop()
     pprint(loop.run_until_complete(test()))
-

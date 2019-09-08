@@ -7,7 +7,6 @@
 import jmespath
 import time
 from urllib.parse import urlparse
-from aioVextractor import config
 import re
 from aioVextractor.utils.requests_retry import RequestRetry
 
@@ -17,7 +16,9 @@ now = lambda: time.time()
 @RequestRetry
 async def entrance(webpage_url, session):
     try:
-        webpage_url = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]| [! *(),] |(?: %[0-9a-fA-F][0-9a-fA-F]))+', webpage_url)[0]
+        webpage_url = \
+            re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]| [! *(),] |(?: %[0-9a-fA-F][0-9a-fA-F]))+',
+                       webpage_url)[0]
     except IndexError:
         return False
     download_headers = {'Connection': 'keep-alive',
@@ -35,7 +36,7 @@ async def entrance(webpage_url, session):
 
 
 @RequestRetry
-async def aweme_detail(aweme_id, session, chance_left=config.RETRY):
+async def aweme_detail(aweme_id, session):
     """
     get all info of the video
     """
@@ -92,9 +93,9 @@ def extract(response_json):
         result['author_avatar'] = jmespath.search('author.avatar_larger.url_list[0]', response_json)
         result['author_description'] = jmespath.search('author.signature', response_json)
         author_gender = jmespath.search('author.gender', response_json)
-        if author_gender==2:
+        if author_gender == 2:
             result['author_gender'] = '女'
-        elif author_gender ==1:
+        elif author_gender == 1:
             result['author_gender'] = '男'
         else:
             result['author_gender'] = None
@@ -122,14 +123,23 @@ def extract(response_json):
         return result
 
 
+TEST_CASE = [
+    "#在抖音，记录美好生活#球球老婆怀孕之后就爱睡这个洗脸巢 睡姿也太可爱了8#猫 http://v.douyin.com/hd9sb3/ 复制此链接，打开【抖音短视频】，直接观看视频！",
+    "http://v.douyin.com/hd9sb3/",
+]
+
 if __name__ == '__main__':
     import asyncio
     import aiohttp
     from pprint import pprint
+
+
     async def test():
         async with aiohttp.ClientSession() as session_:
-            return await entrance(webpage_url="#在抖音，记录美好生活#球球老婆怀孕之后就爱睡这个洗脸巢 睡姿也太可爱了8#猫 http://v.douyin.com/hd9sb3/ 复制此链接，打开【抖音短视频】，直接观看视频！",
-                                  session=session_)
+            return await entrance(
+                webpage_url="#在抖音，记录美好生活#球球老婆怀孕之后就爱睡这个洗脸巢 睡姿也太可爱了8#猫 http://v.douyin.com/hd9sb3/ 复制此链接，打开【抖音短视频】，直接观看视频！",
+                session=session_)
+
 
     loop = asyncio.get_event_loop()
     pprint(loop.run_until_complete(test()))

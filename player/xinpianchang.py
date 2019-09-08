@@ -3,7 +3,6 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
-
 import jmespath
 from aioVextractor.utils.user_agent import UserAgent
 from aioVextractor.utils.requests_retry import RequestRetry
@@ -32,13 +31,12 @@ async def entrance(webpage_url, session):
     async with session.get(webpage_url, headers=headers, params=params) as response:
         response_text = await response.text(encoding='utf8', errors='ignore')
         webpage = await extract_publish(response=response_text)
-        xpc_vid = webpage['vid']
-        database_vid = webpage_url.split('?')[0].split('/')[-1].strip('a')
-        if not xpc_vid:
+        vid = webpage['vid']
+        if not vid:
             return False
-        video = await extract_video_info(referer=webpage_url, vid=xpc_vid, session=session)
+        video = await extract_video_info(referer=webpage_url, vid=vid, session=session)
         if all([webpage, video]):
-            return {**{**webpage, **video}, **{"vid": database_vid}}
+            return {**webpage, **video}
         else:
             pprint([webpage, video])
             return False
@@ -140,13 +138,12 @@ def get_ext(url_):
     return ext.split('@')[0]
 
 
-TEST_CASE = [
-    "https://www.xinpianchang.com/a10475334?from=ArticleList",
-    "https://www.xinpianchang.com/u10009204?from=userList",
-]
 if __name__ == '__main__':
     import aiohttp
     from pprint import pprint
+
+    "https://www.xinpianchang.com/a10475334?from=ArticleList"
+    "https://www.xinpianchang.com/u10009204?from=userList"
 
 
     async def test():

@@ -95,6 +95,7 @@ def extract_play_addr(VideoJson):
 
 def extract_single(VideoJson, webpage_url):
     result = dict()
+    result['downloader'] = 'ytd'
     result['webpage_url'] = webpage_url
     result['author'] = jmespath.search('uploader', VideoJson)
     result['cover'] = check_cover(jmespath.search('thumbnail', VideoJson))
@@ -113,17 +114,8 @@ def extract_single(VideoJson, webpage_url):
     result['vid'] = jmespath.search('id', VideoJson)
     cate = jmespath.search('categories', VideoJson)
     result['category'] = ','.join(list(map(lambda x: x.replace(' & ', ','), cate))) if cate else cate
-    formats = extract_play_addr(VideoJson)
-    # play_addr_list = dict()
-    # for u, p, h in jmespath.search('formats[].[url, protocol, height]', VideoJson):
-    #     if ('m3u8' not in u) and ('/../' not in u):
-    #         play_addr_list[h] = u
-    # if len(play_addr_list) == 1:
-    #     result['play_addr'] = play_addr_list[max(play_addr_list)]
-    # else:
-    #     if None in play_addr_list:
-    #         del play_addr_list[None]
-    result['play_addr'] = formats['url']
+    # formats = extract_play_addr(VideoJson)
+    # result['play_addr'] = formats['url']
     result['from'] = VideoJson.get('extractor', None).lower() if VideoJson.get('extractor', None) else urlparse(
         webpage_url).netloc
     result['title'] = jmespath.search('title', VideoJson)
@@ -132,6 +124,9 @@ def extract_single(VideoJson, webpage_url):
     return result
 
 
+TEST_CASE = [
+    "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4",
+]
 if __name__ == '__main__':
     import asyncio
     from pprint import pprint

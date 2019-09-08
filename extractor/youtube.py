@@ -27,6 +27,7 @@ async def entrance(webpage_url, session):
         traceback.print_exc()
         return False
 
+
 @RequestRetry
 async def extract_author(webpage_url, session):
     headers = {'authority': 'www.youtube.com',
@@ -64,38 +65,31 @@ async def extract_author(webpage_url, session):
                                             'thumbnail.'
                                             'thumbnails[-1].'
                                             'url',
-                ytInitialData)
+                                            ytInitialData)
 
             author_avatar = 'http:' + author_avatar if (author_avatar and author_avatar.startswith('//')) else None
         return {"author_avatar": author_avatar,
-                'from' : "youtube"
-        }
+                'from': "youtube"
+                }
 
+
+TEST_CASE = [
+    "https://www.youtube.com/watch?v=tofSaLB9kwE",
+    "https://www.youtube.com/watch?v=pgN-vvVVxMA",
+    "https://www.youtube.com/watch?v=iAeYPfrXwk4",
+    "https://www.youtube.com/watch?v=jDO2YPGv9fw&list=PLNHZSfaJJc25zChky2JaM99ba8I2bVUza&index=15&t=0s",
+    "https://www.youtube.com/watch?v=JGwWNGJdvx8&list=PLDcnymzs18LU4Kexrs91TVdfnplU3I5zs&index=28&t=0s",
+]
 
 if __name__ == '__main__':
-    import asyncio
     import aiohttp
     from pprint import pprint
-
-    "https://www.youtube.com/watch?v=tofSaLB9kwE"
-
-    #
-    # def test():
-    #     return entrance(
-    #         webpage_url="https://www.youtube.com/watch?v=tofSaLB9kwE")
-    #
-    #
-    # pprint(test())
-    #
-    "https://www.youtube.com/watch?v=tofSaLB9kwE"
-    "https://www.youtube.com/watch?v=pgN-vvVVxMA"
-    "https://www.youtube.com/watch?v=iAeYPfrXwk4"
 
 
     async def test():
         async with aiohttp.ClientSession() as session_:
             return await entrance(
-                webpage_url="https://www.youtube.com/watch?v=DfG6VKnjrVw",
+                webpage_url="https://www.youtube.com/watch?v=JGwWNGJdvx8&list=PLDcnymzs18LU4Kexrs91TVdfnplU3I5zs&index=28&t=0s",
                 session=session_)
 
 

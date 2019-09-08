@@ -7,10 +7,11 @@
 import traceback
 import asyncio
 from aioVextractor.utils.requests_retry import RequestRetry
-from aioVextractor. extractor import common
+from aioVextractor.extractor import common
 from aioVextractor.utils.user_agent import safari
 from random import choice
 from scrapy import Selector
+
 
 async def entrance(webpage_url, session):
     try:
@@ -50,17 +51,18 @@ async def extract_author(webpage_url, session):
         else:
             avatar = clip_page_config.replace('\\/', '/')
         return {"author_avatar": avatar,
-                'from' : "vimeo"
+                'from': "vimeo"
                 }
 
 
+TEST_CASE = [
+    "https://vimeo.com/281493330",
+    "https://vimeo.com/344361560",
+]
+
 if __name__ == '__main__':
-    import asyncio
     import aiohttp
     from pprint import pprint
-
-    "https://vimeo.com/281493330"
-    "https://vimeo.com/344361560"
 
 
     #

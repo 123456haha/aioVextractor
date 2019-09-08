@@ -10,6 +10,7 @@ from aioVextractor.utils.user_agent import UserAgent
 from random import choice
 import traceback
 
+
 @RequestRetry
 async def entrance(webpage_url, session):
     try:
@@ -28,6 +29,7 @@ async def entrance(webpage_url, session):
         async with session.get(response_url, headers=download_headers, params=params) as response:
             response_json = await response.json()
             return {**extract(response_json), **{"webpage_url": webpage_url}}
+
 
 def extract(response_json):
     result = dict()
@@ -49,15 +51,22 @@ def extract(response_json):
     return result
 
 
+TEST_CASE = [
+    "https://www.eyepetizer.net/detail.html?vid=119611&utm_campaign=routine&utm_medium=share&utm_source=others&uid=0&resourceType=video&udid=1bb9f2f14545490c9168f7b99d89136e8ff14724&vc=443&vn=4.9.1&size=1080X1920&deviceModel=vivo%20X9&first_channel=eyepetizer_vivo_market&last_channel=eyepetizer_vivo_market&system_version_code=25",
+]
+
 if __name__ == '__main__':
     import asyncio
     import aiohttp
     from pprint import pprint
-    "https://www.eyepetizer.net/detail.html?vid=119611&utm_campaign=routine&utm_medium=share&utm_source=others&uid=0&resourceType=video&udid=1bb9f2f14545490c9168f7b99d89136e8ff14724&vc=443&vn=4.9.1&size=1080X1920&deviceModel=vivo%20X9&first_channel=eyepetizer_vivo_market&last_channel=eyepetizer_vivo_market&system_version_code=25"
+
+
     async def test():
         async with aiohttp.ClientSession() as session_:
-            return await entrance(webpage_url="https://www.eyepetizer.net/detail.html?vid=119611&utm_campaign=routine&utm_medium=share&utm_source=others&uid=0&resourceType=video&udid=1bb9f2f14545490c9168f7b99d89136e8ff14724&vc=443&vn=4.9.1&size=1080X1920&deviceModel=vivo%20X9&first_channel=eyepetizer_vivo_market&last_channel=eyepetizer_vivo_market&system_version_code=25",
-                                  session=session_)
+            return await entrance(
+                webpage_url="https://www.eyepetizer.net/detail.html?vid=119611&utm_campaign=routine&utm_medium=share&utm_source=others&uid=0&resourceType=video&udid=1bb9f2f14545490c9168f7b99d89136e8ff14724&vc=443&vn=4.9.1&size=1080X1920&deviceModel=vivo%20X9&first_channel=eyepetizer_vivo_market&last_channel=eyepetizer_vivo_market&system_version_code=25",
+                session=session_)
+
 
     loop = asyncio.get_event_loop()
     pprint(loop.run_until_complete(test()))

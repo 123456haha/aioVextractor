@@ -4,23 +4,8 @@
 # IDE: PyCharm
 
 from aioVextractor import breaker
-import math
 import asyncio
-# import aiohttp
-# from aiostream.stream import takewhile
-# from aioVextractor.utils.requests_retry import RequestRetry
-# from aioVextractor.utils.user_agent import safari
-# from random import choice
-# import ujson as json
-# from scrapy import Selector
-from urllib.parse import (urlsplit, unquote)
-
-
-# import jmespath
-# import emoji
-# import traceback
-# import re
-# import html
+from urllib.parse import urlsplit
 
 async def breakdown(webpage_url,
                     page = 1,
@@ -50,6 +35,18 @@ async def breakdown(webpage_url,
         # async for ele in breaker.xinpianchang.breakdown(webpage_url=webpage_url, page=page, params=params):
         #     pass
             # yield ele  ## ele, has_more, params
+    elif netloc == 'www.instagram.com':
+        results = await breaker.instagram.breakdown(webpage_url=webpage_url, page=page, params=params)
+        return results  ## results, has_next, None
+        # async for ele in breaker.xinpianchang.breakdown(webpage_url=webpage_url, page=page, params=params):
+        #     pass
+        # yield ele  ## ele, has_more, params
+    elif netloc == 'www.pinterest.com':
+        results = await breaker.pinterest.breakdown(webpage_url=webpage_url, page=page, params=params)
+        return results  ## results, has_next, None
+        # async for ele in breaker.xinpianchang.breakdown(webpage_url=webpage_url, page=page, params=params):
+        #     pass
+        # yield ele  ## ele, has_more, params
     else:
         pass
 

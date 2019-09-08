@@ -5,25 +5,19 @@
 
 import asyncio
 import aiohttp
-from aioVextractor import config
-import re
-from aiostream.stream import takewhile
-from aioVextractor.utils import paging
-from urllib.parse import (urlparse, unquote)
+from urllib.parse import unquote
 import html
 import emoji
 import traceback
 from random import choice
-import jmespath
-from aioVextractor.utils.user_agent import (UserAgent)
-from aioVextractor.utils.requests_retry import RequestRetry
+from ..utils.user_agent import (UserAgent)
+from ..utils.requests_retry import RequestRetry
 from scrapy import Selector
 import time
 
 
-
 async def breakdown(webpage_url,
-                    page = 1,
+                    page=1,
                     params=None):
     """
     cursor is the current place of the video
@@ -34,18 +28,6 @@ async def breakdown(webpage_url,
     for clips in clips_list:
         results = await extract_user_pageing_api(ResText=clips, webpage_url=webpage_url)
         return results
-        # async for ele in takewhile(extract_user_pageing_api(ResText=clips), lambda x: isinstance(x, (dict, int))):
-        #     yield ele
-            # offset -= 1
-            # if offset <= 0:
-            #     break
-            # yield results
-        # else:
-        #     if jmespath.search('clips_meta.has_next', clips):
-        #         continue
-        #     else:
-        #         break
-        # yield results
 
 
 @RequestRetry
@@ -157,6 +139,7 @@ def format_desc(desc):
     except:
         return desc
 
+
 def format_count(num):
     try:
         if 'w' in num:
@@ -182,7 +165,9 @@ if __name__ == '__main__':
     async def test():
         return await breakdown("https://www.xinpianchang.com/u10002513?from=userList", page=1)
 
+
     loop = asyncio.get_event_loop()
     _res = loop.run_until_complete(test())
     from pprint import pprint
+
     pprint(_res)

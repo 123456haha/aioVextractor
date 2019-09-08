@@ -3,6 +3,7 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
+
 import traceback
 import time, json
 import jmespath
@@ -14,15 +15,15 @@ from random import choice
 
 
 @RequestRetry
-async def entrance(webpage_url, session):
+async def entrance(iframe_url, session):
     try:
-        vid_ = webpage_url.split('?')[0].split('/')[-1].split('.')[0].replace('id_', '').replace('==', '')
-        # vid_ = vid_.split('?')[0]
+        vid = iframe_url.split('?')[0].split('/')[-1].replace('==', '').lstrip('id_')
     except:
         traceback.print_exc()
         return False
     else:
-        data = {"video_id": vid_,
+        webpage_url = "https://v.youku.com/v_show/id_{}".format(vid)
+        data = {"video_id": vid,
                 "client_id": "b598bfd8ec862716",
                 "callback": "f'youkuPlayer_call_{int(time.time() * 1000)}'",
                 "type": "pc",
@@ -41,14 +42,15 @@ async def entrance(webpage_url, session):
                 return False
             else:
                 gather_results = await asyncio.gather(*[
-                    extract_info(vid=vid_, sign=stealsign, client_id=data['client_id'], session=session),
-                    extract_comment_count(vid=vid_, session=session),
+                    extract_info(vid=vid, sign=stealsign, client_id=data['client_id'], session=session),
+                    extract_comment_count(vid=vid, session=session),
                     extract_webpage(url=webpage_url, session=session)
                 ])
-                result = {**{"webpage_url": webpage_url, "vid": vid_, "downloader": 'ytd'},
+                result = {**{"webpage_url": webpage_url, "vid": vid, },
                           **{**gather_results[0],
                              **gather_results[1]}}
                 result['category'] += gather_results[2]['category']
+                result['downloader'] = 'ytd'
                 return {**gather_results[2], **result}
 
 
@@ -90,7 +92,7 @@ async def extract_info(vid, sign, client_id, session):
         videodata = json.loads(html.replace(new_parm['callback'], '')[1:-1])
         item = dict()
         item['from'] = "优酷"
-        item['play_addr'] = jmespath.search('data.stream[0].m3u8_url', videodata)
+        # item['play_addr'] = jmespath.search('data.stream[0].m3u8_url', videodata)
         item['duration'] = jmespath.search('data.video.seconds', videodata)
         item['cover'] = jmespath.search('data.video.logo', videodata)
         item['author'] = jmespath.search('data.uploader.username', videodata)
@@ -104,12 +106,14 @@ async def extract_info(vid, sign, client_id, session):
         try:
             item['height'] = jmespath.search('max_by(data.stream, &size).height', videodata)
             item['width'] = jmespath.search('max_by(data.stream, &size).width', videodata)
-            item['cdn_url'] = jmespath.search('max_by(data.stream, &size).segs[].cdn_url', videodata)
+            # item['cdn_url'] = jmespath.search('max_by(data.stream, &size).segs[].cdn_url', videodata)
+            item['play_addr'] = jmespath.search('max_by(data.stream, &size).segs[].cdn_url', videodata)[0]
         except:
             traceback.print_exc()
             item['height'] = jmespath.search('data.stream[-1].height', videodata)
             item['width'] = jmespath.search('data.stream[-1].width', videodata)
-            item['cdn_url'] = jmespath.search('data.stream[-1].segs[].cdn_url', videodata)
+            # item['cdn_url'] = jmespath.search('data.stream[-1].segs[].cdn_url', videodata)
+            item['play_addr'] = jmespath.search('data.stream[-1].segs[].cdn_url', videodata)[0]
         return item
 
 
@@ -181,26 +185,24 @@ async def request_youku_page(url, session):
         return response_text
 
 
-TEST_CASE = [
-    "https://v.youku.com/v_show/id_XMzg5Mjc5NDExMg==.html?spm=a2h0j.11185381.bpmodule-playpage-segments.5~5~A&&s=1f1b995a017c11df97c0",
-    "https://v.youku.com/v_show/id_XNDIyMTIwMjc2MA==.html?spm=a2ha1.12675304.m_2556_c_8261.d_2&s=5b4e34d331864a6d89dc&scm=20140719.manual.2556.show_5b4e34d331864a6d89dc",
-    "https://v.youku.com/v_show/id_XNDEyNDE5MzYyOA==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5MzYyOA%3D%3D",
-    "https://v.youku.com/v_show/id_XMzIzNTkyNzYyOA==.html?spm=a2ha1.12675304.m_2561_c_8264.d_1&s=efbfbd043420efbfbdef&scm=20140719.rcmd.2561.show_efbfbd043420efbfbdef",
-    "https://v.youku.com/v_show/id_XNDI0MTQ4MzIwMA==.html?spm=a2ha1.12675304.m_5497_c_27681.d_1&scm=20140719.manual.5497.video_XNDI0MTQ4MzIwMA%3D%3D",
-    "https://v.youku.com/v_show/id_XMTcxNTA2OTEwNA==.html?spm=a2ha1.12528442.m_4424_c_11054_4.d_5&s=cb4582f4f72011e5a080&scm=20140719.rcmd.4424.show_cb4582f4f72011e5a080",
-    "https://v.youku.com/v_show/id_XNDI0ODk0ODUzNg==.html?spm=a2ha1.12675304.m_2556_c_8261.d_1&s=de83005bc0ba4a9284b3&scm=20140719.manual.2556.show_de83005bc0ba4a9284b3",
-    "https://v.youku.com/v_show/id_XNDEyNDE5NzQ1Mg==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5NzQ1Mg%3D%3D",
-]
-
 if __name__ == '__main__':
     import aiohttp
     from pprint import pprint
+
+    "https://v.youku.com/v_show/id_XMzg5Mjc5NDExMg==.html?spm=a2h0j.11185381.bpmodule-playpage-segments.5~5~A&&s=1f1b995a017c11df97c0"
+    "https://v.youku.com/v_show/id_XNDIyMTIwMjc2MA==.html?spm=a2ha1.12675304.m_2556_c_8261.d_2&s=5b4e34d331864a6d89dc&scm=20140719.manual.2556.show_5b4e34d331864a6d89dc"
+    "https://v.youku.com/v_show/id_XNDEyNDE5MzYyOA==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5MzYyOA%3D%3D"
+    "https://v.youku.com/v_show/id_XMzIzNTkyNzYyOA==.html?spm=a2ha1.12675304.m_2561_c_8264.d_1&s=efbfbd043420efbfbdef&scm=20140719.rcmd.2561.show_efbfbd043420efbfbdef"
+    "https://v.youku.com/v_show/id_XNDI0MTQ4MzIwMA==.html?spm=a2ha1.12675304.m_5497_c_27681.d_1&scm=20140719.manual.5497.video_XNDI0MTQ4MzIwMA%3D%3D"
+    "https://v.youku.com/v_show/id_XMTcxNTA2OTEwNA==.html?spm=a2ha1.12528442.m_4424_c_11054_4.d_5&s=cb4582f4f72011e5a080&scm=20140719.rcmd.4424.show_cb4582f4f72011e5a080"
+    "https://v.youku.com/v_show/id_XNDI0ODk0ODUzNg==.html?spm=a2ha1.12675304.m_2556_c_8261.d_1&s=de83005bc0ba4a9284b3&scm=20140719.manual.2556.show_de83005bc0ba4a9284b3"
+    "https://v.youku.com/v_show/id_XNDEyNDE5NzQ1Mg==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5NzQ1Mg%3D%3D"
 
 
     async def test():
         async with aiohttp.ClientSession() as session_:
             return await entrance(
-                webpage_url="https://v.youku.com/v_show/id_XNDA3MjQzNTUyOA==",
+                webpage_url="https://v.youku.com/v_show/id_XNDEyNDE5NzQ1Mg==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5NzQ1Mg%3D%3D",
                 session=session_)
 
 

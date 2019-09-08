@@ -5,17 +5,7 @@
 
 import traceback
 import re
-from aioVextractor.extractor import (bilibili,
-                                     common,
-                                     douyin,
-                                     eyepetizer,
-                                     tencent,
-                                     tvcf,
-                                     vimeo,
-                                     xinpianchang,
-                                     youku,
-                                     youtube,
-                                     )
+from extractor import *
 
 
 async def distribute(webpage_url, netloc, path, session):
@@ -47,7 +37,44 @@ async def distribute(webpage_url, netloc, path, session):
         elif netloc == 'www.youtube.com':
             if constrain(path, '/watch'):
                 return await youtube.entrance(webpage_url=webpage_url, session=session)
+        elif "www.instagram.com" == netloc:
+            res = await instagram.entrance(webpage_url=webpage_url, session=session)
+            return res
+        elif "carben.me" == netloc:
+            res = await carben.entrance(webpage_url=webpage_url, session=session)
+            return res
+        elif "lanfanapp.com" == netloc:
+            res = await lanfan.entrance(webpage_url=webpage_url, session=session)
+            return res
+        elif "www.digitaling.com" == netloc:
+            res = await digitaling.entrance(webpage_url=webpage_url, session=session)
+            return res
+        elif "www.pinterest.com" == netloc:
+            res = await pinterest.entrance(webpage_url=webpage_url, session=session)
+            return res
+        elif "creative.adquan.com" == netloc:
+            res = await adquan.entrance(webpage_url=webpage_url, session=session)
+            return res
+        elif "www.adquan.com" == netloc:
+            res = await adquan.entrance(webpage_url=webpage_url, session=session)
+            return res
+        elif "blog.naver.com" == netloc:
+            res = await naver.entrance(webpage_url=webpage_url, session=session)
+            return res
+        elif "mobile.rr.tv" == netloc:
+            res = await renren.entrance(webpage_url=webpage_url, session=session)
+            return res
+        elif "socialbeta.com" == netloc:
+            res = await socialbeta.entrance(webpage_url=webpage_url, session=session)
+            return res
+        elif "www.vmovier.com" == netloc:
+            res = await vmovier.entrance(webpage_url=webpage_url, session=session)
+            return res
+        elif "iwebad.com" == netloc:
+            res = await iwebad.entrance(webpage_url=webpage_url, session=session)
+            return res
         else:
+            print(f"USING THE COMMON EXTRACTOR")
             res = await common.extract_info(webpage_url, collaborate=False)
             if isinstance(res, (dict, list)):
                 return res
