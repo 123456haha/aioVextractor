@@ -16,9 +16,8 @@ now = lambda: time.time()
 @RequestRetry
 async def entrance(webpage_url, session):
     try:
-        webpage_url = \
-            re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]| [! *(),] |(?: %[0-9a-fA-F][0-9a-fA-F]))+',
-                       webpage_url)[0]
+        webpage_url = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]| [! *(),] |(?: %[0-9a-fA-F][0-9a-fA-F]))+',
+                                 webpage_url)[0]
     except IndexError:
         return False
     download_headers = {'Connection': 'keep-alive',
@@ -31,8 +30,10 @@ async def entrance(webpage_url, session):
         Location = response_getinfo.headers['Location']
         get_aweme_id = lambda L: urlparse(L).path.strip('/').split('/')[-1]
         aweme_id = get_aweme_id(Location)
-        return extract(response_json=await aweme_detail(aweme_id=aweme_id,
-                                                        session=session))
+        # print(f"aweme_id: {aweme_id}")
+        result = extract(response_json=await aweme_detail(aweme_id=aweme_id,
+                                                          session=session))
+        return result if result else None
 
 
 @RequestRetry
@@ -40,42 +41,11 @@ async def aweme_detail(aweme_id, session):
     """
     get all info of the video
     """
-    api = 'https://aweme.snssdk.com/aweme/v1/aweme/detail/'
-    aweme_detail_headers = {'Host': 'aweme.snssdk.com',
-                            'sdk-version': '1',
-                            'X-SS-TC': '0',
-                            'User-Agent': 'com.ss.android.ugc.aweme/400 (Linux; U; Android 7.1.2; zh_CN; vivo X9; Build/N2G47H; Cronet/58.0.2991.0)',
-                            'X-Pods': ''}
-    aweme_detail_params = (('aweme_id', str(aweme_id)),
-                           ('retry_type', 'no_retry'),
-                           ('mcc_mnc', '46001'),
-                           ('iid', '56611278631'),
-                           ('device_id', '46086810620'),
-                           ('ac', 'wifi'),
-                           ('channel', 'vivo'),
-                           ('aid', '1128'),
-                           ('app_name', 'aweme'),
-                           ('version_code', '400'),
-                           ('version_name', '4.0.0'),
-                           ('device_platform', 'android'),
-                           ('ssmix', 'a'),
-                           ('device_type', 'vivo X9'),
-                           ('device_brand', 'vivo'),
-                           ('language', 'zh'),
-                           ('os_api', '25'),
-                           ('os_version', '7.1.2'),
-                           ('uuid', '864551033997690'),
-                           ('openudid', 'f9b692782e50a622'),
-                           ('manifest_version_code', '400'),
-                           ('resolution', '1080*1920'),
-                           ('dpi', '480'),
-                           ('update_version_code', '4002'),
-                           ('_rticket', int(now() * 1000)),
-                           ('ts', int(now())),
-                           ('js_sdk_version', '1.6.4'))
-    async with session.get(api,
+    api = f'https://aweme-hl.snssdk.com/aweme/v1/aweme/detail/?aweme_id={aweme_id}&device_platform=ios&app_name=aweme&aid=1128'
+    aweme_detail_headers = {'user-agent': 'Mozilla/5.0'}
+    async with session.get(api.format(aweme_id),
                            headers=aweme_detail_headers,
-                           params=aweme_detail_params) as response:
+                           ) as response:
         response_json = await response.json()
         return jmespath.search('aweme_detail', response_json)
 

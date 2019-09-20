@@ -11,9 +11,12 @@ from scrapy.selector import Selector
 import os
 from urllib.parse import urlparse
 import jmespath
-import ujson as json
 import asyncio
-
+import platform
+if platform.system() in {"Linux", "Darwin"}:
+    import ujson as json
+else:
+    import json
 
 @RequestRetry
 async def entrance(webpage_url, session):

@@ -8,7 +8,6 @@ I may need specific headers to play the video
 
 import jmespath
 import traceback
-import ujson as json
 from aioVextractor.extractor import common
 from aioVextractor.utils.user_agent import (UserAgent, android)
 from random import choice
@@ -17,6 +16,12 @@ import re
 from aioVextractor.utils.requests_retry import RequestRetry
 from aioVextractor.utils.MergeDict import merge_dicts
 import asyncio
+import platform
+
+if platform.system() in {"Linux", "Darwin"}:
+    import ujson as json
+else:
+    import json
 
 
 async def entrance(webpage_url, session):

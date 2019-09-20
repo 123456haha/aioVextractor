@@ -5,11 +5,16 @@
 
 import jmespath
 import traceback
-import ujson as json
 from aioVextractor.extractor import common
 from scrapy import Selector
 from aioVextractor.utils.requests_retry import RequestRetry
 import asyncio
+import platform
+
+if platform.system() in {"Linux", "Darwin"}:
+    import ujson as json
+else:
+    import json
 
 
 async def entrance(webpage_url, session):

@@ -5,7 +5,6 @@
 
 from urllib.parse import urlparse
 import jmespath
-import ujson as json
 from aioVextractor.utils.requests_retry import RequestRetry
 from random import choice
 from aioVextractor.utils.user_agent import UserAgent
@@ -13,6 +12,12 @@ from aioVextractor.player import youku
 from aioVextractor.player import xinpianchang
 from scrapy.selector import Selector
 import asyncio
+import platform
+
+if platform.system() in {"Linux", "Darwin"}:
+    import ujson as json
+else:
+    import json
 
 
 @RequestRetry

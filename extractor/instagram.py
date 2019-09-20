@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# IDE: PyCharm
-
 import asyncio
 import aiohttp, json, time
 from aioVextractor.utils.requests_retry import *
@@ -59,11 +55,11 @@ async def get_content_items(webpage_url, item, session):
             item['comment_count'] = shortcode_media.get('edge_media_to_parent_comment', {}).get('count', None)
             item['webpage_url'] = webpage_url
             item['cover'] = shortcode_media.get("display_url")
-            item['width'] = shortcode_media.get("dimensions", {}).get("width")
-            item['height'] = shortcode_media.get("dimensions", {}).get("height")
-            item['author'] = shortcode_media.get("owner", {}).get("username")
-            item['author_id'] = shortcode_media.get("owner", {}).get("id")
-            item['author_avatar'] = shortcode_media.get("owner", {}).get("profile_pic_url")
+            item['width'] = shortcode_media.get("dimensions",{}).get("width")
+            item['height'] = shortcode_media.get("dimensions",{}).get("height")
+            item['author'] = shortcode_media.get("owner",{}).get("username")
+            item['author_id'] = shortcode_media.get("owner",{}).get("id")
+            item['author_avatar'] = shortcode_media.get("owner",{}).get("profile_pic_url")
             if item['author']:
                 item['author_url'] = "https://www.instagram.com/" + item['author']
         except:
@@ -79,9 +75,9 @@ async def get_items_by_user(tagurl, session):
     if not tagurl:
         return this_user_items
     if tagurl[-1] != '/':
-        tagurl = tagurl + '/?__a=1'
+        tagurl = tagurl+'/?__a=1'
     else:
-        tagurl = tagurl + '?__a=1'
+        tagurl = tagurl+'?__a=1'
     async with session.get(tagurl, verify_ssl=False) as resp:
         html = await resp.text(encoding='utf-8', errors="ignore")
         try:
@@ -124,12 +120,23 @@ async def fetch_items(username):
     async with aiohttp.ClientSession(connector=conn) as session:
         return await get_items_by_user(username, session)
 
-
-async def GetTVData(webpage_url, session):
-    if webpage_url.endswith("/"):
-        tagurl = webpage_url + "?__a=1"
+@RequestRetry
+async def entrance(webpage_url, session):
+    if "/p/" in webpage_url:
+        item = dict()
+        await get_content_items(webpage_url, item, session)
+        return item
+    elif "/tv/" in webpage_url:
+        return await GetTVData(webpage_url,session)
     else:
-        tagurl = webpage_url.split("#")[0] + "/?__a=1"
+        videolist = await get_items_by_user(webpage_url,session)
+        return videolist
+
+async def GetTVData(webpage_url,session):
+    if webpage_url.endswith("/"):
+        tagurl = webpage_url+"?__a=1"
+    else:
+        tagurl = webpage_url.split("#")[0] +"/?__a=1"
     item = dict()
     async with session.get(tagurl, verify_ssl=False) as resp:
         try:
@@ -159,8 +166,8 @@ async def GetTVData(webpage_url, session):
             item['width'] = shortcode_media.get("dimensions", {}).get("width")
             item['height'] = shortcode_media.get("dimensions", {}).get("height")
             item['author'] = shortcode_media.get("owner", {}).get("username")
-            item['author_id'] = shortcode_media.get("owner", {}).get("id")
-            item['author_avatar'] = shortcode_media.get("owner", {}).get("profile_pic_url")
+            item['author_id'] = shortcode_media.get("owner",{}).get("id")
+            item['author_avatar'] = shortcode_media.get("owner",{}).get("profile_pic_url")
             if item['author']:
                 item['author_url'] = "https://www.instagram.com/" + item['author']
         except:

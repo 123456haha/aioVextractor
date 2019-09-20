@@ -3,13 +3,18 @@
 # Created by panos on 1/28/19
 # IDE: PyCharm
 
-import ujson as json
 import jmespath
 from aioVextractor.utils.user_agent import UserAgent
 from aioVextractor.utils.requests_retry import RequestRetry
 from random import choice
 from scrapy.selector import Selector
 import asyncio
+import platform
+
+if platform.system() in {"Linux", "Darwin"}:
+    import ujson as json
+else:
+    import json
 
 
 @RequestRetry
@@ -22,10 +27,9 @@ async def entrance(webpage_url, session):
                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
     async with session.get(webpage_url, headers=headers) as response:
         response_text = await response.text(encoding='utf8', errors='ignore')
-        print(response_text)
         selector = Selector(text=response_text)
         result = dict()
-        video_json = json.loads(selector.css('script::text').re_first('__NEXT_DATA__ = (\{[\s|\S]*\});'))
+        video_json = json.loads(selector.css('#__NEXT_DATA__::text').re_first('([\s|\S]*)'))
         result['author'] = jmespath.search('props.pageProps.initialProps.detail.contributor.display_name', video_json)
         result['play_addr'] = jmespath.search('props.pageProps.initialProps.detail.video.preview_mp4_url', video_json)
         result['title'] = jmespath.search('props.pageProps.initialProps.detail.video.description', video_json)
@@ -35,7 +39,7 @@ async def entrance(webpage_url, session):
         result['cover'] = jmespath.search('props.pageProps.initialProps.detail.video.preview_jpg_url', video_json)
         result['duration'] = jmespath.search('props.pageProps.initialProps.detail.video.duration', video_json)
         result['tag'] = jmespath.search('props.pageProps.initialProps.detail.video.keywords', video_json)
-        result['from'] = "广告门"
+        result['from'] = "站酷海洛"
         result['webpage_url'] = webpage_url
         return result
 
