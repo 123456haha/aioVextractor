@@ -75,6 +75,9 @@ async def entrance(webpage_url, session,retry=0):
     return videolist
 
 
+TEST_CASE = [
+    "https://www.pinterest.com/pin/457256168416688731",
+]
 
 async def test():
     async with aiohttp.ClientSession() as session_:

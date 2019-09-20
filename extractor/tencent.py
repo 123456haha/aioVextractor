@@ -18,11 +18,11 @@ from scrapy.selector import Selector
 import time
 import asyncio
 import platform
+
 if platform.system() in {"Linux", "Darwin"}:
     import ujson as json
 else:
     import json
-
 
 
 @RequestRetry
@@ -96,7 +96,8 @@ async def entrance(webpage_url, session):
                         player_view_count = None
                     result['view_count'] = player_view_count
             else:
-                result['view_count'] = selector.css('head meta[itemprop*=interactionCount]::attr(content)').extract_first()
+                result['view_count'] = selector.css(
+                    'head meta[itemprop*=interactionCount]::attr(content)').extract_first()
             if result['view_count'] == 'undefined':
                 result['view_count'] = None
             gather_results = await asyncio.gather(*[extract_comment_count(selector=selector, session=session),
@@ -248,7 +249,8 @@ async def extract_by_vkey(vid, url, session, chance_left=config.RETRY):
 
     api_get_info = os.path.join('http://', Host, 'getinfo')
     try:
-        async with session.get(api_get_info, headers=extract_by_vkey_headers, params=extract_by_vkey_params) as response_getinfo:
+        async with session.get(api_get_info, headers=extract_by_vkey_headers,
+                               params=extract_by_vkey_params) as response_getinfo:
             response_getinfo_text = await response_getinfo.text(encoding='utf8', errors='ignore')
     except http_exception:
         if chance_left != 1:
@@ -284,15 +286,15 @@ def createGUID():
         position += 1
     return guid
 
+
 @RequestRetry
 async def extract_by_api(url, session):
-
     extract_by_api_headers = {'Accept-Encoding': 'gzip, deflate',
-                                         'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-                                         'User-Agent': choice(UserAgent),
-                                         'Accept': '*/*',
-                                         'Referer': 'http://v.ranks.xin/',
-                                         'X-Requested-With': 'XMLHttpRequest'}
+                              'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                              'User-Agent': choice(UserAgent),
+                              'Accept': '*/*',
+                              'Referer': 'http://v.ranks.xin/',
+                              'X-Requested-With': 'XMLHttpRequest'}
     params = {'url': url}
     api = 'http://v.ranks.xin/video-parse.php'
     async with session.get(api, headers=extract_by_api_headers, params=params) as response:
@@ -304,19 +306,25 @@ async def extract_by_api(url, session):
         return result
 
 
+TEST_CASE = [
+    "https://v.qq.com/x/page/s0886ag14xn.html",
+    "https://v.qq.com/x/page/n0864edqzkl.html",
+    "https://v.qq.com/x/page/s08899ss07p.html",
+    "https://v.qq.com/x/cover/bzfkv5se8qaqel2.html",
+    "https://v.qq.com/x/page/x0888utz1ni.html",
+]
+
 if __name__ == '__main__':
     import asyncio
     import aiohttp
     from pprint import pprint
-    "https://v.qq.com/x/page/s0886ag14xn.html"
-    "https://v.qq.com/x/page/n0864edqzkl.html"
-    "https://v.qq.com/x/page/s08899ss07p.html"
-    "https://v.qq.com/x/cover/bzfkv5se8qaqel2.html"
-    "https://v.qq.com/x/page/x0888utz1ni.html"
+
+
     async def test():
         async with aiohttp.ClientSession() as session_:
             return await entrance(webpage_url="https://v.qq.com/x/page/x0888utz1ni.html",
                                   session=session_)
+
 
     loop = asyncio.get_event_loop()
     pprint(loop.run_until_complete(test()))

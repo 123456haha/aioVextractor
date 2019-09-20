@@ -57,8 +57,9 @@ from extractor import tvcf
 from extractor import vimeo
 from extractor import vmovier
 from extractor import xinpianchang
+from extractor import weixin
 
-TEST_CASE = (
+TEST_CASE = list(set(
         adquan.TEST_CASE
         + bilibili.TEST_CASE
         + carben.TEST_CASE
@@ -68,20 +69,21 @@ TEST_CASE = (
         + eyepetizer.TEST_CASE
         + hellorf.TEST_CASE
         + instagram.TEST_CASE
-        + pinterest.TEST_CASE
         + iwebad.TEST_CASE
         + lanfan.TEST_CASE
         + naver.TEST_CASE
-        + youku.TEST_CASE
-        + youtube.TEST_CASE
+        + pinterest.TEST_CASE
         + renren.TEST_CASE
         + socialbeta.TEST_CASE
         + tencent.TEST_CASE
         + tvcf.TEST_CASE
         + vimeo.TEST_CASE
         + vmovier.TEST_CASE
+        + weixin.TEST_CASE
         + xinpianchang.TEST_CASE
-)
+        + youku.TEST_CASE
+        + youtube.TEST_CASE
+))
 
 ALLOW_NETLOC = {urlsplit(url).netloc for url in TEST_CASE}
 

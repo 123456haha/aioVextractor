@@ -49,13 +49,13 @@ async def allocate_url(iframe_url, session):
         return await common.extract_info(webpage_url=iframe_url)
 
 
+TEST_CASE = [
+    "https://mp.weixin.qq.com/s/IqbmeLcurLXvCj-LefJfYw"
+]
+
 if __name__ == '__main__':
     import aiohttp
     from pprint import pprint
-
-    """
-    https://mp.weixin.qq.com/s/IqbmeLcurLXvCj-LefJfYw
-    """
 
 
     async def test():
