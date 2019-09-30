@@ -5,10 +5,9 @@
 
 import asyncio
 import aiohttp
-from ..utils.requests_retry import RequestRetry
-from ..utils.user_agent import safari
+from aioVextractor.utils.requests_retry import RequestRetry
+from aioVextractor.utils.user_agent import safari
 from random import choice
-import ujson as json
 from scrapy import Selector
 from urllib.parse import (urlsplit, unquote)
 import jmespath
@@ -16,6 +15,11 @@ import emoji
 import traceback
 import re
 import html
+import platform
+if platform.system() == 'Linux':
+    import ujson as json
+else:
+    import json
 
 
 async def breakdown(webpage_url,
