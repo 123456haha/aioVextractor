@@ -78,7 +78,7 @@ async def distribute(webpage_url, netloc, path, session):
             return res
         else:
             print(f"USING THE COMMON EXTRACTOR")
-            res = await common.extract_info(webpage_url, collaborate=False)
+            res = await common.breakdown(webpage_url)
             if isinstance(res, (dict, list)):
                 return res
             else:

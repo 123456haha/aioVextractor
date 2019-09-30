@@ -10,6 +10,44 @@ import time
 from urllib.parse import (parse_qs, urlparse)
 from aioVextractor.utils.user_agent import UserAgent
 from random import choice
+import aiohttp
+from aioVextractor.utils.requests_retry import RequestRetry
+from concurrent import futures  ## lib for multiprocessing and threading
+from scrapy import Selector
+import os
+import asyncio
+
+
+async def breakdown(webpage_url):
+    def wrapper(url):
+        try:
+            new_loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(new_loop)
+            res = new_loop.run_until_complete(extract_info(webpage_url=url, collaborate=False))
+            new_loop.close()
+            return res
+        except:
+            traceback.print_exc()
+            return False
+    webpage_content = await retrieve_webpapge(webpage_url=webpage_url)
+    selector = Selector(text=webpage_content)
+    iframe_src = selector.css('iframe::attr(src)').extract()
+    with futures.ThreadPoolExecutor(max_workers=min(10, os.cpu_count())) as executor:  ## set up processes
+        executor.submit(wrapper)
+        future_to_url = [executor.submit(wrapper, url=iframe) for iframe in iframe_src]
+        results = []
+        try:
+            for f in futures.as_completed(future_to_url, timeout=max([len(iframe_src) * 3, 15])):
+                try:
+                    result = f.result()
+                    result['playlist_url'] = webpage_url
+                    results.append(result)
+                except:
+                    traceback.print_exc()
+                    continue
+        except:
+            pass
+        return results
 
 
 async def extract_info(webpage_url, collaborate=True):
@@ -124,11 +162,22 @@ def extract_single(VideoJson, webpage_url):
     return result
 
 
-TEST_CASE = [
-    "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4",
-]
+@RequestRetry
+async def retrieve_webpapge(webpage_url):
+    """retrieve webpage"""
+    async with aiohttp.ClientSession(raise_for_status=True) as session:
+        headers = {
+            'upgrade-insecure-requests': '1',
+            'user-agent': choice(UserAgent),
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
+        }
+        async with session.get(webpage_url, headers=headers) as response:
+            return await response.text()
+
+
 if __name__ == '__main__':
-    import asyncio
     from pprint import pprint
 
 
