@@ -10,9 +10,19 @@ if __name__ == '__main__':
     from aioVextractor import *
     from aioVextractor.extractor import *
     from pprint import pprint
+
+
     async def test():
         async with aiohttp.ClientSession() as session:
             for webpage_url in TEST_CASE:
-                result = await extract(webpage_url=webpage_url, session=session)
-                pprint(result)
-                print("******************************************************")
+                procceed = input("proccee webpage_url: {webpage_url}?\n"
+                                 "press Enter/n/no to ignore and y/yes to procceed: ")
+                if procceed in {"y", 'yes'}:
+                    result = await extract(webpage_url=webpage_url,
+                                           session=session)
+                    pprint(result)
+                    print(
+                        "***************************************************************************************************\n")
+
+
+    asyncio.run(test())

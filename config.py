@@ -7,7 +7,7 @@
 ## retry at most 3 times when encounters failure request
 RETRY = 3
 
-URL_REGEX = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+URL_REGEX = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),#]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 
 
 # PLAYLIST_TEST_CASE = ['https://vimeo.com/alitasmitmedia',

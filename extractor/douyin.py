@@ -33,7 +33,8 @@ async def entrance(webpage_url, session):
         # print(f"aweme_id: {aweme_id}")
         result = extract(response_json=await aweme_detail(aweme_id=aweme_id,
                                                           session=session))
-        return result if result else None
+
+        return result if result else False
 
 
 @RequestRetry
@@ -73,6 +74,8 @@ def extract(response_json):
         result['play_addr'] = jmespath.search("video.play_addr.url_list[?contains(@, 'bytecdn')] | [0]", response_json)
         if not result['play_addr']:
             result['play_addr'] = jmespath.search("video.play_addr.url_list[0]", response_json)
+        if not result['play_addr']:
+            return False
         result['title'] = jmespath.search('desc', response_json)
         result['vid'] = jmespath.search('aweme_id', response_json)
         result['cover'] = jmespath.search('video.cover.url_list[0]', response_json)

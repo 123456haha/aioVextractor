@@ -168,7 +168,7 @@ if __name__ == '__main__':
     async def test():
         async with aiohttp.ClientSession() as session_:
             for iiii in TEST_CASE:
-                result = await extract(webpage_url=iiii, session=session_)
+                result = await extract(webpage_url="https://mobile.rr.tv/mission/#/share/video?id=1879897", session=session_)
                 print(result)
                 print('\n')
 

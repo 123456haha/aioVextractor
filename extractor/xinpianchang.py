@@ -142,7 +142,6 @@ def get_ext(url_):
 
 TEST_CASE = [
     "https://www.xinpianchang.com/a10475334?from=ArticleList",
-    "https://www.xinpianchang.com/u10009204?from=userList",
 ]
 if __name__ == '__main__':
     import aiohttp

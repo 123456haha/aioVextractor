@@ -73,6 +73,9 @@ async def distribute(webpage_url, netloc, path, session):
         elif "iwebad.com" == netloc:
             res = await iwebad.entrance(webpage_url=webpage_url, session=session)
             return res
+        elif "mp.weixin.qq.com" == netloc:
+            res = await weixin.entrance(webpage_url=webpage_url, session=session)
+            return res
         else:
             print(f"USING THE COMMON EXTRACTOR")
             res = await common.extract_info(webpage_url, collaborate=False)
