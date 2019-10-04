@@ -16,6 +16,7 @@ import platform
 from aioVextractor import config
 import wrapt
 import functools
+import re
 
 
 def validate(wrapped=None):
@@ -69,8 +70,15 @@ def validate(wrapped=None):
 
 
 class BaseExtractor:
+    ## a list of regexs to match the target website
+    ## this is used to identify whether a incoming url is extractable
+    target_website = [
+        r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),#]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+    ]
+
     def __init__(self, from_="generic"):
         self.from_ = from_
+
 
     def __enter__(self):
         ## a random headers with UA parm
@@ -166,6 +174,15 @@ class BaseExtractor:
             return "The Python Interpreter you are using is {python_version}.\n" \
                    "You should consider switching it to some more modern one such as Python 3.7+ " \
                 .format(python_version=python_version)
+    @staticmethod
+    def janitor(string):
+        """
+        match the url(s) from string
+        :param string:
+        :return:
+        """
+        url_list = re.findall(config.URL_REGEX, string)  ## find all url in the string
+        return url_list
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # asyncio.run(self.async_session.close())
