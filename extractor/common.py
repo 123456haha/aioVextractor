@@ -176,6 +176,9 @@ async def retrieve_webpapge(webpage_url):
         async with session.get(webpage_url, headers=headers) as response:
             return await response.text()
 
+TEST_CASE = [
+    "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4",
+]
 
 if __name__ == '__main__':
     from pprint import pprint
