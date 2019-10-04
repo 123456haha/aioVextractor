@@ -14,12 +14,8 @@ import asyncio
 import aiohttp
 import platform
 from aioVextractor import config
-import traceback
 import wrapt
 import functools
-
-
-# import trio
 
 
 def validate(wrapped=None):
@@ -77,53 +73,6 @@ class BaseExtractor:
         self.from_ = from_
 
     def __enter__(self):
-        ## all possible output fields
-        # self.fields = [
-        #     'ad_link',
-        #     'author',
-        #     'author_attention',
-        #     'author_avatar',
-        #     'author_birthday',
-        #     'author_description',
-        #     'author_follwer_count',
-        #     'author_follwing_count',
-        #     'author_gender',
-        #     'author_id',
-        #     'author_sign',
-        #     'author_url',
-        #     'author_videoNum',
-        #     'category',
-        #     # 'cdn_url',
-        #     'collect_count',
-        #     'comment_count',
-        #     'cover',
-        #     # 'created_at',
-        #     'description',
-        #     'dislike_count',
-        #     'download_count',
-        #     'downloader',
-        #     'duration',
-        #     'forward_count',
-        #     'from',
-        #     'gender',
-        #     'height',
-        #     'language',
-        #     'like_count',
-        #     'play_addr',
-        #     # 'player_id',
-        #     'rating',
-        #     'recommend',
-        #     'region',
-        #     'share_count',
-        #     'tag',
-        #     'title',
-        #     'upload_date',
-        #     'upload_ts',
-        #     'vid',
-        #     'view_count',
-        #     'webpage_url',
-        #     'width',
-        # ]
         ## a random headers with UA parm
         self.general_headers = lambda user_agent: {
             'Connection': 'keep-alive',
