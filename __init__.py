@@ -10,22 +10,22 @@ curPath = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(curPath)
 
 
-from aioVextractor import (
-    breaker,
-    extractor,
-    utils,
-    config,
-    distributor,
-    breakdown,
-)
-
-from extract import (
-    extract,
-    is_playlist
-)
-
-from breakdown import breakdown
-from aioVextractor.distributor import distribute
-from aioVextractor.extractor import ALLOW_NETLOC
-import aiohttp
-import asyncio
+# from aioVextractor import (
+#     breaker,
+#     extractor,
+#     utils,
+#     config,
+#     distributor,
+#     breakdown,
+# )
+#
+# from extract import (
+#     extract,
+#     is_playlist
+# )
+#
+# from breakdown import breakdown
+# from aioVextractor.distributor import distribute
+# from aioVextractor.extractor import ALLOW_NETLOC
+# import aiohttp
+# import asyncio
