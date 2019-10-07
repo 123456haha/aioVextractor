@@ -16,7 +16,7 @@ import traceback
 import re
 import html
 import platform
-if platform.system() == 'Linux':
+if platform.system() in {"Linux", "Darwin"}:
     import ujson as json
 else:
     import json
