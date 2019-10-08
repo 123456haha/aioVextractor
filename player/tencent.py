@@ -26,7 +26,8 @@ async def entrance(session, iframe_url=None, webpage_url=None):
         try:
             vid = parse_qs(urlparse(iframe_url).query).get('vid')[0]
         except IndexError:
-            return 'url does not contain `vid`'
+            print(f'url: {iframe_url} does not contain `vid`')
+            return False
         webpage_url = 'https://v.qq.com/x/page/{vid}.html'.format(vid=vid)
     elif webpage_url:
         webpage_url = webpage_url
