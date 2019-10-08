@@ -91,7 +91,7 @@ async def extract_info(vid, sign, client_id, session):
         html = await response.text(encoding='utf-8', errors='ignore')
         videodata = json.loads(html.replace(new_parm['callback'], '')[1:-1])
         item = dict()
-        item['from'] = "优酷"
+        item['from'] = "youku"
         # item['play_addr'] = jmespath.search('data.stream[0].m3u8_url', videodata)
         item['duration'] = jmespath.search('data.video.seconds', videodata)
         item['cover'] = jmespath.search('data.video.logo', videodata)

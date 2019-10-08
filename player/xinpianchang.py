@@ -31,14 +31,14 @@ async def entrance(webpage_url, session):
     async with session.get(webpage_url, headers=headers, params=params) as response:
         response_text = await response.text(encoding='utf8', errors='ignore')
         webpage = await extract_publish(response=response_text)
-        vid = webpage['vid']
-        if not vid:
+        xpc_vid = webpage['vid']
+        database_vid = webpage_url.split('?')[0].split('/')[-1].strip('a')
+        if not xpc_vid:
             return False
-        video = await extract_video_info(referer=webpage_url, vid=vid, session=session)
+        video = await extract_video_info(referer=webpage_url, vid=xpc_vid, session=session)
         if all([webpage, video]):
-            return {**webpage, **video}
+            return {**{**webpage, **video}, **{"vid": database_vid}}
         else:
-            pprint([webpage, video])
             return False
 
 

@@ -21,12 +21,18 @@ import asyncio
 
 
 @RequestRetry
-async def entrance(iframe_url, session):
-    try:
-        vid = parse_qs(urlparse(iframe_url).query).get('vid')[0]
-    except IndexError:
-        return 'url does not contain `vid`'
-    webpage_url = 'https://v.qq.com/x/page/{vid}.html'.format(vid=vid)
+async def entrance(session, iframe_url=None, webpage_url=None):
+    if iframe_url:
+        try:
+            vid = parse_qs(urlparse(iframe_url).query).get('vid')[0]
+        except IndexError:
+            return 'url does not contain `vid`'
+        webpage_url = 'https://v.qq.com/x/page/{vid}.html'.format(vid=vid)
+    elif webpage_url:
+        webpage_url = webpage_url
+    else:
+        print("You did not specify `iframe_url` or `webpage_url`")
+        return False
     result = dict()
     headers = {'authority': 'v.qq.com',
                'upgrade-insecure-requests': '1',
