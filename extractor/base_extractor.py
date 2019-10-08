@@ -7,6 +7,7 @@ from aioVextractor.utils.requests_retry import RequestRetry
 from aioVextractor.utils.user_agent import UserAgent
 from aioVextractor.player import tencent
 from aioVextractor.player import youku
+from aioVextractor.player import xinpianchang
 # from aioVextractor.extractor import common
 from random import choice
 from scrapy.selector import Selector
@@ -21,9 +22,13 @@ import youtube_dl
 import traceback
 import jmespath
 import time
+from os.path import splitext
+import html
+import os
+from concurrent import futures  ## lib for multiprocessing and threading
 from urllib.parse import (
     urlparse,
-    parse_qs
+    parse_qs,
 )
 
 
@@ -51,7 +56,7 @@ def validate(wrapped=None):
         elif isinstance(results, dict):
             results = [results]
 
-        print(f"results: {results}")
+        # print(f"results: {results}")
 
         for result in results:
             output = dict()
@@ -123,7 +128,6 @@ class BaseExtractor:
                       'q=0.9,image/webp,image/apng,*/*;'
                       'q=0.8,application/signed-exchange;'
                       'v=b3',
-            'Referer': 'https://www.digitaling.com/articles',
             'Accept-Encoding': 'gzip, deflate, br',
             'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
         }
@@ -176,8 +180,10 @@ class BaseExtractor:
         """
         if 'v.qq.com' in iframe_url:
             return await tencent.entrance(iframe_url=iframe_url, session=session)
-        elif 'player.youku.com' in iframe_url:
+        elif 'player.youku.com' in iframe_url or 'v.youku' in iframe_url:
             return await youku.entrance(iframe_url=iframe_url, session=session)
+        elif "xinpianchang" in iframe_url:
+            return await xinpianchang.entrance(webpage_url=iframe_url, session=session)
         else:
             return await self.breakdown(webpage_url=iframe_url)
 
@@ -383,13 +389,10 @@ class BaseExtractor:
 
     async def breakdown(self, webpage_url):
         """
-
+        extract iframes from webpage_url and extract these iframe_urls concurrently
         :param webpage_url:
         :return:
         """
-
-        import os
-        from concurrent import futures  ## lib for multiprocessing and threading
 
         def wrapper(url):
             try:
@@ -422,6 +425,26 @@ class BaseExtractor:
                 traceback.print_exc()
                 pass
             return results
+
+    @staticmethod
+    def unescape(string):
+        if string:
+            return html.unescape(string)
+        else:
+            return None
+
+    @staticmethod
+    def get_ext(url_):
+        """
+        Return the filename extension from url, or ''
+        """
+        if url_ is None:
+            return False
+        parsed = urlparse(url_)
+        root, ext_ = splitext(parsed.path)
+        ext = ext_[1:]  # or ext[1:] if you don't want the leading '.'
+        ## ext = 'jpeg@80w_80h_1e_1c'
+        return ext.split('@')[0]
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # asyncio.run(self.async_session.close())
