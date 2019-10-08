@@ -4,19 +4,19 @@
 # IDE: PyCharm
 
 
-import jmespath
+# import jmespath
 # from aioVextractor.utils.user_agent import UserAgent
 # from aioVextractor.utils.requests_retry import RequestRetry
 # from random import choice
 # from os.path import splitext
-from scrapy.selector import Selector
+# from scrapy.selector import Selector
 # import asyncio
 # import html
-import emoji
-import dateutil.parser
-import traceback
+# import emoji
+# import dateutil.parser
+# import traceback
 # from urllib.parse import urlparse
-import os
+# import os
 
 
 # @RequestRetry

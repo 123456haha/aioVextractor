@@ -122,10 +122,11 @@ class Extractor(BaseExtractor):
 
 
 if __name__ == '__main__':
+    from pprint import pprint
     with Extractor() as extractor:
-        # print(extractor.target_website)
-        ress = extractor.sync_entrance(webpage_url="https://vimeo.com/281493330")
-        print(ress)
+        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
+        pprint(res)
+
 
     # import aiohttp
     # from pprint import pprint

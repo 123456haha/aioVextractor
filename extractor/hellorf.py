@@ -8,7 +8,7 @@ import jmespath
 # from aioVextractor.utils.requests_retry import RequestRetry
 # from random import choice
 from scrapy.selector import Selector
-import asyncio
+# import asyncio
 import platform
 
 if platform.system() in {"Linux", "Darwin"}:
@@ -85,9 +85,11 @@ class Extractor(BaseExtractor):
             return result
 
 if __name__ == '__main__':
+    from pprint import pprint
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://www.hellorf.com/video/show/11995691")
-        print(res)
+        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
+        pprint(res)
+
 
     # import aiohttp
     # from pprint import pprint

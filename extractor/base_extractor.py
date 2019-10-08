@@ -365,7 +365,7 @@ class BaseExtractor:
 
         This method provide something more the the above method:
         1. merging more than 2 dictionaries
-        2. only replace the previous value with the upcoming value if the previous value is meanginless (None/False/0)
+        2. only replace the previous value with the upcoming value if the previous value is in {None/False/0}
         """
 
         result = {}
@@ -452,11 +452,12 @@ class BaseExtractor:
 
 
 if __name__ == '__main__':
+    from pprint import pprint
     with BaseExtractor() as extractor:
         res = extractor.sync_entrance(webpage_url="https://www.digitaling.com/projects/55684.html")
-        print(res)
+        pprint(res)
         res = extractor.sync_entrance(webpage_url="https://www.digitaling.com/projects/56636.html")
-        print(res)
+        pprint(res)
         # for i in extractor.results:
         #     print(i)
     # extractor = BaseExtractor()

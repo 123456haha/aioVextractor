@@ -93,9 +93,11 @@ class Extractor(BaseExtractor):
             return results
 
 if __name__ == '__main__':
+    from pprint import pprint
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="http://iwebad.com/video/3577.html")
-        print(res)
+        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
+        pprint(res)
+
 
     # import aiohttp
     # from pprint import pprint

@@ -5,17 +5,17 @@
 
 # import youtube_dl
 # import jmespath
-import traceback
+# import traceback
 # import time
 # from urllib.parse import (parse_qs, urlparse)
 # from aioVextractor.utils.user_agent import UserAgent
 # from random import choice
 # import aiohttp
 # from aioVextractor.utils.requests_retry import RequestRetry
-from concurrent import futures  ## lib for multiprocessing and threading
-from scrapy import Selector
-import os
-import asyncio
+# from concurrent import futures  ## lib for multiprocessing and threading
+# from scrapy import Selector
+# import os
+# import asyncio
 #
 #
 # async def breakdown(webpage_url):
@@ -194,10 +194,11 @@ class Extractor(BaseExtractor):
 
 
 if __name__ == '__main__':
+    from pprint import pprint
     with Extractor() as extractor:
-        # print(extractor.target_website)
-        ress = extractor.sync_entrance(webpage_url="http://peacefulcuisine.com/category/videos/#")
-        print(ress)
+        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
+        pprint(res)
+
 
 
     # async def test():

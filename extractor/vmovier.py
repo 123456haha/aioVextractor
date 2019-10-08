@@ -142,7 +142,7 @@ class Extractor(BaseExtractor):
     async def allocate_url(self, url, session, referer=None, selector=None):
         if 'openapi' in url:
             return await self.extract_openapi_info(selector=selector, player_address=url,
-                                              referer=referer, session=session)
+                                                   referer=referer, session=session)
         elif 'v.youku.com' in url:
             return await youku.entrance(iframe_url=url, session=session)
         elif "xinpianchang" in url:

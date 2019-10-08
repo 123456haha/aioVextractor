@@ -6,11 +6,11 @@
 import jmespath
 from urllib.parse import urlparse, parse_qs
 import time
-from aioVextractor.utils.user_agent import UserAgent
-from aioVextractor.utils.requests_retry import RequestRetry
-from random import choice
+# from aioVextractor.utils.user_agent import UserAgent
+# from aioVextractor.utils.requests_retry import RequestRetry
+# from random import choice
 from scrapy.selector import Selector
-import asyncio
+# import asyncio
 import traceback
 
 # @RequestRetry
@@ -204,9 +204,11 @@ class Extractor(BaseExtractor):
 
 
 if __name__ == '__main__':
+    from pprint import pprint
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="http://blog.naver.com/PostList.nhn?blogId=paranzui&categoryNo=0&from=postList")
-        print(res)
+        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
+        pprint(res)
+
 
     # import aiohttp
     # from pprint import pprint

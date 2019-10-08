@@ -3,10 +3,10 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
-from aioVextractor.utils.requests_retry import RequestRetry
-from aioVextractor.utils.user_agent import UserAgent
+# from aioVextractor.utils.requests_retry import RequestRetry
+# from aioVextractor.utils.user_agent import UserAgent
 import time
-from random import choice
+# from random import choice
 from scrapy.selector import Selector
 import os
 from urllib.parse import urlparse
@@ -249,7 +249,7 @@ class Extractor(BaseExtractor):
                 api = f'https://play.tvcf.co.kr/rest/api/player/init/{idx}'
                 async with session.get(api, headers=headers) as r_code:
                     response_text = await r_code.text()
-                    print(f"response_text: {response_text}")
+                    # print(f"response_text: {response_text}")
                     r_code_json = json.loads(response_text)
                     code = jmespath.search('video.code', r_code_json)
                     result['from'] = self.from_
@@ -307,15 +307,15 @@ class Extractor(BaseExtractor):
               ])
         return result
 
-        # def get_ext(url_):
-        #     """Return the filename extension from url, or ''."""
-        #     if url_ is None:
-        #         return False
-        #     parsed = urlparse(url_)
-        #     root, ext_ = splitext(parsed.query)
-        #     ext = ext_[1:]  # or ext[1:] if you don't want the leading '.'
-        #     ## ext = 'jpeg@80w_80h_1e_1c'
-        #     return ext.split('@')[0]
+    # def get_ext(url_):
+    #     """Return the filename extension from url, or ''."""
+    #     if url_ is None:
+    #         return False
+    #     parsed = urlparse(url_)
+    #     root, ext_ = splitext(parsed.query)
+    #     ext = ext_[1:]  # or ext[1:] if you don't want the leading '.'
+    #     ## ext = 'jpeg@80w_80h_1e_1c'
+    #     return ext.split('@')[0]
 
     @RequestRetry(default_exception_return=[],
                   default_other_exception_return=[])

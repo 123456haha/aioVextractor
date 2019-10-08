@@ -230,9 +230,11 @@ class Extractor(BaseExtractor):
             return item
 
 if __name__ == '__main__':
+    from pprint import pprint
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://www.instagram.com/p/B3LaNyYlyfG/")
-        print(res)
+        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
+        pprint(res)
+
 
 
     # async def test():

@@ -3,26 +3,26 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
-from aioVextractor.utils.requests_retry import RequestRetry
-from aioVextractor.utils.exception import http_exception
-from aioVextractor.utils.user_agent import UserAgent
-from random import choice
-from aioVextractor import config
-import traceback
-import jmespath
-import math
-import random
-import re
-import os
-from scrapy.selector import Selector
-import time
-import asyncio
-import platform
-
-if platform.system() in {"Linux", "Darwin"}:
-    import ujson as json
-else:
-    import json
+# from aioVextractor.utils.requests_retry import RequestRetry
+# from aioVextractor.utils.exception import http_exception
+# from aioVextractor.utils.user_agent import UserAgent
+# from random import choice
+# from aioVextractor import config
+# import traceback
+# import jmespath
+# import math
+# import random
+# import re
+# import os
+# from scrapy.selector import Selector
+# import time
+# import asyncio
+# import platform
+#
+# if platform.system() in {"Linux", "Darwin"}:
+#     import ujson as json
+# else:
+#     import json
 
 # @RequestRetry
 # async def entrance(webpage_url, session):
@@ -335,10 +335,10 @@ class Extractor(BaseExtractor):
 
 if __name__ == '__main__':
     from pprint import pprint
-
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://v.qq.com/x/page/s0886ag14xn.html")
+        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
         pprint(res)
+
 
     # import asyncio
     # import aiohttp

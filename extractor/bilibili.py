@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 # Created by panos on 2019/6/20
 # IDE: PyCharm
-"""
-I may need specific headers to play the video
-"""
+
 
 import jmespath
 import traceback
@@ -181,10 +179,11 @@ class Extractor(BaseExtractor):
 
 
 if __name__ == '__main__':
-
+    from pprint import pprint
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4")
-        print(res)
+        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
+        pprint(res)
+
     # import aiohttp
     # from pprint import pprint
     #

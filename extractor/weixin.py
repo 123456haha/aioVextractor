@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 # Created by panos on 1/21/19
 # IDE: PyCharm
-from aioVextractor.utils.user_agent import UserAgent
-from aioVextractor.player import tencent
-from aioVextractor.player import youku
-from aioVextractor.extractor import common
-from aioVextractor.utils.requests_retry import RequestRetry
-from random import choice
+# from aioVextractor.utils.user_agent import UserAgent
+# from aioVextractor.player import tencent
+# from aioVextractor.player import youku
+# from aioVextractor.extractor import common
+# from aioVextractor.utils.requests_retry import RequestRetry
+# from random import choice
 from scrapy.selector import Selector
 import asyncio
 
