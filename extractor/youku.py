@@ -192,17 +192,45 @@ TEST_CASE = [
     "https://v.youku.com/v_show/id_XNDEyNDE5NzQ1Mg==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5NzQ1Mg%3D%3D",
 ]
 
+
+from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, RequestRetry)
+from aioVextractor.player import youku
+
+
+class Extractor(BaseExtractor):
+    target_website = [
+        "https://v\.youku\.com/v_show/id_\w{10,36}",
+    ]
+
+    def __init__(self, *args, **kwargs):
+        BaseExtractor.__init__(self, *args, **kwargs)
+        self.from_ = "youku"
+
+    @validate
+    @RequestRetry
+    async def entrance(self, webpage_url, session):
+        return await youku.entrance(iframe_url=webpage_url, session=session)
+
+
+
+
 if __name__ == '__main__':
-    import aiohttp
     from pprint import pprint
 
+    with Extractor() as extractor:
+        res = extractor.sync_entrance(webpage_url="https://v.youku.com/v_show/id_XNDEyNDE5NzQ1Mg")
+        pprint(res)
 
-    async def test():
-        async with aiohttp.ClientSession() as session_:
-            return await entrance(
-                webpage_url="https://v.youku.com/v_show/id_XNDA3MjQzNTUyOA==",
-                session=session_)
-
-
-    loop = asyncio.get_event_loop()
-    pprint(loop.run_until_complete(test()))
+    # import aiohttp
+    # from pprint import pprint
+    #
+    #
+    # async def test():
+    #     async with aiohttp.ClientSession() as session_:
+    #         return await entrance(
+    #             webpage_url="https://v.youku.com/v_show/id_XNDA3MjQzNTUyOA==",
+    #             session=session_)
+    #
+    #
+    # loop = asyncio.get_event_loop()
+    # pprint(loop.run_until_complete(test()))
