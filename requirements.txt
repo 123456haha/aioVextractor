@@ -7,6 +7,8 @@ jmespath==0.9.4
 lxml==4.3.4
 mysql-connector-python==8.0.18
 python-dateutil==2.8.0
+sanic==19.9.0
+sanic-cors==0.9.9.post3
 Scrapy==1.6.0
 ujson==1.35
 uvloop==0.12.2
