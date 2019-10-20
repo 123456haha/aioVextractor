@@ -96,7 +96,7 @@ else:
 
 class Extractor(BaseExtractor):
     target_website = [
-        "www\.pinterest\.com/pin/\d{15,23}",
+        "https://www\.pinterest\.com/pin/\d{15,23}",
     ]
 
     def __init__(self, *args, **kwargs):
