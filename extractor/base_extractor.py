@@ -139,21 +139,23 @@ async def validate(func, extractor_instace, args, kwargs):
     2. ensure the integrated of the output data according to the config.FIELDS
     :return:
     """
+    ## list of regexs for matching exact webpage_url for extractor_instance
     target_website = extractor_instace.target_website
     webpage_url = kwargs['webpage_url']
     urls = []
+    ## match url form webpage_url
     for regex in target_website:
         urls += re.findall(regex, webpage_url)
-
+    ## asyncio gather these urls
     gather_results = await asyncio.gather(
         *[
-            # func(*args, **kwargs) for webpage_url in urls
             func(*args, **{**kwargs, **{"webpage_url": webpage_url}}) for webpage_url in urls
         ])
 
     outputs = []
     for results in gather_results:
-        
+        ## if the results is []/False/None/0
+        ## skip to the next one
         if results:
             pass
         else:
@@ -165,8 +167,7 @@ async def validate(func, extractor_instace, args, kwargs):
         elif isinstance(results, dict):
             results = [results]
 
-        # print(f"results: {results}")
-
+        ## validate the integrity of the output
         for result in results:
             output = dict()
             for field in config.FIELDS:
