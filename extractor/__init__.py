@@ -2,7 +2,19 @@
 # -*- coding: utf-8 -*-
 # Created by panos on 2019/6/20
 # IDE: PyCharm
-
+"""
+extractor/ contains all the codes necessary for each specified website
+every extractor listed under this dir are inherit from extractor.base_extractor.BaseExtractor,
+which having a bunch of easy-to-use APIs.
+Such as:
+1. general_headers: provides a headers while requesting a webpage
+2. random_ua: gives out a random user agent
+3. extract_iframe: An API to extract iframe with src link to v.qq / youku / youtube / vimeo and etc.
+4. janitor: match the url(s) from string using regex
+5. merge_dicts: shows a different way to merge two dict other from {**dict_one, **dict_two}
+6. unescape: unescape a string
+and etc..
+"""
 from urllib.parse import urlsplit
 import aiohttp
 import asyncio
