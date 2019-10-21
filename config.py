@@ -10,63 +10,6 @@ RETRY = 3
 
 URL_REGEX = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),#]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 
-# PLAYLIST_TEST_CASE = ['https://vimeo.com/alitasmitmedia',
-#                       'https://vimeo.com/channels/ceiga',
-#                       'https://www.youtube.com/playlist?list=PLohYzz4btpaSt2T0rcfmF8wfQzuW_6JTv',
-#                       'https://www.youtube.com/channel/UC36FGmBEGfmOV2T5QVNI9ew',
-#                       'https://www.xinpianchang.com/u10539256?from=userList',
-#                       ]
-## how many videos retrieve from a playlist by default
-# DEFAULT_CURSOR = 0
-# DEFAULT_OFFSET = 10
-
-# fields = [
-#     'ad_link',
-#     'author',
-#     'author_attention',
-#     'author_avatar',
-#     'author_birthday',
-#     'author_description',
-#     'author_follwer_count',
-#     'author_follwing_count',
-#     'author_gender',
-#     'author_id',
-#     'author_sign',
-#     'author_url',
-#     'author_videoNum',
-#     'category',
-#     # 'cdn_url',
-#     'collect_count',
-#     'comment_count',
-#     'cover',
-#     # 'created_at',
-#     'description',
-#     'dislike_count',
-#     'download_count',
-#     'downloader',
-#     'duration',
-#     'forward_count',
-#     'from',
-#     'gender',
-#     'height',
-#     'language',
-#     'like_count',
-#     'play_addr',
-#     # 'player_id',
-#     'rating',
-#     'recommend',
-#     'region',
-#     'share_count',
-#     'tag',
-#     'title',
-#     'upload_date',
-#     'upload_ts',
-#     'vid',
-#     'view_count',
-#     'webpage_url',
-#     'width',
-# ]
-
 ## indicator to show the significance level of the fields
 FIELD_SIGNI_LEVEL = {
     "must": 1,  ## necessary field that should be present after extracting
