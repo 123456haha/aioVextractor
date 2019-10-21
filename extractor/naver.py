@@ -85,7 +85,6 @@ class Extractor(BaseExtractor):
         try:
             return int(time.mktime(time.strptime(upload_ts, '%Y. %m. %d. %H:%M'))) if upload_ts else None
         except:
-            traceback.print_exc()
             return None
 
     @staticmethod

@@ -19,7 +19,7 @@ class Extractor(BaseExtractor):
     ]
 
     TEST_CASE = [
-        "https://www.instagram.com/p/B1G1rBiAa_8/",
+        "https://www.instagram.com/p/B1tXMlihthT/",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -63,7 +63,7 @@ class Extractor(BaseExtractor):
 if __name__ == '__main__':
     from pprint import pprint
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
+        res = extractor.sync_entrance(webpage_url="https://www.instagram.com/p/B1tXMlihthT/")
         pprint(res)
 
 

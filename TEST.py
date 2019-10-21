@@ -12,14 +12,21 @@ from aioVextractor.extractor import *
 import aiohttp
 import asyncio
 
-async def test():
+async def test(asking=True):
     async with aiohttp.ClientSession() as session:
         fail_url = set()
         for ie in gen_extractor_classes():
-            for sample in ie.TEST_CASE:
-                procceed = input(f"proccee webpage_url: {sample}?\n"
-                                 f"press Enter/n/no to ignore and y/yes to procceed\n"
-                                 f"enter `pass` to the next extractor TEST_CASE: ")
+            try:
+                TEST_CASE = ie.TEST_CASE
+            except:
+                continue
+            for sample in TEST_CASE:
+                if asking:
+                    procceed = input(f"proccee webpage_url: {sample}?\n"
+                                     f"press Enter/n/no to ignore and y/yes to procceed\n"
+                                     f"enter `pass` to the next extractor TEST_CASE: ")
+                else:
+                    procceed = "yes"
                 if procceed in {"y", 'yes'}:
                     result = await extract(webpage_url=sample, session=session)
                     pprint(result)
@@ -34,4 +41,4 @@ async def test():
                   f"{fail_url}")
 
 
-asyncio.run(test())
+asyncio.run(test(asking=False))

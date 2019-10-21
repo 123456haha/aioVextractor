@@ -40,10 +40,15 @@ async def validate(func, extractor_instace, args, kwargs):
     ## list of regexs for matching exact webpage_url for extractor_instance
     target_website = extractor_instace.target_website
     webpage_url = kwargs['webpage_url']
+    print(f"webpage_url: {webpage_url}")
     urls = []
     ## match url form webpage_url
     for regex in target_website:
+        print(f"regex: {regex}")
         urls += re.findall(regex, webpage_url)
+        print(f"urls: {urls}")
+
+    print(f"urls: {urls}")
     ## asyncio gather these urls
     gather_results = await asyncio.gather(
         *[

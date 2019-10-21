@@ -23,7 +23,7 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "http[s]?://www\.tvcf\.co\.kr/YCF/V.asp\?Code=\w{7,15}",
+        "http[s]?://www\.tvcf\.co\.kr/YCf/V\.asp\?Code=\w{7,15}",
         "http[s]?://play\.tvcf\.co\.kr/\d{3,10}",
     ]
 
@@ -40,6 +40,8 @@ class Extractor(BaseExtractor):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session):
+        print(f"webpage_url: {webpage_url}")
+
         if 'code' in webpage_url.lower():  ## old version http://www.tvcf.co.kr/YCf/V.asp?Code=A000363280
             ParseResult = urlparse(webpage_url)
             try:
@@ -51,6 +53,7 @@ class Extractor(BaseExtractor):
                 params = {'Code': code}
                 async with session.get('http://www.tvcf.co.kr/YCf/V.asp', headers=headers, params=params) as response:
                     response_text = await response.text(encoding='utf8', errors='ignore')
+                    print(f"response_text: {response_text}")
                     result = dict()
                     result['webpage_url'] = webpage_url
                     result['from'] = self.from_
@@ -131,16 +134,6 @@ class Extractor(BaseExtractor):
               ])
         return result
 
-    # def get_ext(url_):
-    #     """Return the filename extension from url, or ''."""
-    #     if url_ is None:
-    #         return False
-    #     parsed = urlparse(url_)
-    #     root, ext_ = splitext(parsed.query)
-    #     ext = ext_[1:]  # or ext[1:] if you don't want the leading '.'
-    #     ## ext = 'jpeg@80w_80h_1e_1c'
-    #     return ext.split('@')[0]
-
     @RequestRetry(default_exception_return=[],
                   default_other_exception_return=[])
     async def get_tags(self, session, idx):
@@ -203,5 +196,5 @@ class Extractor(BaseExtractor):
 if __name__ == '__main__':
     from pprint import pprint
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://play.tvcf.co.kr/755843")
+        res = extractor.sync_entrance(webpage_url="http://www.tvcf.co.kr/YCf/V.asp?Code=A000363280")
         pprint(res)

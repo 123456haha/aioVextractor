@@ -13,6 +13,7 @@ from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, Req
 class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://www\.eyepetizer\.net/detail\.html\?vid=\d{3,8}",
+        "www\.eyepetizer\.net/detail\.html\?vid=\d{3,8}",
     ]
 
     TEST_CASE = [
