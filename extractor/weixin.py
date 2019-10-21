@@ -11,16 +11,14 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-TEST_CASE = [
-    "https://mp.weixin.qq.com/s/IqbmeLcurLXvCj-LefJfYw"
-]
-
-
-
 
 class Extractor(BaseExtractor):
     target_website = [
         "https://mp\.weixin\.qq\.com/s/[\w-]{10,36}",
+    ]
+
+    TEST_CASE = [
+        "https://mp.weixin.qq.com/s/IqbmeLcurLXvCj-LefJfYw"
     ]
 
     def __init__(self, *args, **kwargs):

@@ -11,15 +11,15 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-TEST_CASE = [
-    "https://socialbeta.com/t/jiafangyifang-news-20190226",
-    "https://socialbeta.com/t/case-collection-overseas-ad-about-superbowl-20190224",
-]
-
 
 class Extractor(BaseExtractor):
     target_website = [
         "https://socialbeta\.com/t/[\w-]*?\d{6,10}",
+    ]
+
+    TEST_CASE = [
+        "https://socialbeta.com/t/jiafangyifang-news-20190226",
+        "https://socialbeta.com/t/case-collection-overseas-ad-about-superbowl-20190224",
     ]
 
     def __init__(self, *args, **kwargs):

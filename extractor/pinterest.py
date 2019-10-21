@@ -12,10 +12,6 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-TEST_CASE = [
-    "https://www.pinterest.com/pin/457256168416688731",
-]
-
 
 
 if platform.system() in {"Linux", "Darwin"}:
@@ -26,6 +22,10 @@ else:
 class Extractor(BaseExtractor):
     target_website = [
         "https://www\.pinterest\.com/pin/\d{15,23}",
+    ]
+
+    TEST_CASE = [
+        "https://www.pinterest.com/pin/457256168416688731",
     ]
 
     def __init__(self, *args, **kwargs):

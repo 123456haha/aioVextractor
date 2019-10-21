@@ -3,10 +3,6 @@
 # Created by panos on 2019/7/1
 # IDE: PyCharm
 
-TEST_CASE = [
-    "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4",
-]
-
 from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, RequestRetry)
 
 

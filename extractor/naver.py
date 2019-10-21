@@ -14,19 +14,19 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-TEST_CASE = [
-    "http://blog.naver.com/PostList.nhn?blogId=paranzui&categoryNo=0&from=postList",
-    "http://blog.naver.com/PostView.nhn?blogId=paranzui&logNo=221233413302&categoryNo=0&parentCategoryNo=0&viewDate=&currentPage=11&postListTopCurrentPage=1&from=postList&userTopListOpen=true&userTopListCount=5&userTopListManageOpen=false&userTopListCurrentPage=11",
-    "http://blog.naver.com/PostView.nhn?blogId=paranzui&logNo=221239676910&categoryNo=0&parentCategoryNo=0&viewDate=&currentPage=11&postListTopCurrentPage=1&from=postList&userTopListOpen=true&userTopListCount=5&userTopListManageOpen=false&userTopListCurrentPage=11",
-    "http://blog.naver.com/PostView.nhn?blogId=paranzui&logNo=221227458497&categoryNo=0&parentCategoryNo=0&viewDate=&currentPage=29&postListTopCurrentPage=1&from=postList&userTopListOpen=true&userTopListCount=5&userTopListManageOpen=false&userTopListCurrentPage=29",
-]
-
 
 
 class Extractor(BaseExtractor):
     target_website = [
         "http://blog\.naver\.com/PostView\.nhn\?blogId=\w*?&logNo=\d{9,15}",
         "http://blog\.naver\.com/PostList\.nhn\?blogId=\w*",
+    ]
+
+    TEST_CASE = [
+        "http://blog.naver.com/PostList.nhn?blogId=paranzui&categoryNo=0&from=postList",
+        "http://blog.naver.com/PostView.nhn?blogId=paranzui&logNo=221233413302&categoryNo=0&parentCategoryNo=0&viewDate=&currentPage=11&postListTopCurrentPage=1&from=postList&userTopListOpen=true&userTopListCount=5&userTopListManageOpen=false&userTopListCurrentPage=11",
+        "http://blog.naver.com/PostView.nhn?blogId=paranzui&logNo=221239676910&categoryNo=0&parentCategoryNo=0&viewDate=&currentPage=11&postListTopCurrentPage=1&from=postList&userTopListOpen=true&userTopListCount=5&userTopListManageOpen=false&userTopListCurrentPage=11",
+        "http://blog.naver.com/PostView.nhn?blogId=paranzui&logNo=221227458497&categoryNo=0&parentCategoryNo=0&viewDate=&currentPage=29&postListTopCurrentPage=1&from=postList&userTopListOpen=true&userTopListCount=5&userTopListManageOpen=false&userTopListCurrentPage=29",
     ]
 
     def __init__(self, *args, **kwargs):

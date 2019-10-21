@@ -11,15 +11,15 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-TEST_CASE = [
-    "http://iwebad.com/video/3578.html",
-    "http://iwebad.com/video/3577.html",
-]
-
 
 class Extractor(BaseExtractor):
     target_website = [
         "http://iwebad\.com/video/\d{1,7}\.html",
+    ]
+
+    TEST_CASE = [
+        "http://iwebad.com/video/3578.html",
+        "http://iwebad.com/video/3577.html",
     ]
 
     def __init__(self, *args, **kwargs):

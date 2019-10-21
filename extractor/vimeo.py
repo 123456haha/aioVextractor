@@ -15,17 +15,17 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-TEST_CASE = [
-    "https://vimeo.com/281493330",
-    "https://vimeo.com/344361560",
-]
-
 
 
 class Extractor(BaseExtractor):
 
     target_website = [
         "https://vimeo\.com/\d{7,18}"
+    ]
+
+    TEST_CASE = [
+        "https://vimeo.com/281493330",
+        "https://vimeo.com/344361560",
     ]
 
     def __init__(self, *args, **kwargs):

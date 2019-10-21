@@ -11,15 +11,15 @@ if platform.system() in {"Linux", "Darwin"}:
 else:
     import json
 
-TEST_CASE = [
-    "https://www.instagram.com/p/B1G1rBiAa_8/",
-]
-
 
 class Extractor(BaseExtractor):
     target_website = [
         "www\.instagram\.com/p/[\w-]*",
         "www\.instagram\.com/tv/[\w-]*",
+    ]
+
+    TEST_CASE = [
+        "https://www.instagram.com/p/B1G1rBiAa_8/",
     ]
 
     def __init__(self, *args, **kwargs):

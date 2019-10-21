@@ -13,25 +13,24 @@ from aioVextractor.extractor.base_extractor import (
     validate,
     RequestRetry
 )
+
 if platform.system() in {"Linux", "Darwin"}:
     import ujson as json
 else:
     import json
 
 
-TEST_CASE = [
-    "https://www.youtube.com/watch?v=tofSaLB9kwE",
-    "https://www.youtube.com/watch?v=pgN-vvVVxMA",
-    "https://www.youtube.com/watch?v=iAeYPfrXwk4",
-    "https://www.youtube.com/watch?v=jDO2YPGv9fw&list=PLNHZSfaJJc25zChky2JaM99ba8I2bVUza&index=15&t=0s",
-    "https://www.youtube.com/watch?v=JGwWNGJdvx8&list=PLDcnymzs18LU4Kexrs91TVdfnplU3I5zs&index=28&t=0s",
-]
-
-
-
 class Extractor(BaseExtractor):
     target_website = [
         "www\.youtube\.com/watch\?v=[\w-]{5,15}"
+    ]
+
+    TEST_CASE = [
+        "https://www.youtube.com/watch?v=tofSaLB9kwE",
+        "https://www.youtube.com/watch?v=pgN-vvVVxMA",
+        "https://www.youtube.com/watch?v=iAeYPfrXwk4",
+        "https://www.youtube.com/watch?v=jDO2YPGv9fw&list=PLNHZSfaJJc25zChky2JaM99ba8I2bVUza&index=15&t=0s",
+        "https://www.youtube.com/watch?v=JGwWNGJdvx8&list=PLDcnymzs18LU4Kexrs91TVdfnplU3I5zs&index=28&t=0s",
     ]
 
     def __init__(self, *args, **kwargs):

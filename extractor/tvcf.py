@@ -20,17 +20,17 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-TEST_CASE = [
-    "http://www.tvcf.co.kr/YCf/V.asp?Code=A000363280",
-    "https://play.tvcf.co.kr/750556",
-    "https://play.tvcf.co.kr/755843",
-]
-
 
 class Extractor(BaseExtractor):
     target_website = [
         "www\.tvcf\.co\.kr/YCF/V.asp\?Code=\w{7,15}",
         "https://play\.tvcf\.co\.kr/\d{3,10}",
+    ]
+
+    TEST_CASE = [
+        "http://www.tvcf.co.kr/YCf/V.asp?Code=A000363280",
+        "https://play.tvcf.co.kr/750556",
+        "https://play.tvcf.co.kr/755843",
     ]
 
     def __init__(self, *args, **kwargs):

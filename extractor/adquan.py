@@ -11,14 +11,6 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-TEST_CASE = [
-    "https://creative.adquan.com/show/286788",
-    "https://creative.adquan.com/show/286778",
-    "http://www.adquan.com/post-2-49507.html",
-    "http://creative.adquan.com/show/49469",
-    "http://creative.adquan.com/show/49415",
-]
-
 
 class Extractor(BaseExtractor):
     target_website = [
@@ -26,6 +18,14 @@ class Extractor(BaseExtractor):
         "http://creative\.adquan\.com/show/\d{3,7}",
         "http://www\.adquan\.com/post-\d-\d{3,7}\.html$",
         "https://www\.adquan\.com/post-\d-\d{3,7}\.html$",
+    ]
+
+    TEST_CASE = [
+        "https://creative.adquan.com/show/286788",
+        "https://creative.adquan.com/show/286778",
+        "http://www.adquan.com/post-2-49507.html",
+        "http://creative.adquan.com/show/49469",
+        "http://creative.adquan.com/show/49415",
     ]
 
     def __init__(self, *args, **kwargs):

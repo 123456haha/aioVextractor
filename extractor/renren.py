@@ -12,15 +12,15 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-TEST_CASE = [
-    "https://mobile.rr.tv/mission/#/share/video?id=1879897",
-    "https://mobile.rr.tv/mission/#/share/video?id=1879530",
-]
-
 
 class Extractor(BaseExtractor):
     target_website = [
         "https://mobile\.rr\.tv/mission/#/share/video\?id=\d{3,7}",
+    ]
+
+    TEST_CASE = [
+        "https://mobile.rr.tv/mission/#/share/video?id=1879897",
+        "https://mobile.rr.tv/mission/#/share/video?id=1879530",
     ]
 
     def __init__(self, *args, **kwargs):

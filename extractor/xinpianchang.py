@@ -10,14 +10,14 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-TEST_CASE = [
-    "https://www.xinpianchang.com/a10475334?from=ArticleList",
-]
-
 
 class Extractor(BaseExtractor):
     target_website = [
         "www\.xinpianchang\.com/a\d{7,10}",
+    ]
+
+    TEST_CASE = [
+        "https://www.xinpianchang.com/a10475334?from=ArticleList",
     ]
 
     def __init__(self, *args, **kwargs):

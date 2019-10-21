@@ -6,18 +6,18 @@
 from scrapy.selector import Selector
 import asyncio
 
-TEST_CASE = [
-    "https://www.digitaling.com/projects/55684.html",
-    "https://www.digitaling.com/projects/56636.html",
-    "https://www.digitaling.com/articles/105167.html",
-]
-
 from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, RequestRetry)
 
 class Extractor(BaseExtractor):
     target_website = [
         "https://www\.digitaling\.com/projects/\d{3,7}\.html",
         "https://www\.digitaling\.com/articles/\d{3,7}\.html",
+    ]
+
+    TEST_CASE = [
+        "https://www.digitaling.com/projects/55684.html",
+        "https://www.digitaling.com/projects/56636.html",
+        "https://www.digitaling.com/articles/105167.html",
     ]
 
     def __init__(self, *args, **kwargs):

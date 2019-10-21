@@ -7,16 +7,16 @@ import jmespath
 import re
 import traceback
 
-TEST_CASE = [
-    "https://www.eyepetizer.net/detail.html?vid=119611&utm_campaign=routine&utm_medium=share&utm_source=others&uid=0&resourceType=video&udid=1bb9f2f14545490c9168f7b99d89136e8ff14724&vc=443&vn=4.9.1&size=1080X1920&deviceModel=vivo%20X9&first_channel=eyepetizer_vivo_market&last_channel=eyepetizer_vivo_market&system_version_code=25",
-]
-
 from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, RequestRetry)
 
 
 class Extractor(BaseExtractor):
     target_website = [
         "www\.eyepetizer\.net/detail\.html\?vid=\d{3,8}",
+    ]
+
+    TEST_CASE = [
+        "https://www.eyepetizer.net/detail.html?vid=119611&utm_campaign=routine&utm_medium=share&utm_source=others&uid=0&resourceType=video&udid=1bb9f2f14545490c9168f7b99d89136e8ff14724&vc=443&vn=4.9.1&size=1080X1920&deviceModel=vivo%20X9&first_channel=eyepetizer_vivo_market&last_channel=eyepetizer_vivo_market&system_version_code=25",
     ]
 
     def __init__(self, *args, **kwargs):

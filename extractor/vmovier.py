@@ -21,21 +21,21 @@ else:
     import json
 
 
-TEST_CASE = [
-    ## xpc player:
-    "https://www.vmovier.com/55810?from=index_new_img",
-    "https://www.vmovier.com/56000?from=index_new_img",
-    ## youku player:
-    "https://www.vmovier.com/56052?from=index_new_title",
-    "https://www.vmovier.com/55952?from=index_new_img",
-    "https://www.vmovier.com/55108",
-]
-
 
 
 class Extractor(BaseExtractor):
     target_website = [
         "www\.vmovier\.com/\d{2,8}",
+    ]
+
+    TEST_CASE = [
+        ## xpc player:
+        "https://www.vmovier.com/55810?from=index_new_img",
+        "https://www.vmovier.com/56000?from=index_new_img",
+        ## youku player:
+        "https://www.vmovier.com/56052?from=index_new_title",
+        "https://www.vmovier.com/55952?from=index_new_img",
+        "https://www.vmovier.com/55108",
     ]
 
     def __init__(self, *args, **kwargs):

@@ -7,17 +7,17 @@ import jmespath
 from urllib.parse import urlparse
 
 
-TEST_CASE = [
-    "#在抖音，记录美好生活#球球老婆怀孕之后就爱睡这个洗脸巢 睡姿也太可爱了8#猫 http://v.douyin.com/hd9sb3/ 复制此链接，打开【抖音短视频】，直接观看视频！",
-    "http://v.douyin.com/hd9sb3/",
-]
-
 from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, RequestRetry)
 
 
 class Extractor(BaseExtractor):
     target_website = [
         "http://v\.douyin\.com/\w{3,9}/",
+    ]
+
+    TEST_CASE = [
+        "#在抖音，记录美好生活#球球老婆怀孕之后就爱睡这个洗脸巢 睡姿也太可爱了8#猫 http://v.douyin.com/hd9sb3/ 复制此链接，打开【抖音短视频】，直接观看视频！",
+        "http://v.douyin.com/hd9sb3/",
     ]
 
     def __init__(self, *args, **kwargs):

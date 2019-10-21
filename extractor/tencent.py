@@ -10,20 +10,20 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-TEST_CASE = [
-    "https://v.qq.com/x/page/s0886ag14xn.html",
-    "https://v.qq.com/x/page/n0864edqzkl.html",
-    "https://v.qq.com/x/page/s08899ss07p.html",
-    "https://v.qq.com/x/cover/bzfkv5se8qaqel2.html",
-    "https://v.qq.com/x/page/x0888utz1ni.html",
-]
-
 
 
 class Extractor(BaseExtractor):
     target_website = [
         "https://v\.qq\.com/x/page/\w{9,18}\.html",
         "https://v\.qq\.com/x/cover/\w{9,18}\.html",
+    ]
+
+    TEST_CASE = [
+        "https://v.qq.com/x/page/s0886ag14xn.html",
+        "https://v.qq.com/x/page/n0864edqzkl.html",
+        "https://v.qq.com/x/page/s08899ss07p.html",
+        "https://v.qq.com/x/cover/bzfkv5se8qaqel2.html",
+        "https://v.qq.com/x/page/x0888utz1ni.html",
     ]
 
     def __init__(self, *args, **kwargs):

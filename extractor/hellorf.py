@@ -13,17 +13,17 @@ else:
     import json
 
 
-TEST_CASE = [
-    "https://www.hellorf.com/video/show/15148543",
-    "https://www.hellorf.com/video/show/11995691",
-]
-
 from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, RequestRetry)
 
 
 class Extractor(BaseExtractor):
     target_website = [
         "www\.hellorf\.com/video.show/\d{5,10}",
+    ]
+
+    TEST_CASE = [
+        "https://www.hellorf.com/video/show/15148543",
+        "https://www.hellorf.com/video/show/11995691",
     ]
 
     def __init__(self, *args, **kwargs):

@@ -14,19 +14,6 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-TEST_CASE = [
-    "https://weibo.com/tv/v/I5RTQlExh?fid=1034:4413979699688929",
-    "https://weibo.com/tv/v/FxTBC1Dp8?from=vhot",
-    "https://weibo.com/tv/v/Ib31ooLdE?fid=1034:4426329710596386",
-    "https://weibo.com/tv/v/IbOnau1mu?fid=1034:4428150730652786",
-    "https://weibo.com/tv/v/IbFq32OZd?fid=1034:4427803702006591",
-    "https://weibo.com/tv/v/I4YSOoeCp?fid=1034:4411872741380331",
-    "https://m.weibo.cn/status/4428801453021670?wm=3333_2001&from=109A193010&sourcetype=dingding",
-    "http://t.cn/Ai8Bj0z6",
-    "https://m.weibo.cn/status/4428801453021670?wm=3333_2001&from=109A193010&sourcetype=dingding",
-
-]
-
 
 
 if platform.system() in {"Linux", "Darwin"}:
@@ -40,6 +27,19 @@ class Extractor(BaseExtractor):
         "https://weibo\.com/tv/v/[\w]{5,15}\?fid=1034\:\d{5,25}",
         "https://weibo\.com/tv/v/[\w]{5,15}\?from=\w{1,10}",
         "http://t\.cn/[\w-]{3,10}",
+    ]
+
+    TEST_CASE = [
+        "https://weibo.com/tv/v/I5RTQlExh?fid=1034:4413979699688929",
+        "https://weibo.com/tv/v/FxTBC1Dp8?from=vhot",
+        "https://weibo.com/tv/v/Ib31ooLdE?fid=1034:4426329710596386",
+        "https://weibo.com/tv/v/IbOnau1mu?fid=1034:4428150730652786",
+        "https://weibo.com/tv/v/IbFq32OZd?fid=1034:4427803702006591",
+        "https://weibo.com/tv/v/I4YSOoeCp?fid=1034:4411872741380331",
+        "https://m.weibo.cn/status/4428801453021670?wm=3333_2001&from=109A193010&sourcetype=dingding",
+        "http://t.cn/Ai8Bj0z6",
+        "https://m.weibo.cn/status/4428801453021670?wm=3333_2001&from=109A193010&sourcetype=dingding",
+
     ]
 
     def __init__(self, *args, **kwargs):

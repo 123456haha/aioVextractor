@@ -12,13 +12,13 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-TEST_CASE = [
-    "https://lanfanapp.com/recipe/3127/",
-]
-
 class Extractor(BaseExtractor):
     target_website = [
         "https://lanfanapp\.com/recipe/\d{1,6}",
+    ]
+
+    TEST_CASE = [
+        "https://lanfanapp.com/recipe/3127/",
     ]
 
     def __init__(self, *args, **kwargs):

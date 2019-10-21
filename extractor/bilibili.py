@@ -17,16 +17,16 @@ if platform.system() in {"Linux", "Darwin"}:
 else:
     import json
 
-TEST_CASE = [
-    "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4",
-]
-
 from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, RequestRetry)
 
 
 class Extractor(BaseExtractor):
     target_website = [
         "www\.bilibili\.com/video/av\d{4,9}",
+    ]
+
+    TEST_CASE = [
+        "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4",
     ]
 
     def __init__(self, *args, **kwargs):
