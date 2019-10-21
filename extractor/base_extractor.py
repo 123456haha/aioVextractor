@@ -8,7 +8,6 @@ from aioVextractor.utils.user_agent import UserAgent
 from aioVextractor.player import tencent
 from aioVextractor.player import youku
 from aioVextractor.player import xinpianchang
-# from aioVextractor.extractor import common
 from random import choice
 from scrapy.selector import Selector
 import asyncio
@@ -16,7 +15,6 @@ import aiohttp
 import platform
 from aioVextractor import config
 import wrapt
-import functools
 import re
 import youtube_dl
 import traceback
@@ -31,106 +29,6 @@ from urllib.parse import (
     parse_qs,
 )
 
-
-# def validate(wrapped=None):
-#     """
-#     1. ensure the accuracy of the input url: match the url by `target_website` in BaseExtractor
-#     2. ensure the integrated of the output data according to the config.FIELDS
-#     :param wrapped:
-#     :return:
-#     """
-#     if wrapped is None:
-#         return functools.partial(validate)
-#
-#     @wrapt.decorator
-#     async def wrapper(func, extractor_instace, args, kwargs):
-#         print(f"args: {args}")
-#         print(f"kwargs: {kwargs}")
-#         target_website = extractor_instace.target_website
-#         print(f"target_website: {target_website}")
-#         webpage_url = kwargs['webpage_url']
-#         session = kwargs['session']
-#         urls = []
-#         for regex in target_website:
-#             print(f"regex: {regex}")
-#             print(f"webpage_url: {webpage_url}")
-#             urls += re.findall(regex, webpage_url)
-#         print(f"urls: {urls}")
-#         print(f"func: {func}")
-#         gather_results = await asyncio.gather(
-#             *[
-#                 func(webpage_url=webpage_url, session=session) for webpage_url in urls
-#                 # func(**{"webpage_url":webpage_url, session:session}) for webpage_url in urls
-#             ])
-#
-#         # gather_task = []
-#         # for webpage_url in urls:
-#         #     kwargs['webpage_url'] = webpage_url
-#         #     print(f"kwargs: {kwargs}")
-#         #     gather_task.append(func(**kwargs))
-#         # gather_results = await asyncio.gather(*gather_task)
-#
-#         # gather_results = await asyncio.gather(*[
-#         #     func(webpage_url=webpage_url, *args, **kwargs) for webpage_url in urls
-#         # ])
-#         # results = await func(webpage_url=webpage_url, *args, **kwargs)
-#         outputs = []
-#         for results in gather_results:
-#             if results:
-#                 pass
-#             else:
-#                 continue
-#                 # return None
-#
-#             if isinstance(results, list):
-#                 pass
-#             elif isinstance(results, dict):
-#                 results = [results]
-#
-#             # print(f"results: {results}")
-#
-#             for result in results:
-#                 output = dict()
-#                 for field in config.FIELDS:
-#                     field_info = config.FIELDS[field]
-#                     signi_level = field_info["signi_level"]
-#                     if signi_level == config.FIELD_SIGNI_LEVEL["else"]:
-#                         output[field] = result.get(field, field_info["default_value"])
-#                     elif signi_level == config.FIELD_SIGNI_LEVEL["must"]:
-#                         try:
-#                             output[field] = result[field]
-#                         except KeyError:
-#                             print(f"You should have specify field `{field}`")
-#                             output = False
-#                             break
-#                     elif signi_level == config.FIELD_SIGNI_LEVEL["condition_must"]:
-#                         dependent_field_name = field_info["dependent_field_name"]
-#                         dependent_field_value = field_info["dependent_field_value"]
-#                         dependent_field_value_actual = result.get(dependent_field_name,
-#                                                                   "f79e2450e6b911e99af648d705c16021")
-#                         ## actual value of the dependent_field
-#                         ## if the dependent_field is not given
-#                         ## the default value is considered
-#                         dependent_field_value_actual = config.FIELDS[dependent_field_name]["default_value"] \
-#                             if dependent_field_value_actual == "f79e2450e6b911e99af648d705c16021" \
-#                             else dependent_field_value_actual
-#                         if dependent_field_value_actual == dependent_field_value:
-#                             try:
-#                                 output[field] = result[field]
-#                             except KeyError:
-#                                 print(f"You should have specify field `{field}` "
-#                                       f"while field `{dependent_field_name}` == {dependent_field_value}")
-#                                 output = False
-#                                 break
-#                         else:
-#                             ## SIGNI_LEVEL=0
-#                             output[field] = result.get(field, field_info['default_value'])
-#                 if output:  ## after scanning all the listed field in config.FIELDS
-#                     outputs.append(output)
-#             else:
-#                 return outputs
-#
-#     return wrapper(wrapped)
 
 @wrapt.decorator
 async def validate(func, extractor_instace, args, kwargs):
@@ -581,6 +479,3 @@ if __name__ == '__main__':
         pprint(res)
         res = extractor.sync_entrance(webpage_url="https://www.digitaling.com/projects/56636.html")
         pprint(res)
-        # for i in extractor.results:
-        #     print(i)
-    # extractor = BaseExtractor()
