@@ -17,7 +17,10 @@ and etc..
 
 If you want to add extractor in this file, here remember the following points:
 1. Regenerate file extractor.extractors
- 
+2. specify target_website as class variable
+3. inherit BaseExtractor.__init__() and define self.from_
+4. redefine BaseExtractor.entracne()
+
 """
 # from urllib.parse import urlsplit
 # import aiohttp

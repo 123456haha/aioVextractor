@@ -111,7 +111,7 @@ async def validate(func, extractor_instace, args, kwargs):
 class BaseExtractor:
     """
     When you define a new extractor base on this class
-    1. specify target_website as public variable
+    1. specify target_website as class variable
     2. inherit BaseExtractor.__init__() and define self.from_
     3. redefine BaseExtractor.entracne()
     """
