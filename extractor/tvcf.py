@@ -40,8 +40,6 @@ class Extractor(BaseExtractor):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session):
-        print(f"webpage_url: {webpage_url}")
-
         if 'code' in webpage_url.lower():  ## old version http://www.tvcf.co.kr/YCf/V.asp?Code=A000363280
             ParseResult = urlparse(webpage_url)
             try:
@@ -53,7 +51,6 @@ class Extractor(BaseExtractor):
                 params = {'Code': code}
                 async with session.get('http://www.tvcf.co.kr/YCf/V.asp', headers=headers, params=params) as response:
                     response_text = await response.text(encoding='utf8', errors='ignore')
-                    print(f"response_text: {response_text}")
                     result = dict()
                     result['webpage_url'] = webpage_url
                     result['from'] = self.from_
