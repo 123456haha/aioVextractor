@@ -14,9 +14,9 @@ from sanic import response as Response
 from sanic import Sanic
 from sanic_cors import CORS
 import platform
-from aioVextractor.extractor import *
 from aioVextractor import distribute
 import aiohttp
+from aioVextractor import config
 
 if platform.system() in {"Linux", "Darwin"}:
     import uvloop
@@ -30,6 +30,18 @@ app.config.KEEP_ALIVE = True
 app.config.KEEP_ALIVE_TIMEOUT = 500
 app.config.RESPONSE_TIMEOUT = 500
 CORS(app, automatic_options=True)
+
+
+@app.route('/')
+async def homepage(request):
+    response = {k: {"method": v[1][1],
+                    "url": app.url_for(k,
+                                       _external=True,
+                                       _server=f"http://{config.LOCAL_IP_ADDR}:{config.SANIC_PORT}"),
+                    "pattern": v[1][2].pattern,
+                    "parameters": v[1][3],
+                    } for k, v in app.router.routes_names.items()}
+    return Response.json(response)
 
 
 @app.route('/extractor', methods=['GET', 'POST'], name='extractor')

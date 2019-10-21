@@ -23,10 +23,11 @@ and etc..
 from aioVextractor.extractor.extractors import *
 
 _ALL_CLASSES = [
-    name
+    klass
     for name, klass in globals().items()
-    if name.endswith('IE') and name != 'baseIE'
+    if name.endswith('IE') and name not in {"baseIE", "commonIE"}
 ]
+_ALL_CLASSES.append(commonIE)
 _ALL_CLASSES.append(baseIE)
 
 def gen_extractor_classes():

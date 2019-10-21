@@ -16,6 +16,7 @@ FIELD_SIGNI_LEVEL = {
     "else": 0,  ## not necessary
     "condition_must": 2  ## conditional necessary such as `play_addr` shold be present while `downloader` is aria2c
 }
+
 ## desired output fields
 ## a mapping between field names and FIELD_SIGNI_LEVEL
 ## signi_level: one of the value in FIELD_SIGNI_LEVEL's values
@@ -72,3 +73,6 @@ FIELDS = {
     'webpage_url': {"signi_level": 1},
     'width': {"signi_level": 0, "default_value": None},
 }
+
+SANIC_PORT = "5555"
+LOCAL_IP_ADDR = '0.0.0.0'
