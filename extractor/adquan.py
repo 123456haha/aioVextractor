@@ -14,10 +14,8 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "https://creative\.adquan\.com/show/\d{3,7}",
-        "http://creative\.adquan\.com/show/\d{3,7}",
-        "http://www\.adquan\.com/post-\d-\d{3,7}\.html$",
-        "https://www\.adquan\.com/post-\d-\d{3,7}\.html$",
+        "http[s]?://creative\.adquan\.com/show/\d{3,7}",
+        "http[s]?://www\.adquan\.com/post-\d-\d{3,7}\.html$",
     ]
 
     TEST_CASE = [

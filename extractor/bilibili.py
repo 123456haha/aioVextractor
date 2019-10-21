@@ -22,7 +22,7 @@ from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, Req
 
 class Extractor(BaseExtractor):
     target_website = [
-        "www\.bilibili\.com/video/av\d{4,9}",
+        "http[s]?://www\.bilibili\.com/video/av\d{4,9}",
     ]
 
     TEST_CASE = [

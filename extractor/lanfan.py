@@ -14,7 +14,7 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "https://lanfanapp\.com/recipe/\d{1,6}",
+        "http[s]?://lanfanapp\.com/recipe/\d{1,6}",
     ]
 
     TEST_CASE = [

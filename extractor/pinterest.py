@@ -12,8 +12,6 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-
-
 if platform.system() in {"Linux", "Darwin"}:
     import ujson as json
 else:
@@ -21,7 +19,7 @@ else:
 
 class Extractor(BaseExtractor):
     target_website = [
-        "https://www\.pinterest\.com/pin/\d{15,23}",
+        "http[s]?://www\.pinterest\.com/pin/\d{15,23}",
     ]
 
     TEST_CASE = [

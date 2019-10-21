@@ -12,7 +12,7 @@ from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, Req
 
 class Extractor(BaseExtractor):
     target_website = [
-        "https://carben\.me/video/\d{1,6}",
+        "http[s]?://carben\.me/video/\d{1,6}",
     ]
 
     TEST_CASE = [

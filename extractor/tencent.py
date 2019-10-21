@@ -14,8 +14,8 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "https://v\.qq\.com/x/page/\w{9,18}\.html",
-        "https://v\.qq\.com/x/cover/\w{9,18}\.html",
+        "http[s]?://v\.qq\.com/x/page/\w{9,18}\.html",
+        "http[s]?://v\.qq\.com/x/cover/\w{9,18}\.html",
     ]
 
     TEST_CASE = [

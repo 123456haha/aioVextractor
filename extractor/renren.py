@@ -15,7 +15,7 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "https://mobile\.rr\.tv/mission/#/share/video\?id=\d{3,7}",
+        "http[s]?://mobile\.rr\.tv/mission/#/share/video\?id=\d{3,7}",
     ]
 
     TEST_CASE = [

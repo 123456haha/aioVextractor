@@ -14,7 +14,7 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "https://mp\.weixin\.qq\.com/s/[\w-]{10,36}",
+        "http[s]?://mp\.weixin\.qq\.com/s/[\w-]{10,36}",
     ]
 
     TEST_CASE = [

@@ -12,7 +12,7 @@ from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, Req
 
 class Extractor(BaseExtractor):
     target_website = [
-        "http://v\.douyin\.com/\w{3,9}/",
+        "http[s]?://v\.douyin\.com/\w{3,9}/",
     ]
 
     TEST_CASE = [

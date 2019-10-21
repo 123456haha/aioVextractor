@@ -18,7 +18,7 @@ from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, Req
 
 class Extractor(BaseExtractor):
     target_website = [
-        "www\.hellorf\.com/video.show/\d{5,10}",
+        "http[s]?://www\.hellorf\.com/video.show/\d{5,10}",
     ]
 
     TEST_CASE = [

@@ -14,7 +14,7 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "https://socialbeta\.com/t/[\w-]*?\d{6,10}",
+        "http[s]?://socialbeta\.com/t/[\w-]*?\d{6,10}",
     ]
 
     TEST_CASE = [

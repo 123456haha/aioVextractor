@@ -20,7 +20,7 @@ from aioVextractor.extractor.base_extractor import (
 class Extractor(BaseExtractor):
 
     target_website = [
-        "https://vimeo\.com/\d{7,18}"
+        "http[s]?://vimeo\.com/\d{7,18}"
     ]
 
     TEST_CASE = [

@@ -13,7 +13,7 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "www\.xinpianchang\.com/a\d{7,10}",
+        "http[s]?://www\.xinpianchang\.com/a\d{7,10}",
     ]
 
     TEST_CASE = [

@@ -18,8 +18,8 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "http://blog\.naver\.com/PostView\.nhn\?blogId=\w*?&logNo=\d{9,15}",
-        "http://blog\.naver\.com/PostList\.nhn\?blogId=\w*",
+        "http[s]?://blog\.naver\.com/PostView\.nhn\?blogId=\w*?&logNo=\d{9,15}",
+        "http[s]?://blog\.naver\.com/PostList\.nhn\?blogId=\w*",
     ]
 
     TEST_CASE = [

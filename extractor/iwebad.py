@@ -14,7 +14,7 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "http://iwebad\.com/video/\d{1,7}\.html",
+        "http[s]?://iwebad\.com/video/\d{1,7}\.html",
     ]
 
     TEST_CASE = [

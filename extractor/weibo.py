@@ -23,10 +23,10 @@ else:
 
 class Extractor(BaseExtractor):
     target_website = [
-        "https://m\.weibo\.cn/status/\d{5,25}",
-        "https://weibo\.com/tv/v/[\w]{5,15}\?fid=1034\:\d{5,25}",
-        "https://weibo\.com/tv/v/[\w]{5,15}\?from=\w{1,10}",
-        "http://t\.cn/[\w-]{3,10}",
+        "http[s]?://m\.weibo\.cn/status/\d{5,25}",
+        "http[s]?://weibo\.com/tv/v/[\w]{5,15}\?fid=1034\:\d{5,25}",
+        "http[s]?://weibo\.com/tv/v/[\w]{5,15}\?from=\w{1,10}",
+        "http[s]?://t\.cn/[\w-]{3,10}",
     ]
 
     TEST_CASE = [

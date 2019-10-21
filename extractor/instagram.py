@@ -14,8 +14,8 @@ else:
 
 class Extractor(BaseExtractor):
     target_website = [
-        "www\.instagram\.com/p/[\w-]*",
-        "www\.instagram\.com/tv/[\w-]*",
+        "http[s]?://www\.instagram\.com/p/[\w-]*",
+        "http[s]?://www\.instagram\.com/tv/[\w-]*",
     ]
 
     TEST_CASE = [
@@ -29,11 +29,6 @@ class Extractor(BaseExtractor):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session):
-        retults = await self.extract(webpage_url, session)
-        return retults
-
-    @RequestRetry
-    async def extract(self, webpage_url, session):
         if webpage_url.endswith("/"):
             tagurl = webpage_url + "?__a=1"
         else:

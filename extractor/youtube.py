@@ -22,7 +22,7 @@ else:
 
 class Extractor(BaseExtractor):
     target_website = [
-        "www\.youtube\.com/watch\?v=[\w-]{5,15}"
+        "http[s]?://www\.youtube\.com/watch\?v=[\w-]{5,15}"
     ]
 
     TEST_CASE = [

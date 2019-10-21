@@ -10,8 +10,8 @@ from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, Req
 
 class Extractor(BaseExtractor):
     target_website = [
-        "https://www\.digitaling\.com/projects/\d{3,7}\.html",
-        "https://www\.digitaling\.com/articles/\d{3,7}\.html",
+        "http[s]?://www\.digitaling\.com/projects/\d{3,7}\.html",
+        "http[s]?://www\.digitaling\.com/articles/\d{3,7}\.html",
     ]
 
     TEST_CASE = [

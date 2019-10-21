@@ -23,8 +23,8 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "www\.tvcf\.co\.kr/YCF/V.asp\?Code=\w{7,15}",
-        "https://play\.tvcf\.co\.kr/\d{3,10}",
+        "http[s]?://www\.tvcf\.co\.kr/YCF/V.asp\?Code=\w{7,15}",
+        "http[s]?://play\.tvcf\.co\.kr/\d{3,10}",
     ]
 
     TEST_CASE = [

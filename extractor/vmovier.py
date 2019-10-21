@@ -25,7 +25,7 @@ else:
 
 class Extractor(BaseExtractor):
     target_website = [
-        "www\.vmovier\.com/\d{2,8}",
+        "http[s]?://www\.vmovier\.com/\d{2,8}",
     ]
 
     TEST_CASE = [
