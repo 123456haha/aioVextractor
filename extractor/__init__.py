@@ -22,10 +22,6 @@ If you want to add extractor in this file, here remember the following points:
 4. redefine BaseExtractor.entracne()
 
 """
-# from urllib.parse import urlsplit
-# import aiohttp
-# import asyncio
-# from aioVextractor.extractor import *
 
 from aioVextractor.extractor.extractors import *
 
