@@ -226,6 +226,19 @@ class BaseExtractor:
     def __init__(self, *args, **kwargs):
         self.from_ = "generic"
 
+    @classmethod
+    def suitable(cls, url):
+        """
+        Define a classmethod to confirm that the incoming urls
+        match the regex in target_website,
+        before you need to instantiate the class
+        """
+        urls = []
+        for _VALID_URL in cls.target_website:
+            urls += re.findall(_VALID_URL, url)
+        else:
+            return urls if urls else False
+
     def __enter__(self):
         ## a random headers with UA parm
         self.general_headers = lambda user_agent: {
