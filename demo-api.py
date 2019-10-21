@@ -20,7 +20,6 @@ from aioVextractor import config
 
 if platform.system() in {"Linux", "Darwin"}:
     import uvloop
-
     uvloop.install()
 else:
     pass
@@ -73,8 +72,8 @@ async def extractor(request):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',
-            port=5555,
-            workers=10,
+            port=config.SANIC_PORT,
+            workers=config.SANIC_WORKER,
             debug=True,
             access_log=True,
             strict_slashes=False,

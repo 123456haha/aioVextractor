@@ -4,6 +4,7 @@
 # IDE: PyCharm
 
 # import time
+import os
 
 ## retry at most 3 times when encounters failure request
 RETRY = 3
@@ -75,4 +76,5 @@ FIELDS = {
 }
 
 SANIC_PORT = "5555"
+SANIC_WORKER = min([os.cpu_count(), 5])
 LOCAL_IP_ADDR = '0.0.0.0'
