@@ -15,9 +15,25 @@ Such as:
 6. unescape: unescape a string
 and etc..
 """
-from urllib.parse import urlsplit
-import aiohttp
-import asyncio
+# from urllib.parse import urlsplit
+# import aiohttp
+# import asyncio
+# from aioVextractor.extractor import *
+
+from aioVextractor.extractor.extractors import *
+
+_ALL_CLASSES = [
+    name
+    for name, klass in globals().items()
+    if name.endswith('IE') and name != 'baseIE'
+]
+_ALL_CLASSES.append(baseIE)
+
+def gen_extractor_classes():
+    """ Return a list of supported extractors.
+    The order does matter; the first extractor matched is the one handling the URL.
+    """
+    return _ALL_CLASSES
 
 # __all__ = [
 #     'adquan',
