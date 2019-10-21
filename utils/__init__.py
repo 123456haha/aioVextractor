@@ -7,7 +7,6 @@ from . import *
 
 __all__ = [
     'exception',
-    'MergeDict',
     'paging',
     'requests_retry',
     'user_agent',
