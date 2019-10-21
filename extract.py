@@ -12,10 +12,8 @@ sys.path.append(rootPath)
 
 import asyncio
 import aiohttp
-import re
-import traceback
-from urllib.parse import urlsplit
-import aioVextractor
+# import re
+from aioVextractor import distribute
 
 
 async def extract(webpage_url, session):
@@ -24,125 +22,81 @@ async def extract(webpage_url, session):
     webpage_url can be single url join() by string than can separate any consecutive urls
     """
     print(f"Extracting URL: {webpage_url}")
-    feed = [aioVextractor.distribute(webpage_url=url_to_parse,
-                                     netloc=netloc,
-                                     path=path,
-                                     session=session) async for url_to_parse, netloc, path in
-            janitor(webpage_url=webpage_url)]
+    distribute_result = distribute(webpage_url=webpage_url)
+    if isinstance(distribute_result, str):
+        return distribute_result
+    else:
+        info_extractor = distribute_result
+        with info_extractor() as dinosaur:
+            result = await dinosaur.entrance(webpage_url=webpage_url, session=session)
+            return result
 
-    gather_results = await asyncio.gather(*feed)
-    final_result = []
-    for ele in gather_results:
-        if isinstance(ele, dict):
-            ele['downloader'] = ele['downloader'] if ele.get('downloader', None) else 'aria2c'
-            final_result.append(ele)
-        elif isinstance(ele, list):
-            for i in ele:
-                i['downloader'] = i['downloader'] if i.get('downloader', None) else 'aria2c'
-                final_result.append(i)
-    return None if final_result is [] else final_result
-
-
-async def janitor(webpage_url):
-    """clean the webpage_url and yield the url from webpage_url"""
-    try:
-        if isinstance(webpage_url, str):  ## determine weather if the webpage_url is a string
-            url_list = re.findall(aioVextractor.config.URL_REGEX, webpage_url)  ## find all url in the string
-            # feed = []  ## ur to be parsed
-            for num, url_to_parse in enumerate(url_list):
-                # print(f"NUMBER {num} URL: {url_to_parse}"
-                #       # f"IN webpage_url {webpage_url}"
-                #       )
-                ## construct necessary parms for identifying the url
-                ParseResult = urlsplit(url_to_parse)
-                netloc = ParseResult.netloc
-                path = ParseResult.path
-                ## identifying the url
-                if netloc in aioVextractor.ALLOW_NETLOC:  ## determine weather if the netloc of the url is in ALLOW_NETLOC
-                    # print(f"NUMBER {num} URL: IS ALLOWED")
-                    yield url_to_parse, netloc, path
-                    # feed.append(execution(**kwargs))
-                else:
-                    # print(f"The netloc {netloc} \n"
-                    #       f"of {url_to_parse} \n"
-                    #       f"is not in ALLOW_NETLOC")
-                    yield url_to_parse, netloc, path
-                    continue
-        else:
-            print(f'The URL: {webpage_url} \n'
-                  f'is NOT a string')
-    except GeneratorExit:
-        pass
-    except:
-        traceback.print_exc()
-
-
-async def is_playlist(webpage_url):
-    """
-    determine weather if webpage_url is a playlist
-    and yield url,netloc,path when it is a playlist
-    :return Boolean: True or False
-    """
-    # print(f"Identifying URL: {webpage_url}")
-    async for url_to_parse, netloc, path in janitor(webpage_url):
-        # print( url_to_parse, netloc, path)
-        if netloc == 'vimeo.com':
-            if re.match('/channels/.*', path):  ## do not supported
-                # continue
-                return None
-                # print(f'IS playlist: {url_to_parse}')
-                # yield url_to_parse, netloc, path
-            elif re.match('/\d{6,11}', path):
-                # continue
-                return None
-            elif re.match('[/.*]', path):
-                # print(f'IS playlist: {url_to_parse}')
-                return url_to_parse, netloc, path
-            else:
-                # print(f"url_to_parse: {url_to_parse}\n"
-                #       f"is NOT valid playlist url\n")
-                # continue
-                return None
-        elif netloc == 'www.youtube.com':
-            if re.match('/playlist', path):
-                # print(f'IS playlist: {url_to_parse}')
-                return url_to_parse, netloc, path
-            elif re.match('/channel/', path):
-                # print(f'IS playlist: {url_to_parse}')
-                return url_to_parse, netloc, path
-            elif re.match('/user/.*?/videos', path):
-                # print(f'IS playlist: {url_to_parse}')
-                return url_to_parse, netloc, path
-            elif re.match('/watch', path):
-                # continue
-                return None
-            else:
-                # print(f"url_to_parse: {url_to_parse}\n"
-                #       f"is NOT valid playlist url\n")
-                # continue
-                return None
-        elif netloc == 'www.xinpianchang.com':
-            if re.match('/u\d*', path):
-                # print(f'IS playlist: {url_to_parse}')
-                return url_to_parse, netloc, path
-            elif re.match('/a\d*', path):
-                # continue
-                return None
-            else:
-                # print(f"url_to_parse: {url_to_parse}\n"
-                #       f"is NOT valid playlist url\n")
-                # continue
-                return None
-        elif netloc == 'www.instagram.com':
-            if "/p/" in url_to_parse or "/tv/" in url_to_parse:
-                return None
-            return url_to_parse, netloc, path
-        elif netloc == 'www.pinterest.com':
-            if "/pin/" in url_to_parse:
-                return None
-            return url_to_parse, netloc, path
-        else:
-            pass
+# async def is_playlist(webpage_url):
+#     """
+#     determine weather if webpage_url is a playlist
+#     and yield url,netloc,path when it is a playlist
+#     :return Boolean: True or False
+#     """
+#     # print(f"Identifying URL: {webpage_url}")
+#     async for url_to_parse, netloc, path in janitor(webpage_url):
+#         # print( url_to_parse, netloc, path)
+#         if netloc == 'vimeo.com':
+#             if re.match('/channels/.*', path):  ## do not supported
+#                 # continue
+#                 return None
+#                 # print(f'IS playlist: {url_to_parse}')
+#                 # yield url_to_parse, netloc, path
+#             elif re.match('/\d{6,11}', path):
+#                 # continue
+#                 return None
+#             elif re.match('[/.*]', path):
+#                 # print(f'IS playlist: {url_to_parse}')
+#                 return url_to_parse, netloc, path
+#             else:
+#                 # print(f"url_to_parse: {url_to_parse}\n"
+#                 #       f"is NOT valid playlist url\n")
+#                 # continue
+#                 return None
+#         elif netloc == 'www.youtube.com':
+#             if re.match('/playlist', path):
+#                 # print(f'IS playlist: {url_to_parse}')
+#                 return url_to_parse, netloc, path
+#             elif re.match('/channel/', path):
+#                 # print(f'IS playlist: {url_to_parse}')
+#                 return url_to_parse, netloc, path
+#             elif re.match('/user/.*?/videos', path):
+#                 # print(f'IS playlist: {url_to_parse}')
+#                 return url_to_parse, netloc, path
+#             elif re.match('/watch', path):
+#                 # continue
+#                 return None
+#             else:
+#                 # print(f"url_to_parse: {url_to_parse}\n"
+#                 #       f"is NOT valid playlist url\n")
+#                 # continue
+#                 return None
+#         elif netloc == 'www.xinpianchang.com':
+#             if re.match('/u\d*', path):
+#                 # print(f'IS playlist: {url_to_parse}')
+#                 return url_to_parse, netloc, path
+#             elif re.match('/a\d*', path):
+#                 # continue
+#                 return None
+#             else:
+#                 # print(f"url_to_parse: {url_to_parse}\n"
+#                 #       f"is NOT valid playlist url\n")
+#                 # continue
+#                 return None
+#         elif netloc == 'www.instagram.com':
+#             if "/p/" in url_to_parse or "/tv/" in url_to_parse:
+#                 return None
+#             return url_to_parse, netloc, path
+#         elif netloc == 'www.pinterest.com':
+#             if "/pin/" in url_to_parse:
+#                 return None
+#             return url_to_parse, netloc, path
+#         else:
+#             pass
 
 
 if __name__ == '__main__':

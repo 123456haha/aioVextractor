@@ -10,7 +10,7 @@ curPath = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(curPath)
 
 from aioVextractor.distributor import distribute
-
+from aioVextractor.extract import extract
 
 # from aioVextractor import (
 #     breaker,

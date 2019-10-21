@@ -14,7 +14,7 @@ from sanic import response as Response
 from sanic import Sanic
 from sanic_cors import CORS
 import platform
-from aioVextractor import distribute
+from aioVextractor import extract
 import aiohttp
 from aioVextractor import config
 
@@ -54,22 +54,17 @@ async def extractor(request):
         except:
             url = request.form.get('url')
     if url:
-        print(f"url: {url}")
-        distribute_result = distribute(webpage_url=url)
-        if isinstance(distribute_result, str):
-            return Response.json({"msg": distribute_result,
-                                  "data": None},
-                                 status=400)
-        else:
-            info_extractor = distribute_result
-            with info_extractor() as dinosaur:
-                async with  aiohttp.ClientSession() as session:
-                    result = await dinosaur.entrance(webpage_url=url, session=session)
-                    # return Response.text(body=result[0]['play_addr'])
-                    return Response.json({
-                        "msg": "success",
-                        "data": result
-                    })
+        async with  aiohttp.ClientSession() as session:
+            result = extract(webpage_url=url, session=session)
+            if isinstance(result, str):
+                return Response.json({"msg": result,
+                                      "data": None},
+                                     status=400)
+            else:
+                return Response.json({
+                    "msg": "success",
+                    "data": result
+                })
     else:
         return Response.json({"msg": "There is not enough input🤯",
                               "data": None},
