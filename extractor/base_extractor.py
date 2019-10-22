@@ -467,6 +467,14 @@ class BaseExtractor:
         ## ext = 'jpeg@80w_80h_1e_1c'
         return ext.split('@')[0]
 
+    @RequestRetry
+    async def request_get(self, url, session, headers, params=None, response_type="text", **kwargs):
+        async with session.get(url, headers=headers, params=params, **kwargs) as response:
+            if response_type == "text":
+                return await response.text()
+            elif response_type == "json":
+                return await response.json()
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         # asyncio.run(self.async_session.close())
         print(f"exc_type, exc_val, exc_tb: {exc_type, exc_val, exc_tb}")
