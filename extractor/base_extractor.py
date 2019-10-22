@@ -109,8 +109,10 @@ async def validate(func, extractor_instace, args, kwargs):
         return outputs
 
 
-class BaseExtractor:
+class ToolSet:
     """
+    Providing the most basic tools
+
     When you define a new extractor base on this class
     1. specify target_website as class variable
     2. inherit BaseExtractor.__init__() and define self.from_
@@ -156,6 +158,112 @@ class BaseExtractor:
         # self.results = []
         return self
 
+    @staticmethod
+    def janitor(string):
+        """
+        match the url(s) from string
+        :param string:
+        :return:
+        """
+        url_list = re.findall(config.URL_REGEX, string)  ## find all url in the string
+        return url_list
+
+    @staticmethod
+    def check_cover(cover):
+        """
+        Some of the vimeo cover urls contain play_icon
+        This method try to extract the url that not
+        :param cover:
+        :return:
+        """
+        if urlparse(cover).path == '/filter/overlay':
+            try:
+                cover_ = parse_qs(urlparse(cover).query).get('src0')[0]
+            except IndexError:
+                return cover
+            if 'play_icon' in cover_:
+                return cover
+            elif cover_ is None:
+                return cover
+            else:
+                return cover_
+        else:
+            return cover
+
+    @staticmethod
+    def merge_dicts(*dict_args):
+        """
+        Given any number of dicts, shallow copy and merge into a new dict,
+
+        You may use new_dict = {**dict_num_one, **dict_num_two},
+        which will merge dict_num_one and dict_num_two,
+        and dict_num_two's value will replace dict_num_one's value when they have the same key
+
+        This method provide something more the the above method:
+        1. merging more than 2 dictionaries
+        2. only replace the previous value with the upcoming value if the previous value is in {None/False/0}
+        """
+
+        result = {}
+        for dictionary in dict_args:
+            for k, v in dictionary.items():
+                if k in result:
+                    result[k] = result[k] if result[k] else v
+                else:
+                    result[k] = v
+            result.update(dictionary)
+        return result
+
+    @RequestRetry
+    async def retrieve_webpapge(self, webpage_url):
+        """
+        retrieve webpage
+        """
+        async with aiohttp.ClientSession(raise_for_status=True) as session:
+            async with session.get(webpage_url, headers=self.general_headers(self.random_ua())) as response:
+                return await response.text()
+
+    @staticmethod
+    def unescape(string):
+        if string:
+            return html.unescape(string)
+        else:
+            return None
+
+    @staticmethod
+    def get_ext(url_):
+        """
+        Return the filename extension from url, or ''
+        """
+        if url_ is None:
+            return False
+        parsed = urlparse(url_)
+        root, ext_ = splitext(parsed.path)
+        ext = ext_[1:]  # or ext[1:] if you don't want the leading '.'
+        ## ext = 'jpeg@80w_80h_1e_1c'
+        return ext.split('@')[0]
+
+    @RequestRetry
+    async def request_get(self, url, session, headers, params=None, response_type="text", **kwargs):
+        async with session.get(url, headers=headers, params=params, **kwargs) as response:
+            if response_type == "text":
+                return await response.text()
+            elif response_type == "json":
+                return await response.json()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # asyncio.run(self.async_session.close())
+        print(f"exc_type, exc_val, exc_tb: {exc_type, exc_val, exc_tb}")
+
+
+class BaseExtractor(ToolSet):
+    """
+    When you define a new extractor base on this class
+    1. specify target_website as class variable
+    2. inherit BaseExtractor.__init__() and define self.from_
+    3. redefine BaseExtractor.entracne()
+    """
+
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session):
@@ -192,22 +300,6 @@ class BaseExtractor:
             else:  ## webpage having no iframe with attr of `src`
                 return False
 
-    async def extract_iframe(self, iframe_url, session):
-        """
-        An API to extract iframe with src link to v.qq / youku / youtube / vimeo and etc.
-        :param iframe_url:
-        :param session:
-        :return:
-        """
-        if 'v.qq.com' in iframe_url:
-            return await tencent.entrance(iframe_url=iframe_url, session=session)
-        elif 'player.youku.com' in iframe_url or 'v.youku' in iframe_url:
-            return await youku.entrance(iframe_url=iframe_url, session=session)
-        elif "xinpianchang" in iframe_url:
-            return await xinpianchang.entrance(webpage_url=iframe_url, session=session)
-        else:
-            return await self.breakdown(webpage_url=iframe_url)
-
     def sync_entrance(self, webpage_url):
         """
         A synchronous entrance to call self.entrance()
@@ -233,15 +325,21 @@ class BaseExtractor:
                    "You should consider switching it to some more modern one such as Python 3.7+ " \
                 .format(python_version=python_version)
 
-    @staticmethod
-    def janitor(string):
+    async def extract_iframe(self, iframe_url, session):
         """
-        match the url(s) from string
-        :param string:
+        An API to extract iframe with src link to v.qq / youku / youtube / vimeo and etc.
+        :param iframe_url:
+        :param session:
         :return:
         """
-        url_list = re.findall(config.URL_REGEX, string)  ## find all url in the string
-        return url_list
+        if 'v.qq.com' in iframe_url:
+            return await tencent.entrance(iframe_url=iframe_url, session=session)
+        elif 'player.youku.com' in iframe_url or 'v.youku' in iframe_url:
+            return await youku.entrance(iframe_url=iframe_url, session=session)
+        elif "xinpianchang" in iframe_url:
+            return await xinpianchang.entrance(webpage_url=iframe_url, session=session)
+        else:
+            return await self.breakdown(webpage_url=iframe_url)
 
     async def extract_info(self, webpage_url, collaborate=True):
         """
@@ -329,28 +427,6 @@ class BaseExtractor:
         return result
 
     @staticmethod
-    def check_cover(cover):
-        """
-        Some of the vimeo cover urls contain play_icon
-        This method try to extract the url that not
-        :param cover:
-        :return:
-        """
-        if urlparse(cover).path == '/filter/overlay':
-            try:
-                cover_ = parse_qs(urlparse(cover).query).get('src0')[0]
-            except IndexError:
-                return cover
-            if 'play_icon' in cover_:
-                return cover
-            elif cover_ is None:
-                return cover
-            else:
-                return cover_
-        else:
-            return cover
-
-    @staticmethod
     def extract_play_addr(video_json):
         """
 
@@ -374,39 +450,6 @@ class BaseExtractor:
                 return jmespath.search('formats[-1]', video_json)
         except:
             return jmespath.search('formats[-1]', video_json)
-
-    @staticmethod
-    def merge_dicts(*dict_args):
-        """
-        Given any number of dicts, shallow copy and merge into a new dict,
-
-        You may use new_dict = {**dict_num_one, **dict_num_two},
-        which will merge dict_num_one and dict_num_two,
-        and dict_num_two's value will replace dict_num_one's value when they have the same key
-
-        This method provide something more the the above method:
-        1. merging more than 2 dictionaries
-        2. only replace the previous value with the upcoming value if the previous value is in {None/False/0}
-        """
-
-        result = {}
-        for dictionary in dict_args:
-            for k, v in dictionary.items():
-                if k in result:
-                    result[k] = result[k] if result[k] else v
-                else:
-                    result[k] = v
-            result.update(dictionary)
-        return result
-
-    @RequestRetry
-    async def retrieve_webpapge(self, webpage_url):
-        """
-        retrieve webpage
-        """
-        async with aiohttp.ClientSession(raise_for_status=True) as session:
-            async with session.get(webpage_url, headers=self.general_headers(self.random_ua())) as response:
-                return await response.text()
 
     async def breakdown(self, webpage_url):
         """
@@ -446,38 +489,6 @@ class BaseExtractor:
                 traceback.print_exc()
                 pass
             return results
-
-    @staticmethod
-    def unescape(string):
-        if string:
-            return html.unescape(string)
-        else:
-            return None
-
-    @staticmethod
-    def get_ext(url_):
-        """
-        Return the filename extension from url, or ''
-        """
-        if url_ is None:
-            return False
-        parsed = urlparse(url_)
-        root, ext_ = splitext(parsed.path)
-        ext = ext_[1:]  # or ext[1:] if you don't want the leading '.'
-        ## ext = 'jpeg@80w_80h_1e_1c'
-        return ext.split('@')[0]
-
-    @RequestRetry
-    async def request_get(self, url, session, headers, params=None, response_type="text", **kwargs):
-        async with session.get(url, headers=headers, params=params, **kwargs) as response:
-            if response_type == "text":
-                return await response.text()
-            elif response_type == "json":
-                return await response.json()
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        # asyncio.run(self.async_session.close())
-        print(f"exc_type, exc_val, exc_tb: {exc_type, exc_val, exc_tb}")
 
 
 if __name__ == '__main__':
