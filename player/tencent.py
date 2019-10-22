@@ -325,7 +325,7 @@ if __name__ == '__main__':
 
     async def test():
         async with aiohttp.ClientSession() as session_:
-            return await entrance(webpage_url="https://v.qq.com/x/cover/bzfkv5se8qaqel2.html",
+            return await entrance(webpage_url="https://v.qq.com/x/page/s0886ag14xn.html",
                                   session=session_)
 
 

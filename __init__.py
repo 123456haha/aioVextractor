@@ -11,7 +11,11 @@ sys.path.append(curPath)
 
 from aioVextractor.distributor import distribute
 from aioVextractor.extract import extract
-
+from aioVextractor.extractor.base_extractor import (
+    BaseExtractor,
+    validate,
+    RequestRetry
+)
 # from aioVextractor import (
 #     breaker,
 #     extractor,
