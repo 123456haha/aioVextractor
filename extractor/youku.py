@@ -3,15 +3,20 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
-from aioVextractor.player import youku
+import traceback
+import time, json
+import jmespath
+from scrapy import Selector
+import asyncio
+import re
 from aioVextractor.extractor.base_extractor import (
-    BaseExtractor,
+    ToolSet,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor):
+class Extractor(ToolSet):
     target_website = [
         "http[s]?://v\.youku\.com/v_show/id_\w{10,36}",
     ]
@@ -28,18 +33,187 @@ class Extractor(BaseExtractor):
     ]
 
     def __init__(self, *args, **kwargs):
-        BaseExtractor.__init__(self, *args, **kwargs)
+        ToolSet.__init__(self, *args, **kwargs)
         self.from_ = "youku"
 
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session):
-        return await youku.entrance(iframe_url=webpage_url, session=session)
+        try:
+            vid = re.findall("v_show/id_([\w-]{5,30})", webpage_url)[0]
+        except:
+            traceback.print_exc()
+            return False
+        else:
+            webpage_url = f"https://v.youku.com/v_show/id_{vid}"
+            data = {"video_id": vid,
+                    "client_id": "b598bfd8ec862716",
+                    "callback": "f'youkuPlayer_call_{int(time.time() * 1000)}'",
+                    "type": "pc",
+                    "embsig": "",
+                    "version": "1.0",
+                    "_t": "006315043435963385"}
+            yk_url = 'https://api.youku.com/players/custom.json?'
+            html = await self.request_get(
+                url=yk_url,
+                session=session,
+                params=data,
+                verify_ssl=False,
+            )
 
+            customdata = json.loads(html)
+            stealsign = customdata['stealsign']
+            gather_results = await asyncio.gather(*[
+                self.extract_info(vid=vid, sign=stealsign, client_id=data['client_id'], session=session),
+                self.extract_comment_count(vid=vid, session=session),
+                self.extract_webpage(url=webpage_url, session=session)
+            ])
+            result = self.merge_dicts(
+                {"webpage_url": webpage_url,
+                 "vid": vid,
+                 "downloader": "ytd",
+                 },
+                *gather_results[:2]
+            )
+            result['category'] += gather_results[2]['category']
+            return {**gather_results[2], **result}
+
+
+    @RequestRetry(default_exception_return={},
+                  default_other_exception_return={})
+    async def extract_info(self, vid, sign, client_id, session):
+        new_parm = {'vid': vid,
+                    'ccode': '0512',
+                    'client_ip': '192.168.1.1',
+                    'utid': 'lwF+FVFsUk4CAXF3uLWWBhbj',
+                    'client_ts': str(int(time.time())),
+                    'r': sign,
+                    'ckey': 'DIl58SLFxFNndSV1GFNnMQVYkx1PP5tKe1siZu/86PR1u/Wh1Ptd+WOZsHHWxysSfAOhNJpdVWsdVJNsfJ8Sxd8WKVvNfAS8aS8fAOzYARzPyPc3JvtnPHjTdKfESTdnuTW6ZPvk2pNDh4uFzotgdMEFkzQ5wZVXl2Pf1/Y6hLK0OnCNxBj3+nb0v72gZ6b0td+WOZsHHWxysSo/0y9D2K42SaB8Y/+aD2K42SaB8Y/+ahU+WOZsHcrxysooUeND',
+                    'site': '1',
+                    'wintype': 'BDskin',
+                    'p': '1',
+                    'fu': '0',
+                    'vs': '1.0',
+                    'rst': 'mp4',
+                    'dq': 'mp4',
+                    'os': 'win',
+                    'osv': '',
+                    'd': '0',
+                    'bt': 'pc',
+                    'aw': 'w',
+                    'needbf': '1',
+                    'atm': '',
+                    'partnerid': client_id,
+                    'callback': f'youkuPlayer_call_{str(int(time.time() * 1000))}',
+                    '_t': '08079273092687054'
+                    }
+        headers = {'Host': 'ups.youku.com',
+                   'Referer': f'https://player.youku.com/embed/XNDIxNTA1MjEwNA==?client_id={client_id}&password=&autoplay=false',
+                   'User-Agent': self.random_ua(),
+                   }
+        api = 'https://ups.youku.com/ups/get.json?'
+        html = await self.request_get(
+            url=api,
+            session=session,
+            headers=headers,
+            params=new_parm,
+            verify_ssl=False
+        )
+        videodata = json.loads(html.replace(new_parm['callback'], '')[1:-1])
+        data = jmespath.search("data", videodata)
+        try:
+            height = jmespath.search('max_by(data.stream, &size).height', videodata)
+            width = jmespath.search('max_by(data.stream, &size).width', videodata)
+            # item['cdn_url'] = jmespath.search('max_by(data.stream, &size).segs[].cdn_url', videodata)
+            play_addr = jmespath.search('max_by(data.stream, &size).segs[].cdn_url', videodata)[0]
+        except:
+            traceback.print_exc()
+            height = jmespath.search('data.stream[-1].height', videodata)
+            width = jmespath.search('data.stream[-1].width', videodata)
+            # item['cdn_url'] = jmespath.search('data.stream[-1].segs[].cdn_url', videodata)
+            play_addr = jmespath.search('data.stream[-1].segs[].cdn_url', videodata)[0]
+        result = {
+            "from": self.from_,
+            "duration": jmespath.search('video.seconds', data),
+            "cover": jmespath.search('video.logo', data),
+            "author": jmespath.search('uploader.username', data),
+            "author_id": jmespath.search('uploader.uid', data),
+            "author_url": jmespath.search('uploader.homepage', data),
+            "author_avatar": jmespath.search('uploader.avatar.xlarge', data),
+            "title": jmespath.search('video.title', data),
+            "category": jmespath.search('video.subcategories[].name', data),
+            "region": jmespath.search('video.network.country_code', data),
+            "upload_ts": jmespath.search('video.ups.ups_ts', data),
+            "height": height,
+            "width": width,
+            "play_addr": play_addr,
+        }
+        return result
+
+
+    @RequestRetry(default_exception_return={},
+                  default_other_exception_return={})
+    async def extract_comment_count(self, vid, session):
+        headers = self.general_headers(user_agent=self.random_ua())
+        headers['authority'] = 'p.comments.youku.com'
+        params = (
+            ('jsoncallback', 'n_commentList'),
+            ('app', '100-DDwODVkv'),
+            ('objectId', vid),
+            ('listType', '0'),
+            ('sign', '1bda07104b5c60f24b3ff236d46ee2c5'),
+            ('time', '1558691658'),
+        )
+        api = 'https://p.comments.youku.com/ycp/comment/pc/commentList'
+        response_text = await self.request_get(
+            url=api,
+            session=session,
+            headers=headers,
+            params=params,
+            verify_ssl=False
+        )
+        response_json = json.loads(response_text[len('  n_commentList('):-1])
+        return {'comment_count': jmespath.search('data.totalSize', response_json)}
+
+
+    async def extract_webpage(self, url, session):
+
+        headers = self.general_headers(user_agent=self.random_ua())
+        headers['authority'] = 'v.youku.com'
+        headers['referer'] = 'https://www.youku.com/'
+
+        text = await self.request_get(
+            url=url,
+            session=session,
+            headers=headers,
+            verify_ssl=False
+        )
+        try:
+            selector = Selector(text=text)
+        except Exception:
+            traceback.print_exc()
+            return {}
+        else:
+            category = selector.css('head meta[name*="irCate"]::attr(content)').extract_first()
+            category = category.split(',') if category else []
+            rating = selector.css('.score').re('<em>(\d)</em>.(\d)</span>')
+            tag = selector.css('head meta[name*="keywords"]::attr(content)').extract_first()
+            tag = tag.split(',') if tag else None
+            description = selector.css('head meta[name*="description"]::attr(content)').extract_first()
+            if rating:
+                try:
+                    rating = float('.'.join(rating))
+                except Exception:
+                    traceback.format_exc()
+                    return {'category': category, "tag": tag, "description": description}
+                else:
+                    return {'category': category, 'rating': rating, "tag": tag, "description": description}
+            else:
+                return {'category': category, "tag": tag, "description": description}
 
 if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://v.youku.com/v_show/id_XNDEyNDE5NzQ1Mg")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
         pprint(res)
