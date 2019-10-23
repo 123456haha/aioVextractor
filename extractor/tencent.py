@@ -16,13 +16,13 @@ from scrapy.selector import Selector
 import time
 import asyncio
 from aioVextractor.extractor.base_extractor import (
-    BaseExtractor,
+    ToolSet,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor):
+class Extractor(ToolSet):
     target_website = [
         "http[s]?://v\.qq\.com/x/page/\w{5,20}\.html",
         "http[s]?://v\.qq\.com/x/cover/\w{5,20}\.html",
@@ -36,7 +36,7 @@ class Extractor(BaseExtractor):
     ]
 
     def __init__(self, *args, **kwargs):
-        BaseExtractor.__init__(self, *args, **kwargs)
+        ToolSet.__init__(self, *args, **kwargs)
         self.from_ = "tencent"
 
     @validate
