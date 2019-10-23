@@ -82,7 +82,6 @@ class BaseExtractor(ToolSet):
         elif 'player.youku.com' in iframe_url or 'v.youku' in iframe_url:
             with youkuIE() as proxy_extractor:
                 return await proxy_extractor.entrance(webpage_url=iframe_url, session=session)
-            # return await youku.entrance(iframe_url=iframe_url, session=session)
         elif "xinpianchang" in iframe_url:
             with xinpianchangIE() as proxy_extractor:
                 return await proxy_extractor.entrance(webpage_url=iframe_url, session=session)

@@ -74,10 +74,12 @@ class Extractor(BaseExtractor):
         if 'openapi' in url:
             return await self.extract_openapi_info(selector=selector, player_address=url,
                                                    referer=referer, session=session)
-        elif 'v.youku.com' in url:
-            return await youku.entrance(iframe_url=url, session=session)
-        elif "xinpianchang" in url:
-            return await xinpianchang.entrance(webpage_url=url, session=session)
+        # elif 'v.youku.com' in url:
+        #     return await self.extract_iframe(iframe_url=url, session=session)
+        # elif "xinpianchang" in url:
+        #     return await self.extract_iframe(iframe_url=url, session=session)
+        else:
+            return await self.extract_iframe(iframe_url=url, session=session)
 
     @RequestRetry
     async def extract_openapi_info(self, selector, player_address, referer, session):
