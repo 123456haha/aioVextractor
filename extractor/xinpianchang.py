@@ -40,8 +40,6 @@ class Extractor(BaseExtractor):
             headers=headers,
             params=params
         )
-        # async with session.get(webpage_url, headers=headers, params=params) as response:
-        #     response_text = await response.text(encoding='utf8', errors='ignore')
         webpage = await self.extract_publish(response=response_text)
         xpc_vid = webpage['vid']
         database_vid = webpage_url.split('?')[0].split('/')[-1].strip('a')
@@ -49,7 +47,6 @@ class Extractor(BaseExtractor):
             return False
         video = await self.extract_video_info(referer=webpage_url, vid=xpc_vid, session=session)
         if all([webpage, video]):
-            # return {**{**webpage, **video}, **{"vid": database_vid}}
             return self.merge_dicts(webpage, video, {"vid": database_vid})
         else:
             return False

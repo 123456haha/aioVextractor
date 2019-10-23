@@ -5,9 +5,6 @@
 
 from aioVextractor.utils.requests_retry import RequestRetry
 from aioVextractor.utils.user_agent import UserAgent
-from aioVextractor.player import tencent
-from aioVextractor.player import youku
-from aioVextractor.player import xinpianchang
 from random import choice
 from scrapy.selector import Selector
 import asyncio
@@ -24,6 +21,9 @@ from os.path import splitext
 import html
 import os
 from concurrent import futures  ## lib for multiprocessing and threading
+from aioVextractor.extractor.tencent import Extractor as tencentIE
+from aioVextractor.extractor.youku import Extractor as youkuIE
+from aioVextractor.extractor.xinpianchang import Extractor as xinpianchangIE
 from urllib.parse import (
     urlparse,
     parse_qs,
@@ -66,8 +66,20 @@ async def validate(func, extractor_instace, args, kwargs):
         elif isinstance(results, dict):
             results = [results]
 
+        vid_filter = set()
         ## validate the integrity of the output
         for result in results:
+            ## filter by `vid`
+            try:
+                vid = result['vid']
+                if vid in vid_filter:
+                    continue
+                else:
+                    vid_filter.add(result['vid'])
+            except:
+                # print(f"You should have specify field `vid`")
+                return f"You should have specify field `vid`"
+
             output = dict()
             for field in config.FIELDS:
                 field_info = config.FIELDS[field]
@@ -158,6 +170,48 @@ class ToolSet:
         # self.results = []
         return self
 
+    @validate
+    @RequestRetry
+    async def entrance(self, webpage_url, session):
+        """
+
+        If you want to add a new extractor for a specific website,
+        this is the top level API you are looking for.
+
+        This API will not show you how to deintegrate(request and scrubbing) a website,
+        but give you some convinence apis(self.extract_iframe(), @validate, @RequestRetry) and tools(self.general_headers())
+        Should return necessary field
+        :param webpage_url:
+        :param session: aiohttp.ClientSession()
+        :return:
+        """
+        pass
+
+    def sync_entrance(self, webpage_url):
+        """
+        A synchronous entrance to call self.entrance()
+        :param webpage_url:
+        :return:
+        """
+
+        async def wrapper():
+            async with aiohttp.ClientSession() as session:
+                return await self.entrance(webpage_url=webpage_url, session=session)
+
+        python_version = float(".".join(platform.python_version_tuple()[0:2]))
+        if python_version >= 3.7:
+            return asyncio.run(wrapper())
+        elif 3.5 <= python_version <= 3.6:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            results = loop.run_until_complete(wrapper())
+            loop.close()
+            return results
+        else:
+            return "The Python Interpreter you are using is {python_version}.\n" \
+                   "You should consider switching it to some more modern one such as Python 3.7+ " \
+                .format(python_version=python_version)
+
     @staticmethod
     def janitor(string):
         """
@@ -244,8 +298,8 @@ class ToolSet:
         return ext.split('@')[0]
 
     @RequestRetry
-    async def request_get(self, url, session, headers, params=None, response_type="text", **kwargs):
-        async with session.get(url, headers=headers, params=params, **kwargs) as response:
+    async def request_get(self, url, session, response_type="text", **kwargs):
+        async with session.get(url, **kwargs) as response:
             if response_type == "text":
                 return await response.text()
             elif response_type == "json":
@@ -300,31 +354,6 @@ class BaseExtractor(ToolSet):
             else:  ## webpage having no iframe with attr of `src`
                 return False
 
-    def sync_entrance(self, webpage_url):
-        """
-        A synchronous entrance to call self.entrance()
-        :param webpage_url:
-        :return:
-        """
-
-        async def wrapper():
-            async with aiohttp.ClientSession() as session:
-                return await self.entrance(webpage_url=webpage_url, session=session)
-
-        python_version = float(".".join(platform.python_version_tuple()[0:2]))
-        if python_version >= 3.7:
-            return asyncio.run(wrapper())
-        elif 3.5 <= python_version <= 3.6:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            results = loop.run_until_complete(wrapper())
-            loop.close()
-            return results
-        else:
-            return "The Python Interpreter you are using is {python_version}.\n" \
-                   "You should consider switching it to some more modern one such as Python 3.7+ " \
-                .format(python_version=python_version)
-
     async def extract_iframe(self, iframe_url, session):
         """
         An API to extract iframe with src link to v.qq / youku / youtube / vimeo and etc.
@@ -333,11 +362,15 @@ class BaseExtractor(ToolSet):
         :return:
         """
         if 'v.qq.com' in iframe_url:
-            return await tencent.entrance(iframe_url=iframe_url, session=session)
+            with tencentIE() as proxy_extractor:
+                return await proxy_extractor.entrance(webpage_url=iframe_url, session=session)
         elif 'player.youku.com' in iframe_url or 'v.youku' in iframe_url:
-            return await youku.entrance(iframe_url=iframe_url, session=session)
+            with youkuIE() as proxy_extractor:
+                return await proxy_extractor.entrance(webpage_url=iframe_url, session=session)
+            # return await youku.entrance(iframe_url=iframe_url, session=session)
         elif "xinpianchang" in iframe_url:
-            return await xinpianchang.entrance(webpage_url=iframe_url, session=session)
+            with xinpianchangIE() as proxy_extractor:
+                return await proxy_extractor.entrance(webpage_url=iframe_url, session=session)
         else:
             return await self.breakdown(webpage_url=iframe_url)
 
@@ -368,19 +401,19 @@ class BaseExtractor(ToolSet):
                     return False
                 else:
                     if VideoJson:
-                        if collaborate:
+                        # if collaborate:
+                        #     result = self.extract_single(video_json=VideoJson, webpage_url=webpage_url)
+                        #     return result
+                        # else:  ## webpage extracting using only youtube-dl
+                        if 'entries' in VideoJson:
+                            result = []
+                            for entry in jmespath.search('entries[]', VideoJson):
+                                element = self.extract_single(video_json=entry, webpage_url=webpage_url)
+                                result.append(element)
+                            return result
+                        else:
                             result = self.extract_single(video_json=VideoJson, webpage_url=webpage_url)
                             return result
-                        else:  ## webpage extracting using only youtube-dl
-                            if 'entries' in VideoJson:
-                                result = []
-                                for entry in jmespath.search('entries[]', VideoJson):
-                                    element = self.extract_single(video_json=entry, webpage_url=webpage_url)
-                                    result.append(element)
-                                return result
-                            else:
-                                result = self.extract_single(video_json=VideoJson, webpage_url=webpage_url)
-                                return result
                     else:
                         return False
         except:
