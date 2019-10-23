@@ -43,7 +43,11 @@ class Extractor(BaseExtractor):
                 self.extract_video(result=result, session=session)
             ])
             if all(gather_results):
-                return self.merge_dicts(*gather_results)
+                if isinstance(gather_results[0], list):
+                    results = [self.merge_dicts(ele, gather_results[1]) for ele in gather_results[0]]
+                    return results
+                else:
+                    return self.merge_dicts(*gather_results)
             else:
                 return False
         except:
@@ -104,28 +108,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
+        res = extractor.sync_entrance(webpage_url="https://www.bilibili.com/video/av26781362")
         pprint(res)
-
-    # import aiohttp
-    # from pprint import pprint
-    #
-    #
-    # #
-    # # def test():
-    # #     return entrance(
-    # #         webpage_url="https://www.youtube.com/watch?v=tofSaLB9kwE")
-    # #
-    # #
-    # # pprint(test())
-    # #
-    #
-    # async def test():
-    #     async with aiohttp.ClientSession() as session_:
-    #         return await entrance(
-    #             webpage_url="https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4",
-    #             session=session_)
-    #
-    #
-    # loop = asyncio.get_event_loop()
-    # pprint(loop.run_until_complete(test()))
