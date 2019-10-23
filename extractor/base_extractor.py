@@ -393,10 +393,13 @@ class BaseExtractor:
         for dictionary in dict_args:
             for k, v in dictionary.items():
                 if k in result:
-                    result[k] = result[k] if result[k] else v
+                    if result[k] and not v:
+                        pass
+                    else:
+                        result[k] = v
                 else:
                     result[k] = v
-            result.update(dictionary)
+            # result.update(dictionary)
         return result
 
     @RequestRetry
