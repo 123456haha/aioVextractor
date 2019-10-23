@@ -25,6 +25,8 @@ async def validate(func, extractor_instace, args, kwargs):
     """
     1. ensure the accuracy of the input url: match the url by `target_website` in BaseExtractor
     2. ensure the integrated of the output data according to the config.FIELDS
+    3. asyncio.gather if multiple urls match
+    4. filter repeated result according by output field `vid`
     :return:
     """
     ## list of regexs for matching exact webpage_url for extractor_instance
