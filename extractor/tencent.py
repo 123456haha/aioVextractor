@@ -15,7 +15,7 @@ import os
 from scrapy.selector import Selector
 import time
 import asyncio
-from aioVextractor.extractor.base_extractor import (
+from aioVextractor.extractor.tool_set import (
     ToolSet,
     validate,
     RequestRetry

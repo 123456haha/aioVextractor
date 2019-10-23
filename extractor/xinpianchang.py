@@ -9,14 +9,14 @@ import emoji
 import dateutil.parser
 import traceback
 import os
-from aioVextractor.extractor.base_extractor import (
-    BaseExtractor,
+from aioVextractor.extractor.tool_set import (
+    ToolSet,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor):
+class Extractor(ToolSet):
     target_website = [
         "http[s]?://www\.xinpianchang\.com/a\d{7,10}",
     ]
@@ -26,7 +26,7 @@ class Extractor(BaseExtractor):
     ]
 
     def __init__(self, *args, **kwargs):
-        BaseExtractor.__init__(self, *args, **kwargs)
+        ToolSet.__init__(self, *args, **kwargs)
         self.from_ = "xinpianchang"
 
     @validate
