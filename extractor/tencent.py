@@ -54,7 +54,7 @@ class Extractor(ToolSet):
                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                    'accept-encoding': 'gzip, deflate, br',
                    'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
-        text = await self.request_get(url=webpage_url, headers=headers, session=session)
+        text = await self.request(url=webpage_url, headers=headers, session=session)
         if not vid:
             try:
                 vid = re.compile('&vid=(.*?)&').findall(text)[0]
@@ -165,7 +165,7 @@ class Extractor(ToolSet):
         params = {'source': '0',
                   'targetids': commentId}
         api = 'https://video.coral.qq.com/article/batchcommentnumv2'
-        response = await self.request_get(api, headers=headers, params=params, response_type="json", session=session)
+        response = await self.request(api, headers=headers, params=params, response_type="json", session=session)
         return {"comment_count": jmespath.search('data[0].commentnum', response)}
 
     @RequestRetry(default_exception_return={})
@@ -180,7 +180,7 @@ class Extractor(ToolSet):
                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                    'Accept-Encoding': 'gzip, deflate',
                    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
-        response = await self.request_get(user_page_url, headers=headers, session=session)
+        response = await self.request(user_page_url, headers=headers, session=session)
         selector = Selector(text=response)
         result = {
             "author": self.extract_author_name(selector=selector),
@@ -270,10 +270,10 @@ class Extractor(ToolSet):
                                   'charge': 0}
 
         api_get_info = os.path.join('http://', Host, 'getinfo')
-        response_getinfo_text = await self.request_get(url=api_get_info,
-                                                       session=session,
-                                                       headers=extract_by_vkey_headers,
-                                                       params=extract_by_vkey_params)
+        response_getinfo_text = await self.request(url=api_get_info,
+                                                   session=session,
+                                                   headers=extract_by_vkey_headers,
+                                                   params=extract_by_vkey_params)
         ResJson = json.loads(response_getinfo_text[len('QZOutputJson='):-1])
         filename = jmespath.search('vl.vi[0].fn', ResJson)
         if not filename:

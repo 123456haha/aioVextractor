@@ -290,12 +290,19 @@ class ToolSet:
         return ext.split('@')[0]
 
     @RequestRetry
-    async def request_get(self, url, session, response_type="text", **kwargs):
-        async with session.get(url, **kwargs) as response:
-            if response_type == "text":
-                return await response.text()
-            elif response_type == "json":
-                return await response.json()
+    async def request(self, url, session, response_type="text", method="get", **kwargs):
+        if method == "get":
+            async with session.get(url, **kwargs) as response:
+                if response_type == "text":
+                    return await response.text()
+                elif response_type == "json":
+                    return await response.json()
+        elif method == "post":
+            async with session.post(url, **kwargs) as response:
+                if response_type == "text":
+                    return await response.text()
+                elif response_type == "json":
+                    return await response.json()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # asyncio.run(self.async_session.close())

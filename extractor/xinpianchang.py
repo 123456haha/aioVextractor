@@ -34,7 +34,7 @@ class Extractor(ToolSet):
     async def entrance(self, webpage_url, session):
         headers = self.general_headers(user_agent=self.random_ua())
         params = {'from': 'ArticleList'}
-        response_text = await self.request_get(
+        response_text = await self.request(
             url=webpage_url,
             session=session,
             headers=headers,
@@ -108,7 +108,7 @@ class Extractor(ToolSet):
                    'Origin': 'http://www.xinpianchang.com'}
         params = {'expand': 'resource,resource_origin?'}
         extract_video_info_url = f'https://openapi-vtom.vmovier.com/v3/video/{vid}'
-        response_json = await self.request_get(
+        response_json = await self.request(
             url=extract_video_info_url,
             session=session,
             headers=headers,

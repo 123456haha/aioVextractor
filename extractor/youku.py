@@ -54,7 +54,7 @@ class Extractor(ToolSet):
                     "version": "1.0",
                     "_t": "006315043435963385"}
             yk_url = 'https://api.youku.com/players/custom.json?'
-            html = await self.request_get(
+            html = await self.request(
                 url=yk_url,
                 session=session,
                 params=data,
@@ -112,7 +112,7 @@ class Extractor(ToolSet):
                    'User-Agent': self.random_ua(),
                    }
         api = 'https://ups.youku.com/ups/get.json?'
-        html = await self.request_get(
+        html = await self.request(
             url=api,
             session=session,
             headers=headers,
@@ -165,7 +165,7 @@ class Extractor(ToolSet):
             ('time', '1558691658'),
         )
         api = 'https://p.comments.youku.com/ycp/comment/pc/commentList'
-        response_text = await self.request_get(
+        response_text = await self.request(
             url=api,
             session=session,
             headers=headers,
@@ -182,7 +182,7 @@ class Extractor(ToolSet):
         headers['authority'] = 'v.youku.com'
         headers['referer'] = 'https://www.youku.com/'
 
-        text = await self.request_get(
+        text = await self.request(
             url=url,
             session=session,
             headers=headers,
