@@ -24,7 +24,7 @@ from urllib.parse import (
 @wrapt.decorator
 async def validate(func, extractor_instace, args, kwargs):
     """
-    1. ensure the accuracy of the input url: match the url by `target_website` in BaseExtractor
+    1. ensure the accuracy of the input url: match the url by `target_website` in class variable
     2. ensure the integrated of the output data according to the config.FIELDS
     3. asyncio.gather if multiple urls match
     4. filter repeated result according by output field `vid`
@@ -72,46 +72,95 @@ async def validate(func, extractor_instace, args, kwargs):
             except:
                 # print(f"You should have specify field `vid`")
                 return f"You should have specify field `vid`"
-
-            output = dict()
-            for field in config.FIELDS:
-                field_info = config.FIELDS[field]
-                signi_level = field_info["signi_level"]
-                if signi_level == config.FIELD_SIGNI_LEVEL["else"]:
-                    output[field] = result.get(field, field_info["default_value"])
-                elif signi_level == config.FIELD_SIGNI_LEVEL["must"]:
-                    try:
-                        output[field] = result[field]
-                    except KeyError:
-                        print(f"You should have specify field `{field}`")
-                        output = False
-                        break
-                elif signi_level == config.FIELD_SIGNI_LEVEL["condition_must"]:
-                    dependent_field_name = field_info["dependent_field_name"]
-                    dependent_field_value = field_info["dependent_field_value"]
-                    dependent_field_value_actual = result.get(dependent_field_name,
-                                                              "f79e2450e6b911e99af648d705c16021")
-                    ## actual value of the dependent_field
-                    ## if the dependent_field is not given
-                    ## the default value is considered
-                    dependent_field_value_actual = config.FIELDS[dependent_field_name]["default_value"] \
-                        if dependent_field_value_actual == "f79e2450e6b911e99af648d705c16021" \
-                        else dependent_field_value_actual
-                    if dependent_field_value_actual == dependent_field_value:
-                        try:
-                            output[field] = result[field]
-                        except KeyError:
-                            print(f"You should have specify field `{field}` "
-                                  f"while field `{dependent_field_name}` == {dependent_field_value}")
-                            output = False
-                            break
-                    else:
-                        ## SIGNI_LEVEL=0
-                        output[field] = result.get(field, field_info['default_value'])
+            output = validate_(
+                result=result,
+                check_field=config.FIELDS,
+            )
+            # output = dict()
+            # for field in config.FIELDS:
+            #     field_info = config.FIELDS[field]
+            #     signi_level = field_info["signi_level"]
+            #     if signi_level == config.FIELD_SIGNI_LEVEL["else"]:
+            #         output[field] = result.get(field, field_info["default_value"])
+            #     elif signi_level == config.FIELD_SIGNI_LEVEL["must"]:
+            #         try:
+            #             output[field] = result[field]
+            #         except KeyError:
+            #             print(f"You should have specify field `{field}`")
+            #             output = False
+            #             break
+            #     elif signi_level == config.FIELD_SIGNI_LEVEL["condition_must"]:
+            #         dependent_field_name = field_info["dependent_field_name"]
+            #         dependent_field_value = field_info["dependent_field_value"]
+            #         dependent_field_value_actual = result.get(dependent_field_name,
+            #                                                   "f79e2450e6b911e99af648d705c16021")
+            #         ## actual value of the dependent_field
+            #         ## if the dependent_field is not given
+            #         ## the default value is considered
+            #         dependent_field_value_actual = config.FIELDS[dependent_field_name]["default_value"] \
+            #             if dependent_field_value_actual == "f79e2450e6b911e99af648d705c16021" \
+            #             else dependent_field_value_actual
+            #         if dependent_field_value_actual == dependent_field_value:
+            #             try:
+            #                 output[field] = result[field]
+            #             except KeyError:
+            #                 print(f"You should have specify field `{field}` "
+            #                       f"while field `{dependent_field_name}` == {dependent_field_value}")
+            #                 output = False
+            #                 break
+            #         else:
+            #             ## SIGNI_LEVEL=0
+            #             output[field] = result.get(field, field_info['default_value'])
             if output:  ## after scanning all the listed field in config.FIELDS
                 outputs.append(output)
     else:
         return outputs
+
+def validate_(result, check_field):
+    """
+    The actual fuction to validata the integrated of the result according the check_field
+    :param result:
+    :param check_field:
+    :return:
+    """
+    output = dict()
+    for field in check_field:
+        field_info = check_field[field]
+        signi_level = field_info["signi_level"]
+        if signi_level == config.FIELD_SIGNI_LEVEL["else"]:
+            output[field] = result.get(field, field_info["default_value"])
+        elif signi_level == config.FIELD_SIGNI_LEVEL["must"]:
+            try:
+                output[field] = result[field]
+            except KeyError:
+                print(f"You should have specify field `{field}`")
+                output = False
+                break
+        elif signi_level == config.FIELD_SIGNI_LEVEL["condition_must"]:
+            dependent_field_name = field_info["dependent_field_name"]
+            dependent_field_value = field_info["dependent_field_value"]
+            dependent_field_value_actual = result.get(dependent_field_name,
+                                                      "f79e2450e6b911e99af648d705c16021")
+            ## actual value of the dependent_field
+            ## if the dependent_field is not given
+            ## the default value is considered
+            dependent_field_value_actual = check_field[dependent_field_name]["default_value"] \
+                if dependent_field_value_actual == "f79e2450e6b911e99af648d705c16021" \
+                else dependent_field_value_actual
+            if dependent_field_value_actual == dependent_field_value:
+                try:
+                    output[field] = result[field]
+                except KeyError:
+                    print(f"You should have specify field `{field}` "
+                          f"while field `{dependent_field_name}` == {dependent_field_value}")
+                    output = False
+                    break
+            else:
+                ## SIGNI_LEVEL=0
+                output[field] = result.get(field, field_info['default_value'])
+    if output:  ## after scanning all the listed field in config.FIELDS
+        return output
+
 
 
 class ToolSet:
