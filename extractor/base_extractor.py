@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # Created by panos on 2019/9/30
 # IDE: PyCharm
-
-from aioVextractor.utils.requests_retry import RequestRetry
+from aioVextractor.utils import RequestRetry
 from scrapy.selector import Selector
 import asyncio
 import aiohttp
