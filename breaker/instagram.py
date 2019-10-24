@@ -2,18 +2,18 @@
 # -*- coding: utf-8 -*-
 # IDE: PyCharm
 
-import time
-import json, base64
-import emoji
-from urllib.parse import quote
-import traceback
 import jmespath
 from aioVextractor.utils import RequestRetry
 from aioVextractor.breaker import (
     BaseBreaker,
     BreakerValidater
 )
+import platform
 
+if platform.system() in {"Linux", "Darwin"}:
+    import ujson as json
+else:
+    import json
 
 class Breaker(BaseBreaker):
     target_website = [
