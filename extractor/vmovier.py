@@ -5,8 +5,6 @@
 
 from urllib.parse import urlparse
 import jmespath
-from aioVextractor.player import youku
-from aioVextractor.player import xinpianchang
 from scrapy.selector import Selector
 import asyncio
 import platform
