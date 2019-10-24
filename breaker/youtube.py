@@ -5,16 +5,19 @@
 
 from aioVextractor.utils.user_agent import safari
 from random import choice
-from scrapy import Selector
 from urllib.parse import (urlsplit, unquote)
 import jmespath
 import emoji
 import traceback
 import re
 import html
-from aioVextractor.breaker import BaseBreaker
 from aioVextractor.utils import RequestRetry
 import platform
+from scrapy import Selector
+from aioVextractor.breaker import (
+    BaseBreaker,
+    BreakerValidater
+)
 
 if platform.system() in {"Linux", "Darwin"}:
     import ujson as json
@@ -22,12 +25,13 @@ else:
     import json
 
 
-
 class Breaker(BaseBreaker):
     target_website = [
         "http[s]?://www\.youtube\.com/channel/[\w-]{10,36}",
         "http[s]?://www\.youtube\.com/playlist\?list=[\w-]{10,36}",
     ]
+
+    downloader = 'ytd'
 
     TEST_CASE = [
         "https://www.youtube.com/channel/UCSRpCBq2xomj7Sz0od73jWw/videos",
@@ -39,6 +43,7 @@ class Breaker(BaseBreaker):
         BaseBreaker.__init__(self, *args, **kwargs)
         self.from_ = "youtube"
 
+    @BreakerValidater
     @RequestRetry
     async def breakdown(self, webpage_url, session, params=None):
         ParseResult = urlsplit(webpage_url)
@@ -192,6 +197,8 @@ class Breaker(BaseBreaker):
                 title = None
                 pass
             result = {
+                "vid": ele['vid'],
+                "cover": ele['cover'],
                 "title": title,
                 "playlist_url": webpage_url,
                 "from": self.from_,
@@ -316,6 +323,8 @@ class Breaker(BaseBreaker):
                     except TypeError:
                         title = None
                     result = {
+                        "vid": ele['vid'],
+                        "cover": ele['cover'],
                         "title": title,
                         "playlist_url": webpage_url,
                         "from": self.from_,
@@ -382,6 +391,8 @@ if __name__ == '__main__':
 
     with Breaker() as breaker:
         res = breaker.sync_breakdown(
-            webpage_url=Breaker.TEST_CASE[0],
+            webpage_url=Breaker.TEST_CASE[2],
+            # params={'clickTrackingParams': 'CDwQybcCIhMI0rC0jdi05QIVlxxgCh23ZQF8',
+            #         'continuation': '4qmFsgI0EhhVQ1NScENCcTJ4b21qN1N6MG9kNzNqV3caGEVnWjJhV1JsYjNNZ0FEZ0JlZ0V5dUFFQQ%3D%3D'}
         )
         pprint(res)

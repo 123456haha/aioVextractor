@@ -8,7 +8,10 @@ import html
 import emoji
 import traceback
 from scrapy import Selector
-from aioVextractor.breaker import BaseBreaker
+from aioVextractor.breaker import (
+    BaseBreaker,
+    BreakerValidater
+)
 from aioVextractor.utils import RequestRetry
 
 
@@ -27,6 +30,7 @@ class Breaker(BaseBreaker):
         BaseBreaker.__init__(self, *args, **kwargs)
         self.from_ = "xinpianchang"
 
+    @BreakerValidater
     @RequestRetry
     async def breakdown(self, webpage_url, session, page=1):
         url = "https://www.xinpianchang.com/index.php"
