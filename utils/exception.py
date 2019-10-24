@@ -24,7 +24,7 @@ http_exception = (ServerDisconnectedError,
                   ClientConnectorError,
                   ClientPayloadError,
                   ServerTimeoutError,
-                  ContentTypeError,
+                  # ContentTypeError,
                   ClientConnectorCertificateError,
                   ClientOSError)
 
