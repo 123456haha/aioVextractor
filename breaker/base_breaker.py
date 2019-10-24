@@ -4,15 +4,108 @@
 # IDE: PyCharm
 
 
-from aioVextractor.extractor.base_extractor import (
-    BaseExtractor,
-)
+# from aioVextractor.extractor.base_extractor import (
+#     BaseExtractor,
+# )
 
 from aioVextractor.extractor.tool_set import (
     ToolSet,
-    validate,
+    validate_,
 )
+
+from aioVextractor import config
+import wrapt
+import aiohttp
+import platform
+import asyncio
+import re
+
+
+@wrapt.decorator
+async def validate(func, extractor_instace, args, kwargs):
+    """
+    1. ensure the accuracy of the input url: match the url by `target_website` in class variable
+    2. ensure the integrated of the output data according to the config.FIELDS_BREAKDOWN
+    3. if multiple urls match, ONLY breakdown the first match
+    4. filter repeated result according by output field `vid`
+    :return:
+    """
+    ## list of regexs for matching exact webpage_url for extractor_instance
+    target_website = extractor_instace.target_website
+    downloader = extractor_instace.downloader
+    webpage_url = kwargs['webpage_url']
+    urls = []
+    ## match url form webpage_url
+    for regex in target_website:
+        urls += re.findall(regex, webpage_url)
+
+    results = await func(*args, **{**kwargs, **{"webpage_url": urls[0]}})
+
+    outputs = []
+
+    ## if the results is []/False/None/0
+    ## return None
+    if results:
+        pass
+    else:
+        return None
+
+    try:
+        results, has_more, params = results
+    except:
+        return "The return is the a 3-elements tuple"
+
+    vid_filter = set()
+    ## validate the integrity of the output
+    for result in results:
+        ## filter by `vid`
+        try:
+            vid = result['vid']
+            if vid in vid_filter:
+                continue
+            else:
+                vid_filter.add(result['vid'])
+        except:
+            # print(f"You should have specify field `vid`")
+            return f"You should have specify field `vid`"
+        output = validate_(
+            result=result,
+            check_field=config.FIELDS_BREAKDOWN,
+        )
+        if output:  ## after scanning all the listed field in config.FIELDS_BREAKDOWN
+            output['downloader'] = downloader
+            outputs.append(output)
+    else:
+        return outputs, has_more, params
 
 
 class BaseBreaker(ToolSet):
-    pass
+    downloader = 'aria2c'
+
+    async def breakdown(self, webpage_url, page, session):
+        pass
+
+    def sync_breakdown(self, webpage_url, *args, **kwargs):
+        """
+        A synchronous entrance to call self.breakdown()
+        :param webpage_url:
+        :return:
+        """
+
+        async def wrapper():
+            async with aiohttp.ClientSession() as session:
+                return await self.breakdown(webpage_url=webpage_url, session=session, *args, **kwargs)
+
+        python_version = float(".".join(platform.python_version_tuple()[0:2]))
+        if python_version >= 3.7:
+            return asyncio.run(wrapper())
+        elif 3.5 <= python_version <= 3.6:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            results = loop.run_until_complete(wrapper())
+            loop.close()
+            return results
+        else:
+            return f"The Python Interpreter you are using is {python_version}.\n" \
+                   f"You should consider switching it to some more modern one such as Python 3.7+ " \
+                .format(python_version=python_version)
