@@ -3,8 +3,7 @@
 # Created by panos on 10/23/19
 # IDE: PyCharm
 
-
-from aioVextractor.utils.requests_retry import RequestRetry
+from aioVextractor.utils import RequestRetry
 from aioVextractor.utils.user_agent import UserAgent
 from random import choice
 import asyncio
@@ -15,10 +14,12 @@ import wrapt
 import re
 from os.path import splitext
 import html
+import time
 from urllib.parse import (
     urlparse,
     parse_qs,
 )
+
 
 @wrapt.decorator
 async def validate(func, extractor_instace, args, kwargs):
@@ -200,8 +201,8 @@ class ToolSet:
             loop.close()
             return results
         else:
-            return "The Python Interpreter you are using is {python_version}.\n" \
-                   "You should consider switching it to some more modern one such as Python 3.7+ " \
+            return f"The Python Interpreter you are using is {python_version}.\n" \
+                   f"You should consider switching it to some more modern one such as Python 3.7+ " \
                 .format(python_version=python_version)
 
     @staticmethod
@@ -288,6 +289,35 @@ class ToolSet:
         ext = ext_[1:]  # or ext[1:] if you don't want the leading '.'
         ## ext = 'jpeg@80w_80h_1e_1c'
         return ext.split('@')[0]
+
+    @staticmethod
+    def string2timestamp(string, format):
+        """
+        Convert a string to 10 digits timestamp according to prividing format
+
+        string: '2019-05-14 发布'
+        format: '%Y-%m-%d 发布'
+        """
+        try:
+            return int(time.mktime(time.strptime(string, format))) if string else None
+        except:
+            return None
+
+    @staticmethod
+    def string2duration(string, format):
+        """
+        Convert a string to seconds according to prividing format
+
+        string: "17' 39''"
+        format: "%M' %S''"
+        """
+        try:
+            t1 = time.strptime(string, format)
+            t2 = time.struct_time((1900, 1, 1, 0, 0, 0, 0, 0, -1))
+            duration = int(time.mktime(t1) - time.mktime(t2))
+            return duration
+        except:
+            return None
 
     @RequestRetry
     async def request(self, url, session, response_type="text", method="get", **kwargs):
