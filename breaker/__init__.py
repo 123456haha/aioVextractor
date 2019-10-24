@@ -4,10 +4,16 @@
 # IDE: PyCharm
 
 from . import *
+from aioVextractor.breaker.base_breaker import BaseBreaker
+from aioVextractor.breaker.base_breaker import validate as BreakerValidater
 
 __all__ = [
+    "BaseBreaker",
+    "BreakerValidater",
     "vimeo",
     "xinpianchang",
     "youtube",
     "instagram",
-    "pinterest", ]
+    "pinterest",
+]
+
