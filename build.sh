@@ -17,4 +17,4 @@ sudo chmod +x /usr/local/bin/docker-compose
 sudo docker build -t extractor .
 #sudo docker-compose up
 sudo docker swarm init
-sudo docker deploy -c docker-compose.yml aioVextractor
+sudo docker stack deploy -c docker-compose.yml aioVextractor
