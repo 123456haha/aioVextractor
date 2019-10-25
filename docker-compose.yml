@@ -48,27 +48,6 @@ services:
       - //var/run/docker.sock:/var/run/docker.sock
     command: -H unix:///var/run/docker.sock
 
-#  redis:
-#    image: redis
-#    volumes:
-#      - mount:/data  # together with `placement` below, while containers come and go, the files stored on ./data on the specified host persists, enabling continuity.
-#      - mount:/usr/local/etc/redis/redis.conf
-#      - .:/aioVextractor
-#    sysctls:
-#      net.core.somaxconn: '2048'
-#    deploy:
-#      mode: global
-#      resources:
-#          limits:
-#            cpus: "2"
-#            memory: 1G
-#      restart_policy:
-#        condition: any
-#        window: '30s' # How long to wait before deciding if a restart has succeeded
-#    networks:
-#      - hostnet
-#    command: redis-server /usr/local/etc/redis/redis.conf
-
 volumes:
   mount:
 
