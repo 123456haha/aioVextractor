@@ -227,7 +227,7 @@ class ToolSet:
         :param session: aiohttp.ClientSession()
         :return:
         """
-        pass
+        print("You should have overwritten this function")
 
     def sync_entrance(self, webpage_url):
         """

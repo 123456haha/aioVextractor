@@ -26,6 +26,7 @@ class Extractor(ToolSet):
     target_website = [
         "http[s]?://v\.qq\.com/x/page/\w{5,20}\.html",
         "http[s]?://v\.qq\.com/x/cover/\w{5,20}\.html",
+        "/iframe/player\.html\?vid=\w{5,20}",
     ]
 
     TEST_CASE = [
@@ -33,6 +34,7 @@ class Extractor(ToolSet):
         "https://v.qq.com/x/page/n0864edqzkl.html",
         "https://v.qq.com/x/page/s08899ss07p.html",
         "https://v.qq.com/x/cover/bzfkv5se8qaqel2.html",
+        "https://v.qq.com/iframe/player.html?vid=c0912n1rqrw&tiny=0&auto=0",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -54,7 +56,11 @@ class Extractor(ToolSet):
                    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                    'accept-encoding': 'gzip, deflate, br',
                    'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
-        text = await self.request(url=webpage_url, headers=headers, session=session)
+        text = await self.request(
+            url=webpage_url,
+            session=session,
+            headers=headers,
+        )
         if not vid:
             try:
                 vid = re.compile('&vid=(.*?)&').findall(text)[0]
@@ -317,5 +323,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
+        res = extractor.sync_entrance(webpage_url='https://v.qq.com/iframe/player.html?vid=c0912n1rqrw&tiny=0&auto=0')
         pprint(res)
