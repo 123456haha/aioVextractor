@@ -7,17 +7,18 @@ RUN ME BEFORE GOING SERIOUS!
 """
 
 from pprint import pprint
-from aioVextractor import extract
-from aioVextractor.extractor import *
+from aioVextractor.extractor import gen_extractor_classes
+from aioVextractor.breaker import gen_breaker_classes
 import aiohttp
 import asyncio
+from aioVextractor import hybrid_worker
 
 async def test(asking=True):
     async with aiohttp.ClientSession() as session:
         fail_url = set()
-        for ie in gen_extractor_classes():
+        for instance in gen_extractor_classes() + gen_breaker_classes():
             try:
-                TEST_CASE = ie.TEST_CASE
+                TEST_CASE = instance.TEST_CASE
             except:
                 continue
             for sample in TEST_CASE:
@@ -28,7 +29,7 @@ async def test(asking=True):
                 else:
                     procceed = "yes"
                 if procceed in {"y", 'yes'}:
-                    result = await extract(webpage_url=sample, session=session)
+                    result = await hybrid_worker(webpage_url=sample, session=session)
                     pprint(result)
                     if not result:
                         fail_url.add(sample)
