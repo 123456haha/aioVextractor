@@ -1,0 +1,82 @@
+# docker swarm init
+# docker stack deploy -c docker-compose.yml --with-registry-auth YourAppName
+# docker service ls
+# docker stack ps YourAppName
+# docker service update --force YourServiceName
+version: '3.7'
+services:
+  web:
+    image: panoslin/gluttony:latest
+    healthcheck:
+      test: curl -fs http://localhost:5555 || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 2
+      start_period: 40s
+    stop_grace_period: 5m
+    deploy:  # This only takes effect when deploying to a swarm with docker stack deploy, and is ignored by docker-compose up and docker-compose run.
+      mode: global
+      resources:
+        limits:
+          cpus: "2"  # limiting each one to use, at most, 10 core of CPU
+          memory: 2000M  # limiting each one to use, at most, 4096M of RAM
+      update_config:
+        parallelism: 1
+        delay: 300s
+        failure_action: rollback
+        monitor: 60s
+        order: stop-first
+
+      restart_policy:
+        condition: any # Immediately restart containers if one fails.
+        delay: '120s' # How long to wait between restart attempts, specified as a duration (default: 0).
+        window: '30s' # How long to wait before deciding if a restart has succeeded
+    networks:
+      - hostnet
+    volumes:
+      - /etc/ssl/openssl.cnf:/etc/ssl/openssl.cnf  # mount
+      - /etc/localtime:/etc/localtime  # mount
+      - .:/aioVextractor  # mount
+    command: gunicorn -c gunicorn-conf.py  demo-api:app
+
+  portainer:
+    image: portainer/portainer
+    networks:
+      - hostnet
+    volumes:
+      - mount:/data
+      - //var/run/docker.sock:/var/run/docker.sock
+    command: -H unix:///var/run/docker.sock
+
+#  redis:
+#    image: redis
+#    volumes:
+#      - mount:/data  # together with `placement` below, while containers come and go, the files stored on ./data on the specified host persists, enabling continuity.
+#      - mount:/usr/local/etc/redis/redis.conf
+#      - .:/aioVextractor
+#    sysctls:
+#      net.core.somaxconn: '2048'
+#    deploy:
+#      mode: global
+#      resources:
+#          limits:
+#            cpus: "2"
+#            memory: 1G
+#      restart_policy:
+#        condition: any
+#        window: '30s' # How long to wait before deciding if a restart has succeeded
+#    networks:
+#      - hostnet
+#    command: redis-server /usr/local/etc/redis/redis.conf
+
+volumes:
+  mount:
+    driver: local
+    driver_opts:
+
+networks:
+  webnet:
+  hostnet:
+    external: true
+    attachable: true
+    name: host
