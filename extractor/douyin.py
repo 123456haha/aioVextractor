@@ -26,7 +26,7 @@ class Extractor(BaseExtractor):
 
     @validate
     @RequestRetry
-    async def entrance(self, webpage_url, session):
+    async def entrance(self, webpage_url, session, *args, **kwargs):
         download_headers = {'Connection': 'keep-alive',
                             'Upgrade-Insecure-Requests': '1',
                             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',

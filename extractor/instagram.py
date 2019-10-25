@@ -28,7 +28,7 @@ class Extractor(BaseExtractor):
 
     @validate
     @RequestRetry
-    async def entrance(self, webpage_url, session):
+    async def entrance(self, webpage_url, session, *args, **kwargs):
         if webpage_url.endswith("/"):
             tagurl = webpage_url + "?__a=1"
         else:

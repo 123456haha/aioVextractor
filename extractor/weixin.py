@@ -27,7 +27,7 @@ class Extractor(BaseExtractor):
 
     @validate
     @RequestRetry
-    async def entrance(self, webpage_url, session):
+    async def entrance(self, webpage_url, session, *args, **kwargs):
         headers = self.general_headers(user_agent=self.random_ua())
         text = await self.request(
             url=webpage_url,

@@ -40,7 +40,7 @@ class Extractor(BaseExtractor):
 
     @validate
     @RequestRetry
-    async def entrance(self, webpage_url, session):
+    async def entrance(self, webpage_url, session, *args, **kwargs):
         if 'code' in webpage_url.lower():  ## old version http://www.tvcf.co.kr/YCf/V.asp?Code=A000363280
             ParseResult = urlparse(webpage_url)
             try:

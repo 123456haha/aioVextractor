@@ -47,7 +47,7 @@ class Extractor(BaseExtractor):
 
     @validate
     @RequestRetry
-    async def entrance(self, webpage_url, session):
+    async def entrance(self, webpage_url, session, *args, **kwargs):
         if re.match("https://m\.weibo\.cn/status/\d{5,25}", webpage_url):
             headers = {
                 'Upgrade-Insecure-Requests': '1',

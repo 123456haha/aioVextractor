@@ -32,7 +32,7 @@ class Extractor(BaseExtractor):
 
     @validate
     @RequestRetry
-    async def entrance(self, webpage_url, session):
+    async def entrance(self, webpage_url, session, *args, **kwargs):
         async with session.get(webpage_url, headers=self.general_headers(self.random_ua())) as response:
             response_text = await response.text(encoding='utf8', errors='ignore')
             selector = Selector(text=response_text)

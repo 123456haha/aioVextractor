@@ -29,7 +29,7 @@ class Extractor(BaseExtractor):
 
     @validate
     @RequestRetry
-    async def entrance(self, webpage_url, session):
+    async def entrance(self, webpage_url, session, *args, **kwargs):
         try:
             vid = re.compile('id=(\d*)').findall(webpage_url)[0]
         except IndexError:

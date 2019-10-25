@@ -32,7 +32,8 @@ class Breaker(BaseBreaker):
 
     @BreakerValidater
     @RequestRetry
-    async def breakdown(self, webpage_url, session, page=1):
+    async def breakdown(self, webpage_url, session, **kwargs):
+        page = kwargs.get("page", 1)
         url = "https://www.xinpianchang.com/index.php"
         xinpianchang_user_id = webpage_url.split('?')[0].split('/u')[-1]
         headers = self.general_headers(user_agent=self.random_ua())

@@ -29,12 +29,12 @@ class Breaker(BaseBreaker):
         self.from_ = "pinterest"
 
     @BreakerValidater
-    async def breakdown(self, webpage_url, session, params=None):
+    async def breakdown(self, webpage_url, session, **kwargs):
         user_name = re.findall("http[s]://www\.pinterest.com/([\w-]{5,36})/video_pins/", webpage_url)[0]
         source_url = f"/{user_name}/video_pins"
 
-        if params:
-            data = json.dumps(params)
+        if kwargs:
+            data = json.dumps(kwargs)
         else:
             data = '{"options":{"isPrefetch":false,"exclude_add_pin_rep":true,"username":"' \
                    + user_name \

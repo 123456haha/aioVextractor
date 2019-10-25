@@ -26,7 +26,7 @@ class Extractor(BaseExtractor):
 
     @validate
     @RequestRetry
-    async def entrance(self, webpage_url, session):
+    async def entrance(self, webpage_url, session, *args, **kwargs):
         try:
             vid = re.compile('vid=([\d]*)').search(webpage_url)[1]
         except (IndexError, TypeError):

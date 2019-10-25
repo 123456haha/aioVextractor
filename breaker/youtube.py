@@ -45,15 +45,15 @@ class Breaker(BaseBreaker):
 
     @BreakerValidater
     @RequestRetry
-    async def breakdown(self, webpage_url, session, params=None):
+    async def breakdown(self, webpage_url, session, **kwargs):
         ParseResult = urlsplit(webpage_url)
         path = ParseResult.path
         if re.match('/playlist', path):
-            if params:
+            if kwargs:
                 webpage_content = await self.retrieve_youtube_pageing_api(
                     referer=webpage_url,
-                    continuation=params['continuation'],
-                    clickTrackingParams=params['clickTrackingParams'],
+                    continuation=kwargs['continuation'],
+                    clickTrackingParams=kwargs['clickTrackingParams'],
                     session=session
                 )
 
@@ -80,11 +80,11 @@ class Breaker(BaseBreaker):
                 return results
 
         elif re.match('/channel/', path) or re.match('/user/', path):
-            if params:
+            if kwargs:
                 webpage_content = await self.retrieve_youtube_pageing_api(
                     referer=webpage_url,
-                    continuation=params['continuation'],
-                    clickTrackingParams=params['clickTrackingParams'],
+                    continuation=kwargs['continuation'],
+                    clickTrackingParams=kwargs['clickTrackingParams'],
                     session=session
                 )
                 results = await self.extract_youtube_pageing_api(ResJson=webpage_content, webpage_url=webpage_url,

@@ -30,8 +30,8 @@ class Breaker(BaseBreaker):
 
     @BreakerValidater
     @RequestRetry
-    async def breakdown(self, webpage_url, session, page=1):
-
+    async def breakdown(self, webpage_url, session, **kwargs):
+        page = kwargs.get("page", 1)
         ParseResult = urlsplit(webpage_url)
         path = ParseResult.path
         if re.match('/channels/.*', path):  ## https://vimeo.com/channels/ceiga

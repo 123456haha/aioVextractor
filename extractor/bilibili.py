@@ -37,7 +37,7 @@ class Extractor(BaseExtractor):
 
     @validate
     @RequestRetry
-    async def entrance(self, webpage_url, session):
+    async def entrance(self, webpage_url, session, *args, **kwargs):
         try:
             result = {'vid': webpage_url.split('?')[0].split('av')[-1]}
             gather_results = await asyncio.gather(*[

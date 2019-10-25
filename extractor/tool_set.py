@@ -80,41 +80,6 @@ async def validate(func, extractor_instace, args, kwargs):
                 result=result,
                 check_field=config.FIELDS,
             )
-            # output = dict()
-            # for field in config.FIELDS:
-            #     field_info = config.FIELDS[field]
-            #     signi_level = field_info["signi_level"]
-            #     if signi_level == config.FIELD_SIGNI_LEVEL["else"]:
-            #         output[field] = result.get(field, field_info["default_value"])
-            #     elif signi_level == config.FIELD_SIGNI_LEVEL["must"]:
-            #         try:
-            #             output[field] = result[field]
-            #         except KeyError:
-            #             print(f"You should have specify field `{field}`")
-            #             output = False
-            #             break
-            #     elif signi_level == config.FIELD_SIGNI_LEVEL["condition_must"]:
-            #         dependent_field_name = field_info["dependent_field_name"]
-            #         dependent_field_value = field_info["dependent_field_value"]
-            #         dependent_field_value_actual = result.get(dependent_field_name,
-            #                                                   "f79e2450e6b911e99af648d705c16021")
-            #         ## actual value of the dependent_field
-            #         ## if the dependent_field is not given
-            #         ## the default value is considered
-            #         dependent_field_value_actual = config.FIELDS[dependent_field_name]["default_value"] \
-            #             if dependent_field_value_actual == "f79e2450e6b911e99af648d705c16021" \
-            #             else dependent_field_value_actual
-            #         if dependent_field_value_actual == dependent_field_value:
-            #             try:
-            #                 output[field] = result[field]
-            #             except KeyError:
-            #                 print(f"You should have specify field `{field}` "
-            #                       f"while field `{dependent_field_name}` == {dependent_field_value}")
-            #                 output = False
-            #                 break
-            #         else:
-            #             ## SIGNI_LEVEL=0
-            #             output[field] = result.get(field, field_info['default_value'])
             if output:  ## after scanning all the listed field in config.FIELDS
                 outputs.append(output)
     else:
@@ -388,5 +353,5 @@ class ToolSet:
                     return await response.json()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        # asyncio.run(self.async_session.close())
-        print(f"exc_type, exc_val, exc_tb: {exc_type, exc_val, exc_tb}")
+        pass
+        # print(f"exc_type, exc_val, exc_tb: {exc_type, exc_val, exc_tb}")

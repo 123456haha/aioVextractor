@@ -45,7 +45,7 @@ class Extractor(ToolSet):
 
     @validate
     @RequestRetry
-    async def entrance(self, webpage_url, session):
+    async def entrance(self, webpage_url, session, *args, **kwargs):
         try:
             vid = parse_qs(urlparse(webpage_url).query).get('vid')[0]
             webpage_url = 'https://v.qq.com/x/page/{vid}.html'.format(vid=vid)

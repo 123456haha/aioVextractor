@@ -32,7 +32,7 @@ class Breaker(BaseBreaker):
         self.from_ = "weibo"
 
     @BreakerValidater
-    async def breakdown(self, webpage_url, session, params=None):
+    async def breakdown(self, webpage_url, session, **kwargs):
         try:
             uid = re.findall("https://weibo\.com/u/(\d{4,20})", webpage_url)[0]
         except IndexError:
@@ -41,9 +41,9 @@ class Breaker(BaseBreaker):
                 uid = re.findall("CONFIG\['oid'\]='(\d{4,20})';", user_page_response)[0]
             except:
                 return False
-        if params:
-            container_id = params['container_id']
-            since_id = params['since_id']
+        if kwargs:
+            container_id = kwargs['container_id']
+            since_id = kwargs['since_id']
             response_user_video_page = await self.request_user_video_page(
                 container_id=container_id,
                 session=session,
