@@ -5,7 +5,7 @@
 """
 HOW TO GENERATE THIS FILE:
 extractor_path = "/path/to/extractor"
-res = [ele for ele in os.listdir(extractor_path) if ele not in {'__init__.py', 'extractors.py', '__pycache__}]
+res = [ele for ele in os.listdir(extractor_path) if ele not in {'__init__.py', 'extractors.py', '__pycache__'}]
 for ele in res:
     print(f"from aioVextractor.extractor.{ele.replace('.py', '')} import Extractor as {ele.replace('.py', '')}IE")
 

@@ -1,0 +1,75 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Created by panos on 10/25/19
+# IDE: PyCharm
+
+
+import sys, os
+
+curPath = os.path.abspath(os.path.dirname(__file__))
+rootPath = os.path.split(curPath)[0]
+sys.path.append(rootPath)
+
+from aioVextractor import (
+    distribute_webpage,
+    distribute_playlist,
+    distribute_hybrid
+)
+
+
+async def extract(webpage_url, session):
+    """
+    extract single webpage_url
+    webpage_url can be single url join() by string than can separate any consecutive urls
+    """
+    print(f"Extracting URL: {webpage_url}")
+    distribute_result = distribute_webpage(webpage_url=webpage_url)
+    if isinstance(distribute_result, str):
+        return distribute_result
+    else:
+        info_extractor = distribute_result
+        with info_extractor() as dinosaur:
+            result = await dinosaur.entrance(webpage_url=webpage_url, session=session)
+            return result
+
+
+async def breakdown(webpage_url, session, *args, **kwargs):
+    print(f"Breaking URL: {webpage_url}")
+    distribute_result = distribute_playlist(webpage_url=webpage_url)
+    if isinstance(distribute_result, str):
+        return distribute_result
+    else:
+        bk = distribute_result
+        with bk() as dinosaur:
+            result = await dinosaur.breakdown(webpage_url=webpage_url, session=session, *args, **kwargs)
+            return result
+
+
+async def hybrid_worker(webpage_url, session, *args, **kwargs):
+    print(f"Processing URL: {webpage_url}")
+    distribute_result = distribute_hybrid(webpage_url=webpage_url)
+    if isinstance(distribute_result, str):
+        return distribute_result
+    else:
+        instance = distribute_result
+        if instance.__name__ == "Breaker":
+            with instance() as breaker:
+                result = await breaker.breakdown(
+                    webpage_url=webpage_url,
+                    session=session,
+                    *args,
+                    **kwargs
+                )
+        else:
+            with instance() as extractor:
+                result = await extractor.entrance(
+                    webpage_url=webpage_url,
+                    session=session,
+                    *args,
+                    **kwargs
+                )
+        return result
+
+
+if __name__ == '__main__':
+    pass

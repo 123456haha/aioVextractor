@@ -13,7 +13,6 @@ sys.path.append(curPath)
 
 from aioVextractor.utils import RequestRetry
 
-
 from aioVextractor.extractor.tool_set import (
     ToolSet,
     validate,
@@ -23,7 +22,9 @@ from aioVextractor.extractor.base_extractor import (
     BaseExtractor,
 )
 
-from aioVextractor.distributor import distribute
-from aioVextractor.extract import extract
-
+from aioVextractor.distributor import (
+    distribute_webpage,
+    distribute_playlist,
+    distribute_hybrid,
+)
 

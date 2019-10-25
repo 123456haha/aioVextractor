@@ -125,6 +125,6 @@ FIELDS_BREAKDOWN = {
 
 }
 
-SANIC_PORT = "5555"
+SANIC_PORT = 5555
 SANIC_WORKER = min([os.cpu_count(), 5])
 LOCAL_IP_ADDR = '0.0.0.0'

@@ -14,12 +14,15 @@ from sanic import response as Response
 from sanic import Sanic
 from sanic_cors import CORS
 import platform
-from aioVextractor import extract
+# from aioVextractor import extract
 import aiohttp
 from aioVextractor import config
+# from aioVextractor import distribute_hybrid
+from aioVextractor.api import hybrid_worker
 
 if platform.system() in {"Linux", "Darwin"}:
     import uvloop
+
     uvloop.install()
 else:
     pass
@@ -54,7 +57,13 @@ async def extractor(request):
             url = request.form.get('url')
     if url:
         async with  aiohttp.ClientSession() as session:
-            result = extract(webpage_url=url, session=session)
+            result = await hybrid_worker(
+                webpage_url=url,
+                session=session,
+                # *args,
+                # **kwargs
+            )
+
             if isinstance(result, str):
                 return Response.json({"msg": result,
                                       "data": None},
