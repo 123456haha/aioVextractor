@@ -14,18 +14,18 @@ from sanic import response as Response
 from sanic import Sanic
 from sanic_cors import CORS
 import platform
-# from aioVextractor import extract
 import aiohttp
 from aioVextractor import config
-# from aioVextractor import distribute_hybrid
 from aioVextractor.api import hybrid_worker
+import base64
 
 if platform.system() in {"Linux", "Darwin"}:
     import uvloop
+    import ujson as json
 
     uvloop.install()
 else:
-    pass
+    import json
 
 app = Sanic()
 app.config.KEEP_ALIVE = True
@@ -50,28 +50,53 @@ async def homepage(request):
 async def extractor(request):
     if request.method == 'GET':
         url = request.args.get('url')
+        encoded_params = request.args.get('next', b'e30=')
     else:  ## request.method == 'POST'
         try:
             url = request.json.get('url')
+            encoded_params = request.json.get('next', b'e30=')
         except:
             url = request.form.get('url')
+            encoded_params = request.form.get('next', b'e30=')
     if url:
+        ## decode the necessary params for next page
+        params = json.loads(str(base64.b64decode(encoded_params), 'utf-8'))
         async with  aiohttp.ClientSession() as session:
             result = await hybrid_worker(
                 webpage_url=url,
                 session=session,
-                # *args,
-                # **kwargs
+                **params
             )
 
             if isinstance(result, str):
                 return Response.json({"msg": result,
                                       "data": None},
                                      status=400)
-            else:
+            elif isinstance(result, tuple):  ## playlist
+                outputs, has_more, params = result
+                ## encode the necessary params for next page
+                encoded_params = base64.b64encode(json.dumps(params).encode('utf-8'))
+                page = params.get("page", 1)
                 return Response.json({
                     "msg": "success",
-                    "data": result
+                    "data": outputs,
+                    "count": len(outputs),
+                    "is_playlist": True,
+                    "next": app.url_for('extractor',
+                                        _external=True,
+                                        _server=f"http://{config.LOCAL_IP_ADDR}:{config.SANIC_PORT}",
+                                        url=url,
+                                        page=page + 1,
+                                        next=encoded_params)
+                    if has_more else None
+                })
+            else:  ## webpage
+                return Response.json({
+                    "msg": "success",
+                    "data": result,
+                    "count": len(result),
+                    "is_playlist": False,
+                    "next": None,
                 })
     else:
         return Response.json({"msg": "There is not enough input🤯",
