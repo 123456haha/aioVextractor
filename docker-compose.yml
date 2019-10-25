@@ -71,8 +71,6 @@ services:
 
 volumes:
   mount:
-    driver: local
-    driver_opts:
 
 networks:
   webnet:
