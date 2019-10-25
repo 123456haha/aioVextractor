@@ -63,35 +63,38 @@ class Extractor(BaseExtractor):
                    'accept-encoding': 'gzip, deflate, br',
                    'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
                    }
-        async with session.get(webpage_url, headers=headers) as response:
-            text = await response.text(encoding='utf8', errors='ignore')
-            selector = Selector(text=text)
-            try:
-                ytInitialData = json.loads(json.
-                                           loads(selector.
-                                                 css('script').
-                                                 re_first('window\["ytInitialData"] = JSON.parse\((.*?)\);')))
-            except TypeError:
-                ytInitialData = json.loads(selector.css('script').re_first(
-                    'window\["ytInitialData"\] = ({[\s|\S]*?});[\s|\S]*?window\["ytInitialPlayerResponse"\]'))
-            author_avatar = jmespath.search('contents.'
-                                            'twoColumnWatchNextResults.'
-                                            'results.'
-                                            'results.'
-                                            'contents[1].'
-                                            'videoSecondaryInfoRenderer.'
-                                            'owner.'
-                                            'videoOwnerRenderer.'
-                                            'thumbnail.'
-                                            'thumbnails[-1].'
-                                            'url',
-                                            ytInitialData)
+        text = await self.request(
+            url=webpage_url,
+            session=session,
+            headers=headers
+        )
+        selector = Selector(text=text)
+        try:
+            ytInitialData = json.loads(json.
+                                       loads(selector.
+                                             css('script').
+                                             re_first('window\["ytInitialData"] = JSON.parse\((.*?)\);')))
+        except TypeError:
+            ytInitialData = json.loads(selector.css('script').re_first(
+                'window\["ytInitialData"\] = ({[\s|\S]*?});[\s|\S]*?window\["ytInitialPlayerResponse"\]'))
+        author_avatar = jmespath.search('contents.'
+                                        'twoColumnWatchNextResults.'
+                                        'results.'
+                                        'results.'
+                                        'contents[1].'
+                                        'videoSecondaryInfoRenderer.'
+                                        'owner.'
+                                        'videoOwnerRenderer.'
+                                        'thumbnail.'
+                                        'thumbnails[-1].'
+                                        'url',
+                                        ytInitialData)
 
-            author_avatar = 'http:' + author_avatar if (author_avatar and author_avatar.startswith('//')) else None
-            return {
-                "author_avatar": author_avatar,
-                'from': self.from_
-            }
+        author_avatar = 'http:' + author_avatar if (author_avatar and author_avatar.startswith('//')) else author_avatar
+        return {
+            "author_avatar": author_avatar,
+            'from': self.from_
+        }
 
 
 if __name__ == '__main__':

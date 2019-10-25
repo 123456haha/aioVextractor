@@ -40,9 +40,14 @@ class Extractor(BaseExtractor):
 
             params = {'f': 'web'}
             response_url = f'https://baobab.kaiyanapp.com/api/v1/video/{vid}'
-            async with session.get(response_url, headers=download_headers, params=params) as response:
-                response_json = await response.json()
-                return {**self.extract(response_json), **{"webpage_url": webpage_url}}
+            response_json = await self.request(
+                url=response_url,
+                session=session,
+                headers=download_headers,
+                params=params,
+                response_type="json"
+            )
+            return {**self.extract(response_json), **{"webpage_url": webpage_url}}
 
     def extract(self, response_json):
         result = dict()
@@ -66,6 +71,6 @@ class Extractor(BaseExtractor):
 if __name__ == '__main__':
     from pprint import pprint
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
         pprint(res)
 

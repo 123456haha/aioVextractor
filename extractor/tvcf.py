@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 import jmespath
 import asyncio
 import platform
+
 if platform.system() in {"Linux", "Darwin"}:
     import ujson as json
 else:
@@ -49,13 +50,19 @@ class Extractor(BaseExtractor):
             else:
                 headers = self.general_headers(user_agent=self.random_ua())
                 params = {'Code': code}
-                async with session.get('http://www.tvcf.co.kr/YCf/V.asp', headers=headers, params=params) as response:
-                    response_text = await response.text(encoding='utf8', errors='ignore')
-                    result = dict()
-                    result['webpage_url'] = webpage_url
-                    result['from'] = self.from_
-                    result = await self.extract_old(response_text, code, result=result)
-                    return result
+                response_text = await self.request(
+                    url='http://www.tvcf.co.kr/YCf/V.asp',
+                    session=session,
+                    headers=headers,
+                    params=params
+                )
+                # async with session.get('http://www.tvcf.co.kr/YCf/V.asp', headers=headers, params=params) as response:
+                #     response_text = await response.text(encoding='utf8', errors='ignore')
+                result = dict()
+                result['webpage_url'] = webpage_url
+                result['from'] = self.from_
+                result = await self.extract_old(response_text, code, result=result)
+                return result
         else:  ## new version https://v.tvcf.co.kr/728764
             try:
                 idx = os.path.split(webpage_url)[-1]
@@ -71,34 +78,39 @@ class Extractor(BaseExtractor):
                            'Referer': webpage_url,  ## https://v.tvcf.co.kr/738572
                            'Connection': 'keep-alive'}
                 api = f'https://play.tvcf.co.kr/rest/api/player/init/{idx}'
-                async with session.get(api, headers=headers) as r_code:
-                    response_text = await r_code.text()
-                    # print(f"response_text: {response_text}")
-                    r_code_json = json.loads(response_text)
-                    code = jmespath.search('video.code', r_code_json)
-                    result['from'] = self.from_
-                    result['duration'] = jmespath.search('video.duration', r_code_json)
-                    result['width'] = jmespath.search('video.width', r_code_json)
-                    result['height'] = jmespath.search('video.height', r_code_json)
-                    result['webpage_url'] = webpage_url
-                    result['vid'] = code
-                    result['cover'] = jmespath.search('video.cut', r_code_json)
-                    result['title'] = jmespath.search('video.title', r_code_json)
-                    result['description'] = jmespath.search('video.copy', r_code_json)
-                    fn = os.path.split(result['cover'])[-1].split('.')[0]
-                    fn_high_quality = fn + "_720p"
-                    play_addr_high_quality = f"http://media.tvcf.co.kr/Service/VStream/VideoStreamer.ashx?fn={fn_high_quality}.mp4"
-                    # play_addr = f"http://media.tvcf.co.kr/Service/VStream/VideoStreamer.ashx?fn={fn}.mp4"
-                    result['play_addr'] = play_addr_high_quality
-                    try:
-                        upload_date = jmespath.search('video.onair', r_code_json)
-                        result['upload_ts'] = int(
-                            time.mktime(time.strptime(upload_date, '%Y%m%d'))) \
-                            if upload_date else None
-                    except:
-                        result['upload_ts'] = None
-                    result['rating'] = jmespath.search('evaluate.value', r_code_json)
-                    return await self.extract_new(session=session, result=result, idx=idx)
+                response_text = await self.request(
+                    url=api,
+                    session=session,
+                    headers=headers,
+                )
+                # async with session.get(api, headers=headers) as r_code:
+                #     response_text = await r_code.text()
+                # print(f"response_text: {response_text}")
+                r_code_json = json.loads(response_text)
+                code = jmespath.search('video.code', r_code_json)
+                result['from'] = self.from_
+                result['duration'] = jmespath.search('video.duration', r_code_json)
+                result['width'] = jmespath.search('video.width', r_code_json)
+                result['height'] = jmespath.search('video.height', r_code_json)
+                result['webpage_url'] = webpage_url
+                result['vid'] = code
+                result['cover'] = jmespath.search('video.cut', r_code_json)
+                result['title'] = jmespath.search('video.title', r_code_json)
+                result['description'] = jmespath.search('video.copy', r_code_json)
+                fn = os.path.split(result['cover'])[-1].split('.')[0]
+                fn_high_quality = fn + "_720p"
+                play_addr_high_quality = f"http://media.tvcf.co.kr/Service/VStream/VideoStreamer.ashx?fn={fn_high_quality}.mp4"
+                # play_addr = f"http://media.tvcf.co.kr/Service/VStream/VideoStreamer.ashx?fn={fn}.mp4"
+                result['play_addr'] = play_addr_high_quality
+                try:
+                    upload_date = jmespath.search('video.onair', r_code_json)
+                    result['upload_ts'] = int(
+                        time.mktime(time.strptime(upload_date, '%Y%m%d'))) \
+                        if upload_date else None
+                except:
+                    result['upload_ts'] = None
+                result['rating'] = jmespath.search('evaluate.value', r_code_json)
+                return await self.extract_new(session=session, result=result, idx=idx)
 
     @staticmethod
     async def extract_old(response, code, result):
@@ -125,10 +137,11 @@ class Extractor(BaseExtractor):
 
     async def extract_new(self, session, result, idx):
         result['title'], result['tag'], result['comment_count'] = await asyncio.gather(
-            *[self.get_title(session=session, idx=idx),
-              self.get_tags(session=session, idx=idx),
-              self.get_comment_num(session=session, idx=idx),
-              ])
+            *[
+                self.get_title(session=session, idx=idx),
+                self.get_tags(session=session, idx=idx),
+                self.get_comment_num(session=session, idx=idx),
+            ])
         return result
 
     @RequestRetry(default_exception_return=[],
@@ -160,16 +173,21 @@ class Extractor(BaseExtractor):
             'Referer': f'https://play.tvcf.co.kr/{idx}',
             'Connection': 'keep-alive',
         }
-        async with session.get(f'https://play.tvcf.co.kr/rest/api/player/init2/{idx}', headers=headers) as response:
-            response_text = await response.text()
-            response_json = json.loads(response_text)
-            title = jmespath.search('search.list[0].[title, chapter]', response_json)
-            try:
-                title = ':'.join(title)
-            except TypeError:  ## TypeError: sequence item 1: expected str instance, NoneType found
-                title = title[0]
-            finally:
-                return title
+        response_text = await self.request(
+            url=f'https://play.tvcf.co.kr/rest/api/player/init2/{idx}',
+            session=session,
+            headers=headers,
+        )
+        # async with session.get(f'https://play.tvcf.co.kr/rest/api/player/init2/{idx}', headers=headers) as response:
+        #     response_text = await response.text()
+        response_json = json.loads(response_text)
+        title = jmespath.search('search.list[0].[title, chapter]', response_json)
+        try:
+            title = ':'.join(title)
+        except TypeError:  ## TypeError: sequence item 1: expected str instance, NoneType found
+            title = title[0]
+        finally:
+            return title
 
     @RequestRetry
     async def get_comment_num(self, idx, session):
@@ -181,17 +199,25 @@ class Extractor(BaseExtractor):
         params = {'skip': '0',
                   'take': '5'}
         url = f'https://play.tvcf.co.kr/rest/api/player/ReplyMore/{idx}'
-        async with session.get(url, headers=headers, params=params) as resp:
-            html = await resp.text(encoding='utf-8')
-            try:
-                data = json.loads(html)
-                return data.get('total', 0)
-            except:
-                return None
+
+        html = await self.request(
+            url=url,
+            session=session,
+            headers=headers,
+            params=params,
+        )
+        # async with session.get(url, headers=headers, params=params) as resp:
+        #     html = await resp.text(encoding='utf-8')
+        try:
+            data = json.loads(html)
+            return data.get('total', 0)
+        except:
+            return None
 
 
 if __name__ == '__main__':
     from pprint import pprint
+
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="http://www.tvcf.co.kr/YCf/V.asp?Code=A000363280")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
         pprint(res)

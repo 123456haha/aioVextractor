@@ -19,6 +19,7 @@ from aioVextractor.extractor.tool_set import (
 class Extractor(ToolSet):
     target_website = [
         "http[s]?://v\.youku\.com/v_show/id_\w{10,36}",
+        "http[s]?://player\.youku\.com/embed/\w{10,36}",
     ]
 
     TEST_CASE = [
@@ -30,6 +31,7 @@ class Extractor(ToolSet):
         "https://v.youku.com/v_show/id_XMTcxNTA2OTEwNA==.html?spm=a2ha1.12528442.m_4424_c_11054_4.d_5&s=cb4582f4f72011e5a080&scm=20140719.rcmd.4424.show_cb4582f4f72011e5a080",
         "https://v.youku.com/v_show/id_XNDI0ODk0ODUzNg==.html?spm=a2ha1.12675304.m_2556_c_8261.d_1&s=de83005bc0ba4a9284b3&scm=20140719.manual.2556.show_de83005bc0ba4a9284b3",
         "https://v.youku.com/v_show/id_XNDEyNDE5NzQ1Mg==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5NzQ1Mg%3D%3D",
+        'http://player.youku.com/embed/XNDA3MjU1MzY3Ng==',
     ]
 
     def __init__(self, *args, **kwargs):
@@ -40,7 +42,7 @@ class Extractor(ToolSet):
     @RequestRetry
     async def entrance(self, webpage_url, session):
         try:
-            vid = re.findall("v_show/id_([\w-]{5,30})", webpage_url)[0]
+            vid = webpage_url.split('?')[0].split('/')[-1].replace('==', '').lstrip('id_').split('.')[0]
         except:
             traceback.print_exc()
             return False

@@ -38,17 +38,16 @@ class Extractor(BaseExtractor):
             selector = Selector(text=response_text)
             result = dict()
             video_json = json.loads(selector.css('#__NEXT_DATA__::text').re_first('([\s|\S]*)'))
-            result['author'] = jmespath.search('props.pageProps.initialProps.detail.contributor.display_name',
-                                               video_json)
-            result['play_addr'] = jmespath.search('props.pageProps.initialProps.detail.video.preview_mp4_url',
-                                                  video_json)
-            result['title'] = jmespath.search('props.pageProps.initialProps.detail.video.description', video_json)
-            result['vid'] = jmespath.search('props.pageProps.initialProps.detail.video.id', video_json)
-            video_category = jmespath.search('props.pageProps.initialProps.detail.video.categories[].name', video_json)
+            detail = jmespath.search("props.pageProps.initialProps.detail", video_json)
+            result['author'] = jmespath.search('contributor.display_name', detail)
+            result['play_addr'] = jmespath.search('video.preview_mp4_url', detail)
+            result['title'] = jmespath.search('video.description', detail)
+            result['vid'] = jmespath.search('video.id', detail)
+            video_category = jmespath.search('video.categories[].name', detail)
             result['category'] = ','.join(video_category)
-            result['cover'] = jmespath.search('props.pageProps.initialProps.detail.video.preview_jpg_url', video_json)
-            result['duration'] = jmespath.search('props.pageProps.initialProps.detail.video.duration', video_json)
-            result['tag'] = jmespath.search('props.pageProps.initialProps.detail.video.keywords', video_json)
+            result['cover'] = jmespath.search('video.preview_jpg_url', detail)
+            result['duration'] = jmespath.search('video.duration', detail)
+            result['tag'] = jmespath.search('video.keywords', detail)
             result['from'] = self.from_
             result['webpage_url'] = webpage_url
             return result
@@ -56,6 +55,6 @@ class Extractor(BaseExtractor):
 if __name__ == '__main__':
     from pprint import pprint
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
         pprint(res)
 

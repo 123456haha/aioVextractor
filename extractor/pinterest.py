@@ -17,6 +17,7 @@ if platform.system() in {"Linux", "Darwin"}:
 else:
     import json
 
+
 class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://www\.pinterest\.com/pin/\d{15,23}",
@@ -35,51 +36,49 @@ class Extractor(BaseExtractor):
     async def entrance(self, webpage_url, session):
         headers = self.general_headers(user_agent=self.random_ua())
         headers["Host"] = "www.pinterest.com"
-        async with session.get(webpage_url, verify_ssl=False, headers=headers) as resp:
-            html = await resp.text()
-            selector = Selector(text=html)
-            jsonstr = selector.css("#initial-state::text").extract_first()
-            if not jsonstr:
-                return None
-            jsondata = json.loads(jsonstr)
-            item = dict()
-            data = jmespath.search("resourceResponses[0].response.data", jsondata)
-            videos = jmespath.search("videos", data)
-            item['vid'] = data.get('id')
-            item['webpage_url'] = "https://www.pinterest.com/pin/" + item['vid']
-            iname = ["orig", "736x", "564x", "474x", "600x315"]
-            for inn in iname:
-                if item.get("cover"):
-                    break
-                item['cover'] = jmespath.search(f"images.{inn}.url", data)
-            pn = ["V_720P", "V_HLSV3_MOBILE", "V_HLSV3_WEB", "V_HLSV4"]
-            for n in pn:
-                if item.get("duration"):
-                    break
-                item['play_addr'] = jmespath.search(f"video_list.{n}.url", videos)
-                if not item.get('cover'):
-                    item['cover'] = jmespath.search(f"video_list.{n}.thumbnail", videos)
-                item['duration'] = jmespath.search(f"video_list.{n}.duration", videos) // 1000
-                item['width'] = jmespath.search(f"video_list.{n}.width", videos)
-                item['height'] = jmespath.search(f"video_list.{n}.height", videos)
 
-            item['title'] = data.get("grid_title")
-            item['description'] = jmespath.search("rich_summary.display_description", data)
-            item['description'] = data.get("description") if not item['description'] else None
-            item['ad_link'] = data.get("tracked_link")
-            pinner = data.get("pinner")
-            if pinner:
-                item['author'] = pinner.get("full_name")
-                item['author_id'] = pinner.get("id")
-                item['author_avatar'] = pinner.get("image_large_url")
-                item['author_avatar'] = pinner.get("image_small_url") if not item['author_avatar'] else None
-                # item['author_url'] = webpage_url
-            item['comment_count'] = data.get("comment_count", 0)
-            item['from'] = self.from_
-            return item
+        html = await self.request(
+            url=webpage_url,
+            session=session,
+            verify_ssl=False,
+            headers=headers
+        )
+        selector = Selector(text=html)
+        jsonstr = selector.css("#initial-state::text").extract_first()
+        if not jsonstr:
+            return None
+        jsondata = json.loads(jsonstr)
+        video = jmespath.search("resourceResponses[0].response.data", jsondata)
+        videos = jmespath.search("videos", video)
+        try:
+            duration = jmespath.search("video_list.*.duration", videos)[0] // 1000
+        except:
+            duration = None
+        result = {
+            "from": self.from_,
+            "vid": video['id'],
+            "webpage_url": f"https://www.pinterest.com/pin/{video['id']}",
+            "playlist_url": webpage_url,
+            "cover": jmespath.search("max_by(images.*, &width).url", video),
+            "title": jmespath.search("title", video),
+            "duration": duration,
+            "play_addr": jmespath.search("max_by(video_list.*, &width).url", videos),
+            "width": jmespath.search("max_by(video_list.*, &width).width", videos),
+            "height": jmespath.search("max_by(video_list.*, &height).height", videos),
+            "description": jmespath.search("rich_summary.display_description", video),
+            "ad_link": jmespath.search("rich_summary.url", video),
+            "author": jmespath.search("pinner.username", video),
+            "author_id": jmespath.search("pinner.id", video),
+            "avatar": jmespath.search("pinner.image_large_url", video),
+            "author_url": webpage_url,
+            "comment_count": jmespath.search("comment_count", video),
+        }
+        return result
+
 
 if __name__ == '__main__':
     from pprint import pprint
+
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://www.pinterest.com/pin/785667097477427570/?nic=1")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
         pprint(res)

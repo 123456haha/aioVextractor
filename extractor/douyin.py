@@ -50,9 +50,15 @@ class Extractor(BaseExtractor):
         """
         api = f'https://aweme-hl.snssdk.com/aweme/v1/aweme/detail/?aweme_id={aweme_id}&device_platform=ios&app_name=aweme&aid=1128'
         aweme_detail_headers = {'user-agent': 'Mozilla/5.0'}
-        async with session.get(api, headers=aweme_detail_headers) as response:
-            response_json = await response.json()
-            return jmespath.search('aweme_detail', response_json)
+
+        response = await self.request(
+            url=api,
+            session=session,
+            headers=aweme_detail_headers,
+            response_type="json"
+        )
+
+        return jmespath.search('aweme_detail', response)
 
     def extract(self, response_json):
         """

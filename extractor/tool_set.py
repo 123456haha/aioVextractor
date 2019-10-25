@@ -38,6 +38,10 @@ async def validate(func, extractor_instace, args, kwargs):
     for regex in target_website:
         urls += re.findall(regex, webpage_url)
 
+    if not urls:
+        print("There has no suitable url match!")
+        return None
+
     ## asyncio gather these urls
     gather_results = await asyncio.gather(
         *[

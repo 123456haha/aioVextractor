@@ -63,7 +63,7 @@ class Extractor(BaseExtractor):
 if __name__ == '__main__':
     from pprint import pprint
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://www.instagram.com/p/B1tXMlihthT/")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
         pprint(res)
 
 

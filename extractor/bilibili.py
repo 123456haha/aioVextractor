@@ -62,36 +62,39 @@ class Extractor(BaseExtractor):
         headers = self.general_headers(user_agent=user_agent)
         headers['Referer'] = 'https://m.bilibili.com/index.html'
         av_url = f'https://m.bilibili.com/video/av{result["vid"]}.html'
-        async with session.get(av_url, headers=headers) as resp:
-            html = await resp.text(encoding='utf-8', errors='ignore')
-            jsonstr = re.findall("window.__INITIAL_STATE__=(.*?)};", html)  # 提取json数据 为保证容错 用 }; 来标识
-            if jsonstr:
-                jsonstr = jsonstr[0] + '}'
-            else:
-                raise ValueError
-            try:
-                jsondata = json.loads(jsonstr)
-                result['comment_count'] = jmespath.search('comment.count', jsondata)
-                result['tag'] = jmespath.search('tags[].tag_name', jsondata)
-                result['author_avatar'] = jmespath.search('upData.face', jsondata)
-                result['author_description'] = jmespath.search('upData.description', jsondata)
-                result['author_birthday'] = jmespath.search('upData.birthday', jsondata)
-                result['author_attention'] = jmespath.search('upData.attention', jsondata)
-                result['author_follwer_count'] = jmespath.search('upData.fans', jsondata)
-                result['author_follwing_count'] = jmespath.search('upData.friend', jsondata)
-                result['author_id'] = jmespath.search('upData.mid', jsondata)
-                result['author'] = jmespath.search('upData.name', jsondata)
-                result['gender'] = jmespath.search('upData.sex', jsondata)
-                result['author_sign'] = jmespath.search('upData.sign', jsondata)
-                result['upload_ts'] = jmespath.search('videoData.ctime', jsondata)
-                result['description'] = jmespath.search('videoData.desc', jsondata)
-                result['duration'] = jmespath.search('videoData.duration', jsondata)
-                result['title'] = jmespath.search('videoData.title', jsondata)
-                result['from'] = self.from_
-                return result
-            except:
-                traceback.print_exc()
-                return False
+        html = await self.request(
+            url=av_url,
+            session=session,
+            headers=headers
+        )
+        jsonstr = re.findall("window.__INITIAL_STATE__\s?=\s?(.*?)};", html)  # 提取json数据 为保证容错 用 }; 来标识
+        if jsonstr:
+            jsonstr = jsonstr[0] + '}'
+        else:
+            return False
+        try:
+            jsondata = json.loads(jsonstr)
+            result['comment_count'] = jmespath.search('comment.count', jsondata)
+            result['tag'] = jmespath.search('tags[].tag_name', jsondata)
+            result['author_avatar'] = jmespath.search('upData.face', jsondata)
+            result['author_description'] = jmespath.search('upData.description', jsondata)
+            result['author_birthday'] = jmespath.search('upData.birthday', jsondata)
+            result['author_attention'] = jmespath.search('upData.attention', jsondata)
+            result['author_follwer_count'] = jmespath.search('upData.fans', jsondata)
+            result['author_follwing_count'] = jmespath.search('upData.friend', jsondata)
+            result['author_id'] = jmespath.search('upData.mid', jsondata)
+            result['author'] = jmespath.search('upData.name', jsondata)
+            result['gender'] = jmespath.search('upData.sex', jsondata)
+            result['author_sign'] = jmespath.search('upData.sign', jsondata)
+            result['upload_ts'] = jmespath.search('videoData.ctime', jsondata)
+            result['description'] = jmespath.search('videoData.desc', jsondata)
+            result['duration'] = jmespath.search('videoData.duration', jsondata)
+            result['title'] = jmespath.search('videoData.title', jsondata)
+            result['from'] = self.from_
+            return result
+        except:
+            traceback.print_exc()
+            return False
 
 
 if __name__ == '__main__':

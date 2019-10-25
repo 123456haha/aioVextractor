@@ -41,7 +41,6 @@ class Extractor(BaseExtractor):
                 result_playLink, result_info = result
                 return {**result_playLink, **result_info}
             else:
-                print(f"extractor renren result: {result}")
                 return False
 
     @RequestRetry
@@ -54,15 +53,19 @@ class Extractor(BaseExtractor):
                    'token': 'undefined',
                    'clientVersion': 'undefined'}
         params = {'videoId': vid}
-        url = 'https://api.rr.tv/v3plus/video/getVideoPlayLinkByVideoId'
-        async with session.get(url, headers=headers, params=params) as response:
-            ResJson = await response.json()
-            if ResJson['code'] != '0000':
-                return False
-            elif not ResJson['data']['playLink']:
-                return False
-            else:
-                return {'vid': vid, 'play_addr': ResJson['data']['playLink']}
+        ResJson = await self.request(
+            url='https://api.rr.tv/v3plus/video/getVideoPlayLinkByVideoId',
+            session=session,
+            headers=headers,
+            params=params,
+            response_type="json"
+        )
+        if ResJson['code'] != '0000':
+            return False
+        elif not ResJson['data']['playLink']:
+            return False
+        else:
+            return {'vid': vid, 'play_addr': ResJson['data']['playLink']}
 
     @RequestRetry
     async def extract(self, vid, session, webpage_url):
@@ -77,24 +80,29 @@ class Extractor(BaseExtractor):
                    'token': 'undefined',
                    'clientType': 'web'}
         params = {'videoId': vid}
-        async with session.get('https://api.rr.tv/v3plus/video/detail', headers=headers, params=params) as response:
-            VideoDetail = await response.json()
-            result = dict()
-            result['webpage_url'] = webpage_url
-            result['from'] = self.from_
-            videoDetailView = jmespath.search('data.videoDetailView', VideoDetail)
-            result['author'] = jmespath.search('author.nickName', videoDetailView)
-            result['avatar'] = jmespath.search('author.headImgUrl', videoDetailView)
-            result['role'] = jmespath.search('author.roleInfo', videoDetailView)
-            result['author_videoNum'] = jmespath.search('author.videoCount', videoDetailView)
-            result['title'] = jmespath.search('title', videoDetailView)
-            result['category'] = jmespath.search('type', videoDetailView)
-            result['cover'] = jmespath.search('cover', videoDetailView)
-            result['description'] = jmespath.search('brief', videoDetailView)
-            result['tag'] = jmespath.search('tagList[].name', videoDetailView)
-            video_duration = jmespath.search('duration', videoDetailView)
-            result['duration'] = self.cal_duration(video_duration) if video_duration else None
-            return result
+        VideoDetail = await self.request(
+            url='https://api.rr.tv/v3plus/video/detail',
+            session=session,
+            headers=headers,
+            params=params,
+            response_type="json"
+        )
+        result = dict()
+        result['webpage_url'] = webpage_url
+        result['from'] = self.from_
+        videoDetailView = jmespath.search('data.videoDetailView', VideoDetail)
+        result['author'] = jmespath.search('author.nickName', videoDetailView)
+        result['avatar'] = jmespath.search('author.headImgUrl', videoDetailView)
+        result['role'] = jmespath.search('author.roleInfo', videoDetailView)
+        result['author_videoNum'] = jmespath.search('author.videoCount', videoDetailView)
+        result['title'] = jmespath.search('title', videoDetailView)
+        result['category'] = jmespath.search('type', videoDetailView)
+        result['cover'] = jmespath.search('cover', videoDetailView)
+        result['description'] = jmespath.search('brief', videoDetailView)
+        result['tag'] = jmespath.search('tagList[].name', videoDetailView)
+        video_duration = jmespath.search('duration', videoDetailView)
+        result['duration'] = self.cal_duration(video_duration) if video_duration else None
+        return result
 
     @staticmethod
     def cal_duration(raw_duration_string):
@@ -105,8 +113,10 @@ class Extractor(BaseExtractor):
             duration += int(i) * (60 ** num)
         return duration
 
+
 if __name__ == '__main__':
     from pprint import pprint
+
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://mobile.rr.tv/mission/#/share/video?id=1879897")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
         pprint(res)

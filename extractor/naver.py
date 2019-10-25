@@ -15,7 +15,6 @@ from aioVextractor.extractor.base_extractor import (
 )
 
 
-
 class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://blog\.naver\.com/PostView\.nhn\?blogId=\w*?&logNo=\d{9,15}",
@@ -36,22 +35,27 @@ class Extractor(BaseExtractor):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session):
-        async with session.get(webpage_url, headers=self.general_headers(user_agent=self.random_ua())) as response:
-            response_text = await response.text(encoding='utf8', errors='ignore')
-            selector = Selector(text=response_text)
-            iframe_url = selector.css('iframe[src*=vid]::attr(src)').extract_first()
-            vid = parse_qs(urlparse(iframe_url).query)['vid'][0]
-            inKey = parse_qs(urlparse(iframe_url).query)['inKey'][0]
-            result = dict()
-            result['avatar'] = selector.css('.bloger .thumb img::attr(src)').extract_first().split('?')[0]
-            author_videoNum = selector.css('.category_title::text').re('([\d|,]*)')
-            result['author_videoNum'] = sorted(author_videoNum)[-1].replace(',', '')
-            result['vid'] = vid
-            result['from'] = self.from_
-            result['upload_ts'] = self.format_upload_ts(selector.css("p[class*='_postAddDate']::text").extract_first())
-            result['webpage_url'] = webpage_url
-            VideoJson = await self.request_naver_api(iframe_url=iframe_url, in_key=inKey, session=session, vid=vid)
-            return self.extract(video_json=VideoJson, result=result)
+        response_text = await self.request(
+            url=webpage_url,
+            session=session,
+            headers=self.general_headers(user_agent=self.random_ua())
+        )
+        # async with session.get(webpage_url, headers=self.general_headers(user_agent=self.random_ua())) as response:
+        #     response_text = await response.text(encoding='utf8', errors='ignore')
+        selector = Selector(text=response_text)
+        iframe_url = selector.css('iframe[src*=vid]::attr(src)').extract_first()
+        vid = parse_qs(urlparse(iframe_url).query)['vid'][0]
+        inKey = parse_qs(urlparse(iframe_url).query)['inKey'][0]
+        result = dict()
+        result['avatar'] = selector.css('.bloger .thumb img::attr(src)').extract_first().split('?')[0]
+        author_videoNum = selector.css('.category_title::text').re('([\d|,]*)')
+        result['author_videoNum'] = sorted(author_videoNum)[-1].replace(',', '')
+        result['vid'] = vid
+        result['from'] = self.from_
+        result['upload_ts'] = self.format_upload_ts(selector.css("p[class*='_postAddDate']::text").extract_first())
+        result['webpage_url'] = webpage_url
+        VideoJson = await self.request_naver_api(iframe_url=iframe_url, in_key=inKey, session=session, vid=vid)
+        return self.extract(video_json=VideoJson, result=result)
 
     @RequestRetry
     async def request_naver_api(self, iframe_url, in_key, session, vid):
@@ -72,9 +76,16 @@ class Extractor(BaseExtractor):
                   'dr': '1920x1080',
                   'lc': 'ko_KR'}
         naver_api = 'http://apis.naver.com/rmcnmv/rmcnmv/vod/play/v2.0/{vid}'.format(vid=vid)
-        async with session.get(naver_api, headers=headers, params=params) as response:
-            VideoJson = await response.json()
-            return VideoJson
+        video_json = await self.request(
+            url=naver_api,
+            session=session,
+            headers=headers,
+            params=params,
+            response_type="json"
+        )
+        # async with session.get(naver_api, headers=headers, params=params) as response:
+        #     VideoJson = await response.json()
+        return video_json
 
     @staticmethod
     def format_upload_ts(upload_ts):
@@ -113,7 +124,7 @@ class Extractor(BaseExtractor):
 
 if __name__ == '__main__':
     from pprint import pprint
-    with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
-        pprint(res)
 
+    with Extractor() as extractor:
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
+        pprint(res)

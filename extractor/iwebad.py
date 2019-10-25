@@ -31,25 +31,33 @@ class Extractor(BaseExtractor):
     async def entrance(self, webpage_url, session):
         headers = self.general_headers(self.random_ua())
         headers['Referer'] = 'http://iwebad.com/'
-        async with session.get(webpage_url, headers=headers) as response:
-            response_text = await response.text(encoding='utf8', errors='ignore')
-            selector = Selector(text=response_text)
-            tencent_urls = selector.css('iframe[src*="v.qq"]::attr(src)').extract()
-            youku_urls = selector.css("iframe[src*='player.youku.com']::attr(src)").extract()
-            urls = tencent_urls + youku_urls
-            if not urls:
-                return False
-            results = await asyncio.gather(
-                *[self.extract_iframe(
+
+        response_text = await self.request(
+            url=webpage_url,
+            session=session,
+            headers=headers
+        )
+        selector = Selector(text=response_text)
+        tencent_urls = selector.css('iframe[src*="v.qq"]::attr(src)').extract()
+        youku_urls = selector.css("iframe[src*='player.youku.com']::attr(src)").extract()
+        urls = tencent_urls + youku_urls
+        if not urls:
+            return False
+        results = await asyncio.gather(
+            *[
+                self.extract_iframe(
                     iframe_url=iframe_url,
                     session=session
-                ) for iframe_url in urls])
-            for ele in results:
+                ) for iframe_url in urls
+            ])
+        outputs = []
+        for result in results:
+            for ele in result:
                 if ele:
                     ele['from'] = self.from_
                     ele['webpage_url'] = webpage_url
-
-            return results
+                    outputs.append(ele)
+        return outputs
 
 
 if __name__ == '__main__':

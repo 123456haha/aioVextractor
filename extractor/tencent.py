@@ -26,7 +26,8 @@ class Extractor(ToolSet):
     target_website = [
         "http[s]?://v\.qq\.com/x/page/\w{5,20}\.html",
         "http[s]?://v\.qq\.com/x/cover/\w{5,20}\.html",
-        "/iframe/player\.html\?vid=\w{5,20}",
+        "http[s]?://v\.qq\.com/iframe/player\.html\?vid=\w{5,20}",
+        "http[s]?://v\.qq\.com/iframe/preview.html\?.*?vid=\w{5,20}",
     ]
 
     TEST_CASE = [
@@ -35,6 +36,7 @@ class Extractor(ToolSet):
         "https://v.qq.com/x/page/s08899ss07p.html",
         "https://v.qq.com/x/cover/bzfkv5se8qaqel2.html",
         "https://v.qq.com/iframe/player.html?vid=c0912n1rqrw&tiny=0&auto=0",
+        "https://v.qq.com/iframe/preview.html?width=500&height=375&auto=0&vid=m0927lumf50",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -68,9 +70,11 @@ class Extractor(ToolSet):
                 return False
         selector = Selector(text=text)
         result, commentId = self.extract(response=text, webpage_url=webpage_url, vid=vid)
-        gather_results = await asyncio.gather(*[self.extract_comment_count(commentId=commentId, session=session),
-                                                self.extract_author_info(selector=selector, session=session),
-                                                self.extract_by_vkey(vid=vid, url=webpage_url, session=session)])
+        gather_results = await asyncio.gather(*[
+            self.extract_comment_count(commentId=commentId, session=session),
+            self.extract_author_info(selector=selector, session=session),
+            self.extract_by_vkey(vid=vid, url=webpage_url, session=session)
+        ])
         result = self.merge_dicts(result, *gather_results)
         return result
 
@@ -171,7 +175,13 @@ class Extractor(ToolSet):
         params = {'source': '0',
                   'targetids': commentId}
         api = 'https://video.coral.qq.com/article/batchcommentnumv2'
-        response = await self.request(api, headers=headers, params=params, response_type="json", session=session)
+        response = await self.request(
+            api,
+            headers=headers,
+            params=params,
+            response_type="json",
+            session=session
+        )
         return {"comment_count": jmespath.search('data[0].commentnum', response)}
 
     @RequestRetry(default_exception_return={})
@@ -186,7 +196,11 @@ class Extractor(ToolSet):
                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                    'Accept-Encoding': 'gzip, deflate',
                    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
-        response = await self.request(user_page_url, headers=headers, session=session)
+        response = await self.request(
+            user_page_url,
+            headers=headers,
+            session=session
+        )
         selector = Selector(text=response)
         result = {
             "author": self.extract_author_name(selector=selector),
@@ -276,10 +290,12 @@ class Extractor(ToolSet):
                                   'charge': 0}
 
         api_get_info = os.path.join('http://', Host, 'getinfo')
-        response_getinfo_text = await self.request(url=api_get_info,
-                                                   session=session,
-                                                   headers=extract_by_vkey_headers,
-                                                   params=extract_by_vkey_params)
+        response_getinfo_text = await self.request(
+            url=api_get_info,
+            session=session,
+            headers=extract_by_vkey_headers,
+            params=extract_by_vkey_params
+        )
         ResJson = json.loads(response_getinfo_text[len('QZOutputJson='):-1])
         filename = jmespath.search('vl.vi[0].fn', ResJson)
         if not filename:

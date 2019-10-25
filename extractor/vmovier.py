@@ -13,12 +13,11 @@ from aioVextractor.extractor.base_extractor import (
     validate,
     RequestRetry
 )
+
 if platform.system() in {"Linux", "Darwin"}:
     import ujson as json
 else:
     import json
-
-
 
 
 class Extractor(BaseExtractor):
@@ -45,37 +44,46 @@ class Extractor(BaseExtractor):
     async def entrance(self, webpage_url, session):
         headers = self.general_headers(user_agent=self.random_ua())
         headers['Referer'] = 'http://creative.adquan.com/'
-        async with session.get(webpage_url, headers=headers) as response:
-            response_text = await response.text(encoding='utf8', errors='ignore')
-            selector = Selector(text=response_text)
-            xinpianchang_url = selector.css('.post-title a::attr(href)').extract()
-            openapi_url = selector.css('iframe[src*=openapi]::attr(src)').extract()
-            youku_url = list(map(lambda x: 'https://v.youku.com/v_show/id_{vid}'.format(vid=x),
-                                 selector.css('script::text').re("vid: '([\s|\S]*?)'")))
-            urls = xinpianchang_url + openapi_url + youku_url
+        response_text = await self.request(
+            url=webpage_url,
+            session=session,
+            headers=headers,
+        )
+        selector = Selector(text=response_text)
+        xinpianchang_url = selector.css('.post-title a::attr(href)').extract()
+        openapi_url = selector.css('iframe[src*=openapi]::attr(src)').extract()
+        youku_url = list(map(lambda x: f'https://v.youku.com/v_show/id_{x}',
+                             selector.css('script::text').re("vid: '([\s|\S]*?)'")))
+        urls = xinpianchang_url + openapi_url + youku_url
 
-            if not urls:
-                return False
-            results = await asyncio.gather(
-                *[self.allocate_url(url=url_,
-                                    session=session,
-                                    referer=webpage_url,
-                                    selector=selector) for url_ in urls])
+        if not urls:
+            return False
 
-            for ele in results:
+        results = await asyncio.gather(
+            *[
+                self.allocate_url(url=url_,
+                                  session=session,
+                                  referer=webpage_url,
+                                  selector=selector)
+                for url_ in urls
+            ])
+
+        outputs = []
+        for result in results:
+            for ele in result:
                 if ele:
                     ele['from'] = self.from_
                     ele['webpage_url'] = webpage_url
-            return results
+                    outputs.append(ele)
+
+        return outputs
 
     async def allocate_url(self, url, session, referer=None, selector=None):
         if 'openapi' in url:
-            return await self.extract_openapi_info(selector=selector, player_address=url,
-                                                   referer=referer, session=session)
-        # elif 'v.youku.com' in url:
-        #     return await self.extract_iframe(iframe_url=url, session=session)
-        # elif "xinpianchang" in url:
-        #     return await self.extract_iframe(iframe_url=url, session=session)
+            return await self.extract_openapi_info(selector=selector,
+                                                   player_address=url,
+                                                   referer=referer,
+                                                   session=session)
         else:
             return await self.extract_iframe(iframe_url=url, session=session)
 
@@ -92,33 +100,22 @@ class Extractor(BaseExtractor):
         headers = self.general_headers(user_agent=self.random_ua())
         headers['referer'] = referer
         headers['authority'] = 'openapi-vtom.vmovier.com'
-        async with session.get(player_address, headers=headers) as player_response:
-            player_response_text = await player_response.text(encoding='utf8', errors='ignore')
-            player_selector = Selector(text=player_response_text)
-            result['cover'] = player_selector.css('#xpc_video::attr(poster)').extract_first()
-            video = json.loads(player_selector.css('script').re_first('var origins = (\[[\s|\S]*?\])'))
-            duration, result['play_addr'] = jmespath.search('max_by(@, &filesize).[duration, url]', video)
-            result['duration'] = int(duration / 1000) if duration else None
-            return result
+        player_response_text = await self.request(
+            url=player_address,
+            session=session,
+            headers=headers,
+        )
+        player_selector = Selector(text=player_response_text)
+        result['cover'] = player_selector.css('#xpc_video::attr(poster)').extract_first()
+        video = json.loads(player_selector.css('script').re_first('var origins = (\[[\s|\S]*?\])'))
+        duration, result['play_addr'] = jmespath.search('max_by(@, &filesize).[duration, url]', video)
+        result['duration'] = int(duration / 1000) if duration else None
+        return [result]
 
 
 if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://www.vmovier.com/56000?from=index_new_img")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[4])
         pprint(res)
-
-    # import aiohttp
-    # from pprint import pprint
-    #
-    #
-    # async def test():
-    #     async with aiohttp.ClientSession() as session_:
-    #         return await entrance(
-    #             webpage_url="https://www.vmovier.com/55108",
-    #             session=session_)
-    #
-    #
-    # loop = asyncio.get_event_loop()
-    # pprint(loop.run_until_complete(test()))

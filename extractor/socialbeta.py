@@ -31,32 +31,38 @@ class Extractor(BaseExtractor):
     async def entrance(self, webpage_url, session):
         headers = self.general_headers(user_agent=self.random_ua())
         headers['Referer'] = webpage_url
-        async with session.get(webpage_url, headers=headers) as response:
-            text = await response.text(errors='ignore')
-            selector = Selector(text=text)
-            youku_urls = selector.css("iframe[src*='player.youku.com']::attr(src)").extract()
-            tencent_urls = selector.css('iframe[src*="v.qq"]::attr(src)').extract()
-            urls = youku_urls + tencent_urls
-            if not urls:
-                return False
+        text = await self.request(
+            url=webpage_url,
+            session=session,
+            headers=headers
+        )
+        selector = Selector(text=text)
+        youku_urls = selector.css("iframe[src*='player.youku.com']::attr(src)").extract()
+        tencent_urls = selector.css('iframe[src*="v.qq"]::attr(src)').extract()
+        urls = youku_urls + tencent_urls
+        if not urls:
+            return False
 
-            results = await asyncio.gather(
-                *[self.extract_iframe(
+        results = await asyncio.gather(
+            *[
+                self.extract_iframe(
                     iframe_url=iframe_url,
                     session=session
-                ) for iframe_url in urls])
-            for ele in results:
+                ) for iframe_url in urls
+            ])
+        outputs = []
+        for result in results:
+            for ele in result:
                 if ele:
                     ele['from'] = self.from_
                     ele['webpage_url'] = webpage_url
-
-            return results
-
+                    outputs.append(ele)
+        return outputs
 
 
 if __name__ == '__main__':
     from pprint import pprint
-    with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://socialbeta.com/t/jiafangyifang-news-20190226")
-        pprint(res)
 
+    with Extractor() as extractor:
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
+        pprint(res)

@@ -14,12 +14,11 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 
-
-
 if platform.system() in {"Linux", "Darwin"}:
     import ujson as json
 else:
     import json
+
 
 class Extractor(BaseExtractor):
     target_website = [
@@ -58,10 +57,13 @@ class Extractor(BaseExtractor):
                 'Sec-Fetch-Mode': 'navigate',
                 'Sec-Fetch-User': '?1',
             }
-            async with session.get(webpage_url, headers=headers) as response:
-                response_text = await response.text()
-                results = self.extract_mobile(response=response_text)
-                return results
+            response_text = await self.request(
+                url=webpage_url,
+                session=session,
+                headers=headers
+            )
+            results = self.extract_mobile(response=response_text)
+            return results
 
         else:
             cookies = {
@@ -82,11 +84,14 @@ class Extractor(BaseExtractor):
                 'Accept-Encoding': 'gzip, deflate, br',
                 'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
             }
-
-            async with session.get(webpage_url, headers=headers, cookies=cookies) as response:
-                text = await response.text()
-                results = self.extract(response=text, webpage_url=webpage_url)
-                return results
+            text = await self.request(
+                url=webpage_url,
+                session=session,
+                headers=headers,
+                cookies=cookies
+            )
+            results = self.extract(response=text, webpage_url=webpage_url)
+            return results
 
     def extract(self, response, webpage_url):
         try:
@@ -104,7 +109,6 @@ class Extractor(BaseExtractor):
         result['play_addr'] = "http://" + re.search("video_src=//([\s|\S]{1,250})&cover_img", action_data).group(1)
         result['cover'] = re.search("cover_img=([\s|\S]*?)&short_url", action_data).group(1)
         result['webpage_url'] = webpage_url
-
         return result
 
     def extract_mobile(self, response):
@@ -139,5 +143,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://m.weibo.cn/status/4428801453021670?wm=3333_2001&from=109A193010&sourcetype=dingding")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[8])
         pprint(res)

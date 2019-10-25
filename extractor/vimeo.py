@@ -16,9 +16,7 @@ from aioVextractor.extractor.base_extractor import (
 )
 
 
-
 class Extractor(BaseExtractor):
-
     target_website = [
         "http[s]?://vimeo\.com/\d{7,18}"
     ]
@@ -31,7 +29,6 @@ class Extractor(BaseExtractor):
     def __init__(self, *args, **kwargs):
         BaseExtractor.__init__(self, *args, **kwargs)
         self.from_ = "vimeo"
-
 
     @validate
     @RequestRetry
@@ -54,25 +51,27 @@ class Extractor(BaseExtractor):
     async def extract_author(self, webpage_url, session):
         headers = self.general_headers(user_agent=choice(safari))
         headers['Referer'] = 'https://vimeo.com/search?q=alita'
-        async with session.get(webpage_url, headers=headers) as response:
-            text = await response.text(encoding='utf8', errors='ignore')
-            regex = '"portrait":\{"src":".*?",\s*"src_2x":"(.*?)"\},'
-            selector = Selector(text=text)
-            try:
-                clip_page_config = selector.css('script').re_first(regex)
-            except TypeError:
-                return False
-            else:
-                avatar = clip_page_config.replace('\\/', '/')
-            return {"author_avatar": avatar,
-                    'from': self.from_
-                    }
-
+        text = await self.request(
+            url=webpage_url,
+            session=session,
+            headers=headers,
+        )
+        regex = '"portrait":\{"src":".*?",\s*"src_2x":"(.*?)"\},'
+        selector = Selector(text=text)
+        try:
+            clip_page_config = selector.css('script').re_first(regex)
+        except TypeError:
+            return False
+        else:
+            avatar = clip_page_config.replace('\\/', '/')
+        return {"author_avatar": avatar,
+                'from': self.from_
+                }
 
 
 if __name__ == '__main__':
     from pprint import pprint
-    with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://creative.adquan.com/show/286808")
-        pprint(res)
 
+    with Extractor() as extractor:
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
+        pprint(res)
