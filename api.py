@@ -72,4 +72,14 @@ async def hybrid_worker(webpage_url, session, *args, **kwargs):
 
 
 if __name__ == '__main__':
-    pass
+    import aiohttp
+    import asyncio
+    async def test():
+        async with aiohttp.ClientSession() as session:
+            single_url = "https://creative.adquan.com/show/286788"
+            playlist_url = "https://weibo.com/p/1005055882998192/photos?type=video#place"
+            print(await extract(webpage_url=single_url, session=session))
+            print(await hybrid_worker(webpage_url=single_url, session=session))
+            print(await breakdown(webpage_url=playlist_url, session=session))
+            print(await hybrid_worker(webpage_url=playlist_url, session=session))
+    asyncio.run(test())
