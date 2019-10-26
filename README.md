@@ -320,4 +320,16 @@ Processing URL: https://www.youtube.com/playlist?list=PLs54iBUqIopDv2wRhkqArl9AE
 ```
 
 
-##### 详细开发文档后续编写：
+##### 开发文档
+
+1. docker便捷部署
+```bash
+git clone https://github.com/panoslin/aioVextractor &&\
+cd aioVextractor &&\
+sudo chmod +x build.sh &&\
+sudo sh build.sh
+```
+
+2. 接口体验地址
+
+[http://47.106.202.56:5555/extractor?url=https://v.qq.com/x/page/n0864edqzkl.html](http://47.106.202.56:5555/extractor?url=https://v.qq.com/x/page/n0864edqzkl.html)
