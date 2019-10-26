@@ -18,8 +18,8 @@ services:
       mode: global
       resources:
         limits:
-          cpus: "2"  # limiting each one to use, at most, 10 core of CPU
-          memory: 2000M  # limiting each one to use, at most, 4096M of RAM
+          cpus: "1"  # limiting each one to use, at most, 10 core of CPU
+          memory: 1000M  # limiting each one to use, at most, 4096M of RAM
       update_config:
         parallelism: 1
         delay: 300s
