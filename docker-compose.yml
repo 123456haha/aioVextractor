@@ -31,8 +31,8 @@ services:
         condition: any # Immediately restart containers if one fails.
         delay: '120s' # How long to wait between restart attempts, specified as a duration (default: 0).
         window: '30s' # How long to wait before deciding if a restart has succeeded
-    networks:
-      - hostnet
+    ports:
+      - 5555:5555
     volumes:
       - /etc/ssl/openssl.cnf:/etc/ssl/openssl.cnf  # mount
       - /etc/localtime:/etc/localtime  # mount
@@ -41,8 +41,8 @@ services:
 
   portainer:
     image: portainer/portainer
-    networks:
-      - hostnet
+    ports:
+      - 9000:9000
     volumes:
       - mount:/data
       - //var/run/docker.sock:/var/run/docker.sock
@@ -51,9 +51,9 @@ services:
 volumes:
   mount:
 
-networks:
-  webnet:
-  hostnet:
-    external: true
-    attachable: true
-    name: host
+#networks:
+#  webnet:
+#  hostnet:
+#    external: true
+#    attachable: true
+#    name: host
