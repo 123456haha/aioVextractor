@@ -4,6 +4,7 @@
 # IDE: PyCharm
 """
 HOW TO GENERATE THIS FILE:
+import os
 extractor_path = "/path/to/extractor"
 res = [ele for ele in os.listdir(extractor_path) if ele not in {'__init__.py', 'extractors.py', '__pycache__'}]
 for ele in res:
