@@ -30,6 +30,7 @@ class BaseExtractor(ToolSet):
     1. specify target_website as class variable
     2. inherit BaseExtractor.__init__() and define self.from_
     3. redefine BaseExtractor.entracne()
+    4. Regenerate file extractor.extractors
     """
 
     @validate
