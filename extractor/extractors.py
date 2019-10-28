@@ -28,11 +28,12 @@ from aioVextractor.extractor.pinterest import Extractor as pinterestIE
 from aioVextractor.extractor.renren import Extractor as renrenIE
 from aioVextractor.extractor.socialbeta import Extractor as socialbetaIE
 from aioVextractor.extractor.tencent import Extractor as tencentIE
+from aioVextractor.extractor.toutiao import Extractor as toutiaoIE
 from aioVextractor.extractor.tvcf import Extractor as tvcfIE
 from aioVextractor.extractor.vimeo import Extractor as vimeoIE
 from aioVextractor.extractor.vmovier import Extractor as vmovierIE
-from aioVextractor.extractor.weixin import Extractor as weixinIE
 from aioVextractor.extractor.weibo import Extractor as weiboIE
+from aioVextractor.extractor.weixin import Extractor as weixinIE
 from aioVextractor.extractor.xinpianchang import Extractor as xinpianchangIE
 from aioVextractor.extractor.youku import Extractor as youkuIE
 from aioVextractor.extractor.youtube import Extractor as youtubeIE
