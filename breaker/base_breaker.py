@@ -57,7 +57,7 @@ async def validate(func, extractor_instace, args, kwargs):
     try:
         results, has_more, params = results
     except:
-        return "The return is the a 3-elements tuple"
+        return "The return should be a 3-elements tuple"
 
     vid_filter = set()
     ## validate the integrity of the output
