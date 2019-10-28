@@ -3,21 +3,32 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
-from bs4 import BeautifulSoup
-import re, json, time
-import traceback
+import re
+import random
+from urllib.parse import urlparse
+import binascii
+import base64
+from scrapy import Selector
+import jmespath
+import execjs
+import platform
 from aioVextractor.extractor.base_extractor import (
     BaseExtractor,
     validate,
     RequestRetry
 )
 
+if platform.system() in {"Linux", "Darwin"}:
+    import ujson as json
+else:
+    import json
+
 class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://m\.toutiaoimg\.com/a\d{10,36}",
         "http[s]?://m\.toutiaocdn\.com/a\d{10,36}",
         "http[s]?://m\.toutiaoimg\.cn/group/\d{10,36}",
-        "http[s]?://m\.toutiaocdn\.net/a\d{10,36}}",
+        "http[s]?://m\.toutiaocdn\.net/a\d{10,36}",
         "http[s]?://m\.toutiaocdn\.com/i\d{10,36}",
         "http[s]?://m\.toutiaoimg\.com/group/\d{10,36}",
     ]
@@ -38,11 +49,126 @@ class Extractor(BaseExtractor):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
-        pass
+        headers = self.general_headers(user_agent=self.random_ua())
+        headers['authority'] = urlparse(webpage_url).netloc
+
+        html = await self.request(
+            url=webpage_url,
+            session=session,
+            headers=headers
+        )
+        if re.match("http[s]?://m\.toutiaocdn\.com/i\d{10,36}", webpage_url):
+            AS, CP, _signature = self.get_token()
+            i = re.findall("http[s]?://m\.toutiaocdn\.com/i(\d{10,36})", webpage_url)[0]
+            api = f'https://m.toutiao.com/i{i}/info/?_signature={_signature}&i={i}'
+            response = await self.request(
+                url=api,
+                session=session,
+                headers=self.general_headers(user_agent=self.random_ua()),
+                response_type="json"
+            )
+            result = self.extract_ipage(response=response)
+            vid = result['vid']
+
+        else:
+            selector = Selector(text=html)
+            SSR_HYDRATED_DATA = json.loads(selector.css("#SSR_HYDRATED_DATA::text").extract_first())
+            result = self.extract(response=SSR_HYDRATED_DATA, webpage_url=webpage_url)
+            vid = re.findall('"vid"\s?:\s?"(\w{5,40})"', html)[0]
+        play_addr = await self.cal_play_addr(vid=vid, webpage_url=webpage_url, session=session)
+        return self.merge_dicts(result, play_addr)
+
+    @staticmethod
+    def right_shift(val, n):
+        return val >> n if val >= 0 else (val + 0x100000000) >> n
+
+    async def cal_play_addr(self, vid, webpage_url, session):
+        api = f'http://i.snssdk.com/video/urls/v/1/toutiao/mp4/{vid}'
+        r = str(random.random())[2:]
+        s = self.right_shift(binascii.crc32(f"{urlparse(api).path}?r={r}".encode()), 0)
+        url = f"{api}?r={r}&s={s}"
+        response = await self.request(
+            url=url,
+            session=session,
+            headers=self.general_headers(user_agent=self.random_ua())
+        )
+        video_json = json.loads(response)
+        main_url = jmespath.search("max_by(data.video_list.*, &size).main_url", video_json)
+        width = jmespath.search("max_by(data.video_list.*, &size).vwidth", video_json)
+        height = jmespath.search("max_by(data.video_list.*, &size).vheight", video_json)
+        try:
+            duration = int(jmespath.search("data.video_duration", video_json))
+        except:
+            duration = None
+        play_addr = base64.b64decode(main_url).decode()
+        return {
+            "play_addr": play_addr,
+            "width": width,
+            "height": height,
+            "vid": jmespath.search("data.video_id", video_json),
+            "duration": duration,
+            "cover": jmespath.search("data.poster_url", video_json),
+            "from": self.from_,
+            "webpage_url": webpage_url,
+        }
+
+    def extract(self, response, webpage_url):
+        video = jmespath.search('Projection.video', response)
+        user_info = jmespath.search('Projection.video.user_info', response)
+        result = {
+            "duration": jmespath.search("video_duration", video),
+            "view_count": jmespath.search("video_watch_count", video),
+            "avatar": jmespath.search("avatar_url", user_info),
+            "author": jmespath.search("name", user_info),
+            "author_id": jmespath.search("user_id", user_info),
+            "like_count": jmespath.search("video_like_count", video),
+            "upload_ts": jmespath.search("video_publish_time", video),
+            "description": jmespath.search("video_abstract", video),
+            "vid": jmespath.search("vid", video),
+            "title": jmespath.search("title", video),
+            "cover": "http://p3.pstatp.com/large/" + jmespath.search("poster_uri", video),
+            "from": self.from_,
+            "webpage_url": webpage_url,
+        }
+        return result
+
+    def extract_ipage(self, response):
+        data = jmespath.search("data", response)
+        result = {
+            "author": jmespath.search("detail_source", data),
+            "author_id": jmespath.search("media_user.id", data),
+            "avatar": jmespath.search("media_user.avatar_url", data),
+            "upload_ts": jmespath.search("publish_time", data),
+            "view_count": jmespath.search("video_play_count", data),
+            "title": jmespath.search("title", data),
+            "webpage_url": jmespath.search("url", data),
+            "comment_count": jmespath.search("comment_count", data),
+            "cover": jmespath.search("poster_url", data),
+            "vid": jmespath.search("video_id", data),
+            "from": self.from_,
+        }
+        return result
+
+    @staticmethod
+    def get_token(path="../special/generate_signature.js"):
+        """
+        获取头条url中的各种token
+        :return: as, cp, _signature
+        """
+        with open(path, "r") as js_file:
+            lines = js_file.readlines()
+            js_code = ""
+            for line in lines:
+                js_code += line
+            context = execjs.compile(js_code)
+            # the type of token is a str of json
+            token = context.call('get_as_cp_signature')
+            token_dict = json.loads(token)
+            return token_dict['as'], token_dict['cp'], token_dict['_signature']
 
 if __name__ == '__main__':
     from pprint import pprint
-    with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
-        pprint(res)
 
+    with Extractor() as extractor:
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[4])
+        pprint(res)
