@@ -26,6 +26,7 @@ class Extractor(ToolSet):
     target_website = [
         "http[s]?://v\.qq\.com/x/page/\w{5,20}\.html",
         "http[s]?://v\.qq\.com/x/cover/\w{5,20}\.html",
+        "http[s]?://v\.qq\.com/x/cover/[\w/]{5,36}\.html",
         "http[s]?://v\.qq\.com/iframe/player\.html\?vid=\w{5,20}",
         "http[s]?://v\.qq\.com/iframe/preview.html\?.*?vid=\w{5,20}",
     ]
@@ -37,6 +38,8 @@ class Extractor(ToolSet):
         "https://v.qq.com/x/cover/bzfkv5se8qaqel2.html",
         "https://v.qq.com/iframe/player.html?vid=c0912n1rqrw&tiny=0&auto=0",
         "https://v.qq.com/iframe/preview.html?width=500&height=375&auto=0&vid=m0927lumf50",
+        "https://v.qq.com/iframe/preview.html?width=500&height=375&auto=0&vid=m0927lumf50",
+        "https://v.qq.com/x/cover/lkc4yiuejqzwgtx/b0021dk5cc6.html",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -339,5 +342,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url='https://v.qq.com/iframe/player.html?vid=c0912n1rqrw&tiny=0&auto=0')
+        res = extractor.sync_entrance(webpage_url="https://v.qq.com/x/cover/lkc4yiuejqzwgtx/b0021dk5cc6.html")
         pprint(res)
