@@ -10,6 +10,9 @@ class Extractor(BaseExtractor):
     """
     Extract iframe url from webpage_url
     """
+    TEST_CASE = [
+        "http://peacefulcuisine.com/category/videos/#",
+    ]
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
@@ -21,5 +24,5 @@ class Extractor(BaseExtractor):
 if __name__ == '__main__':
     from pprint import pprint
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://www.instagram.com/p/B1tXMlihthT/")
+        res = extractor.sync_entrance(webpage_url="http://peacefulcuisine.com/category/videos/#")
         pprint(res)

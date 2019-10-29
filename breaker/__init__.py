@@ -3,13 +3,8 @@
 # Created by panos on 2019/7/6
 # IDE: PyCharm
 
-from . import *
 from aioVextractor.breaker.base_breaker import BaseBreaker
 from aioVextractor.breaker.base_breaker import validate as BreakerValidater
-
-
-
-
 from aioVextractor.breaker.breakers import *
 
 _ALL_CLASSES = [
