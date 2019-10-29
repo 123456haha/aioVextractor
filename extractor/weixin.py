@@ -18,7 +18,8 @@ class Extractor(BaseExtractor):
     ]
 
     TEST_CASE = [
-        "https://mp.weixin.qq.com/s/IqbmeLcurLXvCj-LefJfYw"
+        "https://mp.weixin.qq.com/s/IqbmeLcurLXvCj-LefJfYw",
+        "https://mp.weixin.qq.com/s/PZ0JBxMIAP5zVhsSxpxu7Q",
     ]
 
     def __init__(self, *args, **kwargs):
