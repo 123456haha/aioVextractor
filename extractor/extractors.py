@@ -13,6 +13,7 @@ for ele in res:
 """
 from aioVextractor.extractor.base_extractor import BaseExtractor as baseIE
 from aioVextractor.extractor.adquan import Extractor as adquanIE
+from aioVextractor.extractor.behance import Extractor as behanceIE
 from aioVextractor.extractor.bilibili import Extractor as bilibiliIE
 from aioVextractor.extractor.carben import Extractor as carbenIE
 from aioVextractor.extractor.common import Extractor as commonIE
