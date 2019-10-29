@@ -28,4 +28,7 @@ from aioVextractor.distributor import (
     distribute_hybrid,
 )
 
-from aioVextractor.api import hybrid_worker
+from aioVextractor.api import (
+    hybrid_worker,
+    extract,
+)

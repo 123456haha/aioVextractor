@@ -87,7 +87,7 @@ async def validate(func, extractor_instace, args, kwargs):
 
 def validate_(result, check_field):
     """
-    The actual fuction to validata the integrated of the result according the check_field
+    The actual function to validata the integrated of the result according the check_field
     :param result:
     :param check_field:
     :return:
