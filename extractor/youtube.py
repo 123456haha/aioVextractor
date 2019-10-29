@@ -22,7 +22,8 @@ else:
 
 class Extractor(BaseExtractor):
     target_website = [
-        "http[s]?://www\.youtube\.com/watch\?v=[\w-]{5,15}"
+        "http[s]?://www\.youtube\.com/watch\?v=[\w-]{5,15}",
+        "http[s]?://youtu\.be/[\w-]{5,15}",
     ]
 
     TEST_CASE = [
@@ -31,6 +32,7 @@ class Extractor(BaseExtractor):
         "https://www.youtube.com/watch?v=iAeYPfrXwk4",
         "https://www.youtube.com/watch?v=jDO2YPGv9fw&list=PLNHZSfaJJc25zChky2JaM99ba8I2bVUza&index=15&t=0s",
         "https://www.youtube.com/watch?v=JGwWNGJdvx8&list=PLDcnymzs18LU4Kexrs91TVdfnplU3I5zs&index=28&t=0s",
+        "https://youtu.be/NJbWAMCM1P4",
     ]
 
     def __init__(self, *args, **kwargs):

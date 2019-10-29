@@ -24,6 +24,7 @@ class Extractor(BaseExtractor):
     TEST_CASE = [
         "https://vimeo.com/281493330",
         "https://vimeo.com/344361560",
+        "https://vimeo.com/5721553",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -73,5 +74,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)
