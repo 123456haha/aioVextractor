@@ -30,6 +30,7 @@ class Extractor(ToolSet):
         "http[s]?://v\.qq\.com/iframe/player\.html\?vid=\w{5,20}",
         "http[s]?://v\.qq\.com/iframe/preview.html\?.*?vid=\w{5,20}",
         "http[s]?://v\.qq\.com/txp/iframe/player.html\?.*?vid=\w{5,20}",
+        "http[s]?://m\.v\.qq\.com/x/cover/x/[\w/\.]{5,40}",
     ]
 
     TEST_CASE = [
@@ -42,6 +43,7 @@ class Extractor(ToolSet):
         "https://v.qq.com/iframe/preview.html?width=500&height=375&auto=0&vid=m0927lumf50",
         "https://v.qq.com/x/cover/lkc4yiuejqzwgtx/b0021dk5cc6.html",
         "https://v.qq.com/txp/iframe/player.html?vid=a3009mlsv3t",
+        "http://m.v.qq.com/x/cover/x/mzc0020085uj8bx/p0032pk4i8i.html?&ptag=4_7.6.0.22280_copy",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -70,7 +72,7 @@ class Extractor(ToolSet):
         )
         if not vid:
             try:
-                vid = re.compile('&vid=(.*?)&').findall(text)[0]
+                vid = re.compile('&vid=(\w{5,15})&?').findall(text)[0]
             except (TypeError, IndexError):
                 return False
         selector = Selector(text=text)
@@ -107,11 +109,12 @@ class Extractor(ToolSet):
             VIDEO_INFO = selector.css('script[r-notemplate]').re_first('var VIDEO_INFO = ([\s|\S]*)\s</script>')
             try:
                 VIDEO_INFO = json.loads(VIDEO_INFO)  ## having tag inside
-            except ValueError:
+            except (ValueError, TypeError):
                 duration = None
             else:
                 duration = jmespath.search("duration", VIDEO_INFO)
         view_count_type = selector.css('.action_count .icon_text::text').extract_first()
+        view_count_type = view_count_type if view_count_type  else ''
         if '专辑' in view_count_type:
             COVER_INFO = selector.css('script[r-notemplate]').re_first('var COVER_INFO = ([\s|\S]*?)\svar')
             try:
@@ -344,5 +347,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://mp.weixin.qq.com/mp/readtemplate?t=pages/video_player_tmpl&amp;action=mpvideo&amp;auto=0&amp;vid=wxv_1051555886176567296")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)
