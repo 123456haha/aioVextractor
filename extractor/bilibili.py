@@ -25,10 +25,12 @@ from aioVextractor.extractor.base_extractor import (
 class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://www\.bilibili\.com/video/av\d{4,9}",
+        "http[s]?://b23\.tv/av\d{1,10}",
     ]
 
     TEST_CASE = [
         "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4",
+        "https://b23.tv/av68290345",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -39,7 +41,7 @@ class Extractor(BaseExtractor):
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
         try:
-            result = {'vid': webpage_url.split('?')[0].split('av')[-1]}
+            result = {'vid': re.findall("/av(\d{5,20})", webpage_url)[0]}
             gather_results = await asyncio.gather(*[
                 self.extract_info(webpage_url=webpage_url),
                 self.extract_video(result=result, session=session)
@@ -101,5 +103,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://www.bilibili.com/video/av26781362")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)

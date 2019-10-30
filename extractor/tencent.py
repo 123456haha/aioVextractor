@@ -29,6 +29,7 @@ class Extractor(ToolSet):
         "http[s]?://v\.qq\.com/x/cover/[\w/]{5,36}\.html",
         "http[s]?://v\.qq\.com/iframe/player\.html\?vid=\w{5,20}",
         "http[s]?://v\.qq\.com/iframe/preview.html\?.*?vid=\w{5,20}",
+        "http[s]?://v\.qq\.com/txp/iframe/player.html\?.*?vid=\w{5,20}",
     ]
 
     TEST_CASE = [
@@ -40,6 +41,7 @@ class Extractor(ToolSet):
         "https://v.qq.com/iframe/preview.html?width=500&height=375&auto=0&vid=m0927lumf50",
         "https://v.qq.com/iframe/preview.html?width=500&height=375&auto=0&vid=m0927lumf50",
         "https://v.qq.com/x/cover/lkc4yiuejqzwgtx/b0021dk5cc6.html",
+        "https://v.qq.com/txp/iframe/player.html?vid=a3009mlsv3t",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -342,5 +344,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://v.qq.com/x/cover/lkc4yiuejqzwgtx/b0021dk5cc6.html")
+        res = extractor.sync_entrance(webpage_url="https://mp.weixin.qq.com/mp/readtemplate?t=pages/video_player_tmpl&amp;action=mpvideo&amp;auto=0&amp;vid=wxv_1051555886176567296")
         pprint(res)

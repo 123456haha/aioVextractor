@@ -16,6 +16,7 @@ class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://creative\.adquan\.com/show/\d{3,7}",
         "http[s]?://www\.adquan\.com/post-\d-\d{3,7}\.html$",
+        "http[s]?://mobile\.adquan\.com.*",
     ]
 
     TEST_CASE = [
@@ -24,6 +25,7 @@ class Extractor(BaseExtractor):
         "http://www.adquan.com/post-2-49507.html",
         "http://creative.adquan.com/show/49469",
         "http://creative.adquan.com/show/49415",
+        "https://mobile.adquan.com/creative/detail/288096",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -74,5 +76,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(Extractor.TEST_CASE[0])
+        res = extractor.sync_entrance(Extractor.TEST_CASE[-1])
         pprint(res)
