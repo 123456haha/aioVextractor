@@ -39,7 +39,7 @@ async def validate(func, extractor_instace, args, kwargs):
         urls += re.findall(regex, webpage_url)
 
     if not urls:
-        print("There has no suitable url match!")
+        print("There has no suitable url match!")  ## can only occurs in testing
         return None
 
     ## asyncio gather these urls
@@ -75,7 +75,7 @@ async def validate(func, extractor_instace, args, kwargs):
                     vid_filter.add(result['vid'])
             except:
                 # print(f"You should have specify field `vid`")
-                return f"You should have specify field `vid`"
+                return f"You should have specify field `vid`"  ## can only occurs in testing
             output = validate_(
                 result=result,
                 check_field=config.FIELDS,
