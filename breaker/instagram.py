@@ -17,7 +17,7 @@ else:
 
 class Breaker(BaseBreaker):
     target_website = [
-        "http[s]://www\.instagram\.com/[\w\.-]{5,50}",
+        "http[s]://www\.instagram\.com/[\w\.-]{1,50}",
     ]
 
     # downloader = 'ytd'
@@ -26,6 +26,7 @@ class Breaker(BaseBreaker):
         "https://www.instagram.com/funnymike/",
         "https://www.instagram.com/filmmkrs?igshid=186z6y04dov3y",
         "https://www.instagram.com/cchannel_beauty/",
+        "https://www.instagram.com/psg/",
     ]
 
     def __init__(self, *args, **kwargs):
