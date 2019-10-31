@@ -30,7 +30,8 @@ class Extractor(ToolSet):
         "http[s]?://v\.qq\.com/iframe/player\.html\?vid=\w{5,20}",
         "http[s]?://v\.qq\.com/iframe/preview.html\?.*?vid=\w{5,20}",
         "http[s]?://v\.qq\.com/txp/iframe/player.html\?.*?vid=\w{5,20}",
-        "http[s]?://m\.v\.qq\.com/x/cover/x/[\w/\.]{5,40}",
+        "http[s]?://m\.v\.qq\.com/x/cover/.*",
+        "http[s]?://m\.v\.qq\.com/x/page/.*",
     ]
 
     TEST_CASE = [
@@ -44,6 +45,7 @@ class Extractor(ToolSet):
         "https://v.qq.com/x/cover/lkc4yiuejqzwgtx/b0021dk5cc6.html",
         "https://v.qq.com/txp/iframe/player.html?vid=a3009mlsv3t",
         "http://m.v.qq.com/x/cover/x/mzc0020085uj8bx/p0032pk4i8i.html?&ptag=4_7.6.0.22280_copy",
+        "https://m.v.qq.com/x/page/c/b/0/c30080f80b0.html?ptag=4_7.6.5.22283_copy",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -72,9 +74,9 @@ class Extractor(ToolSet):
         )
         if not vid:
             try:
-                vid = re.compile('&vid=(\w{5,15})&?').findall(text)[0]
+                vid = re.findall('&vid=(\w{5,15})&?', text)[0]
             except (TypeError, IndexError):
-                return False
+                vid = re.findall('(\w{11})\.html', text)[0]
         selector = Selector(text=text)
         result, commentId = self.extract(response=text, webpage_url=webpage_url, vid=vid)
         gather_results = await asyncio.gather(*[
@@ -95,7 +97,8 @@ class Extractor(ToolSet):
                 replace('_', ' ')
         except AttributeError:
             title = selector.css('.player_title a::text').extract_first()
-
+        if not title:
+            title = selector.css(".video_tit::text").extract_first()
         category = selector.css('.site_channel .channel_nav[class~="current"]::text').extract()
         tag = selector.css("head meta[name*='keywords']::attr(content)").extract_first()
         video_create_time = selector.css('head meta[itemprop="datePublished"]::attr(content)').extract_first()
