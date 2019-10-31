@@ -25,6 +25,7 @@ class Extractor(BaseExtractor):
         "https://vimeo.com/281493330",
         "https://vimeo.com/344361560",
         "https://vimeo.com/5721553",
+        "https://vimeo.com/368525290",
     ]
 
     def __init__(self, *args, **kwargs):

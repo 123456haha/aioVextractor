@@ -32,6 +32,7 @@ class Extractor(ToolSet):
         "http[s]?://v\.qq\.com/txp/iframe/player.html\?.*?vid=\w{5,20}",
         "http[s]?://m\.v\.qq\.com/x/cover/.*",
         "http[s]?://m\.v\.qq\.com/x/page/.*",
+        "http[s]?://m\.v\.qq\.com/play/.*",
     ]
 
     TEST_CASE = [
@@ -46,6 +47,7 @@ class Extractor(ToolSet):
         "https://v.qq.com/txp/iframe/player.html?vid=a3009mlsv3t",
         "http://m.v.qq.com/x/cover/x/mzc0020085uj8bx/p0032pk4i8i.html?&ptag=4_7.6.0.22280_copy",
         "https://m.v.qq.com/x/page/c/b/0/c30080f80b0.html?ptag=4_7.6.5.22283_copy",
+        "http://m.v.qq.com/play/play.html?vid=c30080f80b0&ptag=4_7.6.5.22283_copy",
     ]
 
     def __init__(self, *args, **kwargs):
