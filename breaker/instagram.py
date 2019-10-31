@@ -25,6 +25,7 @@ class Breaker(BaseBreaker):
     TEST_CASE = [
         "https://www.instagram.com/funnymike/",
         "https://www.instagram.com/filmmkrs?igshid=186z6y04dov3y",
+        "https://www.instagram.com/cchannel_beauty/",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -131,11 +132,11 @@ if __name__ == '__main__':
 
     with Breaker() as breaker:
         res = breaker.sync_breakdown(
-            webpage_url=Breaker.TEST_CASE[0],
-            params={
-                'end_cursor': 'QVFDRWVWQ2xMbEhqUko5YkdLR0Jib2JhbUQwcTBiZEtCa3Y1by14amZEam5iNGxqUUZnOEFWUUhPZ1pFaTdfMHhRbFJlNGRVOFRrRy1tNnczY1g5WkFfaQ==',
-                'first': 12,
-                'id': '3679812611',
-                'query_hash': 'f2405b236d85e8296cf30347c9f08c2a'}
+            webpage_url=Breaker.TEST_CASE[-1],
+            # params={
+            #     'end_cursor': 'QVFDRWVWQ2xMbEhqUko5YkdLR0Jib2JhbUQwcTBiZEtCa3Y1by14amZEam5iNGxqUUZnOEFWUUhPZ1pFaTdfMHhRbFJlNGRVOFRrRy1tNnczY1g5WkFfaQ==',
+            #     'first': 12,
+            #     'id': '3679812611',
+            #     'query_hash': 'f2405b236d85e8296cf30347c9f08c2a'}
         )
         pprint(res)
