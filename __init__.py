@@ -30,5 +30,6 @@ from aioVextractor.distributor import (
 
 from aioVextractor.api import (
     hybrid_worker,
+    breakdown,
     extract,
 )
