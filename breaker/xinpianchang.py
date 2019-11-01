@@ -57,9 +57,7 @@ class Breaker(BaseBreaker):
             params=params,
             method="post",
         )
-        print(f'clips: {clips}')
         results = await self.extract_user_pageing_api(ResText=clips, webpage_url=webpage_url)
-        print(f'results: {results}')
         return results
 
     async def extract_user_pageing_api(self, ResText, webpage_url):
