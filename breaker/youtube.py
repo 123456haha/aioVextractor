@@ -15,6 +15,7 @@ from aioVextractor.utils import RequestRetry
 import platform
 from scrapy import Selector
 from aioVextractor.breaker import (
+    BreakerMeta,
     BaseBreaker,
     BreakerValidater
 )
@@ -25,7 +26,7 @@ else:
     import json
 
 
-class Breaker(BaseBreaker):
+class Breaker(BaseBreaker, BreakerMeta):
     target_website = [
         "http[s]?://www\.youtube\.com/channel/[\w-]{10,36}",
         "http[s]?://www\.youtube\.com/playlist\?list=[\w-]{10,36}",

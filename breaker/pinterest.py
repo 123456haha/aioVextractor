@@ -2,18 +2,18 @@
 # -*- coding: utf-8 -*-
 # IDE: PyCharm
 
-import base64
 import traceback
 import time
 import re
 import jmespath
 from aioVextractor.breaker import (
+    BreakerMeta,
     BaseBreaker,
     BreakerValidater
 )
 import json
 
-class Breaker(BaseBreaker):
+class Breaker(BaseBreaker, BreakerMeta):
     target_website = [
         "http[s]://www\.pinterest.com/[\w-]{5,36}/video_pins/",
     ]
@@ -102,12 +102,12 @@ if __name__ == '__main__':
     with Breaker() as breaker:
         res = breaker.sync_breakdown(
             webpage_url=Breaker.TEST_CASE[0],
-            params={'context': {},
-                    'options': {'bookmarks': [
-                        'Pz9mZmZmZmZmZmEyZjY1ZTdmMDM5MTQwMTAwMTA1OTg0YXxhMjc5Yjk1MmVhNjAyNGNjZjRmODc4ZDU4MzI5MDNhZmM1NzQ5Yzk0MzE1ZjdmMjM3MDE0MDM5MDRkMTI4MmEyfE5FV3w='],
-                                'exclude_add_pin_rep': True,
-                                'field_set_key': 'grid_item',
-                                'isPrefetch': False,
-                                'username': 'luvbridal'}}
+            # params={'context': {},
+            #         'options': {'bookmarks': [
+            #             'Pz9mZmZmZmZmZmEyZjY1ZTdmMDM5MTQwMTAwMTA1OTg0YXxhMjc5Yjk1MmVhNjAyNGNjZjRmODc4ZDU4MzI5MDNhZmM1NzQ5Yzk0MzE1ZjdmMjM3MDE0MDM5MDRkMTI4MmEyfE5FV3w='],
+            #                     'exclude_add_pin_rep': True,
+            #                     'field_set_key': 'grid_item',
+            #                     'isPrefetch': False,
+            #                     'username': 'luvbridal'}}
         )
         pprint(res)

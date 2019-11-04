@@ -5,6 +5,7 @@
 import jmespath
 from aioVextractor.utils import RequestRetry
 from aioVextractor.breaker import (
+    BreakerMeta,
     BaseBreaker,
     BreakerValidater
 )
@@ -15,7 +16,7 @@ if platform.system() in {"Linux", "Darwin"}:
 else:
     import json
 
-class Breaker(BaseBreaker):
+class Breaker(BaseBreaker, BreakerMeta):
     target_website = [
         "http[s]://www\.instagram\.com/[\w\.-]{1,50}",
     ]

@@ -3,11 +3,6 @@
 # Created by panos on 10/23/19
 # IDE: PyCharm
 
-
-# from aioVextractor.extractor.base_extractor import (
-#     BaseExtractor,
-# )
-
 from aioVextractor.extractor.tool_set import (
     ToolSet,
     validate_,
@@ -19,6 +14,11 @@ import aiohttp
 import platform
 import asyncio
 import re
+import traceback
+from abc import (
+    ABCMeta,
+    abstractmethod
+)
 
 
 @wrapt.decorator
@@ -83,11 +83,15 @@ async def validate(func, extractor_instace, args, kwargs):
         return outputs, has_more, params
 
 
+class BreakerMeta(metaclass=ABCMeta):
+
+    @abstractmethod
+    def breakdown(self, *args, **kwargs):
+        pass
+
+
 class BaseBreaker(ToolSet):
     downloader = 'aria2c'
-
-    async def breakdown(self, webpage_url, page, session):
-        pass
 
     def sync_breakdown(self, webpage_url, *args, **kwargs):
         """
@@ -98,7 +102,10 @@ class BaseBreaker(ToolSet):
 
         async def wrapper():
             async with aiohttp.ClientSession() as session:
-                return await self.breakdown(webpage_url=webpage_url, session=session, *args, **kwargs)
+                try:
+                    return await self.breakdown(webpage_url=webpage_url, session=session, *args, **kwargs)
+                except:
+                    traceback.print_exc()
 
         python_version = float(".".join(platform.python_version_tuple()[0:2]))
         if python_version >= 3.7:
