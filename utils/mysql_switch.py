@@ -21,6 +21,13 @@ def MysqlRetry(
         default_exception_return=False,
         default_other_exception_return=False,
 ):
+    """
+    work as a decorator
+    providing keywork arguments for the decorated function
+    containg kwargs['conn'] and kwargs['cur'],
+    which are the MySQLConnection object and cursor object from mysql-connector-python, respectively.
+
+    """
     if wrapped is None:
         return functools.partial(MysqlRetry,
                                  default_exception_return=default_exception_return,
