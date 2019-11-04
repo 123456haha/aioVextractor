@@ -9,6 +9,7 @@ from scrapy import Selector
 import asyncio
 import platform
 from aioVextractor.extractor.base_extractor import (
+    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
@@ -20,7 +21,7 @@ else:
     import json
 
 
-class Extractor(BaseExtractor):
+class Extractor(BaseExtractor, ExtractorMeta):
     target_website = [
         "http[s]?://www\.youtube\.com/watch\?v=[\w-]{5,15}",
         "http[s]?://youtu\.be/[\w-]{5,15}",
@@ -49,7 +50,11 @@ class Extractor(BaseExtractor):
                 self.extract_author(webpage_url=webpage_url, session=session)
             ])
             if all(gather_results):
-                return {**gather_results[0], **gather_results[1]}
+                if isinstance(gather_results[0], list):
+                    results = [self.merge_dicts(ele, gather_results[1]) for ele in gather_results[0]]
+                    return results
+                else:
+                    return self.merge_dicts(*gather_results)
             else:
                 return False
         except:

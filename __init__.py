@@ -20,6 +20,7 @@ from aioVextractor.extractor.tool_set import (
 
 from aioVextractor.extractor.base_extractor import (
     BaseExtractor,
+    ExtractorMeta,
 )
 
 from aioVextractor.distributor import (

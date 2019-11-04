@@ -16,13 +16,14 @@ if platform.system() in {"Linux", "Darwin"}:
 else:
     import json
 from aioVextractor.extractor.base_extractor import (
+    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor):
+class Extractor(BaseExtractor, ExtractorMeta):
     target_website = [
         "http[s]?://www\.tvcf\.co\.kr/YCf/V\.asp\?Code=\w{7,15}",
         "http[s]?://play\.tvcf\.co\.kr/\d{3,10}",

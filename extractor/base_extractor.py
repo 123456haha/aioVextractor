@@ -23,6 +23,18 @@ from aioVextractor.extractor.tool_set import (
     validate,
 )
 
+from abc import (
+    ABCMeta,
+    abstractmethod
+)
+
+
+class ExtractorMeta(metaclass=ABCMeta):
+
+    @abstractmethod
+    def entrance(self, *args, **kwargs):
+        pass
+
 
 class BaseExtractor(ToolSet):
     """
@@ -53,19 +65,22 @@ class BaseExtractor(ToolSet):
             text = await response.text(encoding='utf8', errors='ignore')
             selector = Selector(text=text)
             urls = selector.css('iframe[src]::attr(src)').extract()
+
             if urls:
+                outputs = []
                 results = await asyncio.gather(
                     *[self.extract_iframe(
                         iframe_url=iframe_url,
                         session=session
                     ) for iframe_url in urls])
-                for ele in results:
-                    if ele:
-                        ele['from'] = self.from_
-                        ele['webpage_url'] = webpage_url
-
+                for result in results:
+                    for ele in result:
+                        if ele:
+                            ele['from'] = self.from_
+                            ele['webpage_url'] = webpage_url
+                            outputs.append(ele)
                 # self.results += results
-                return results
+                return outputs
             else:  ## webpage having no iframe with attr of `src`
                 return False
 
@@ -127,7 +142,7 @@ class BaseExtractor(ToolSet):
                             return result
                         else:
                             result = self.extract_single(video_json=VideoJson, webpage_url=webpage_url)
-                            return result
+                            return [result]
                     else:
                         return False
         except:
@@ -197,7 +212,6 @@ class BaseExtractor(ToolSet):
                 return jmespath.search('formats[-1]', video_json)
         except:
             return jmespath.search('formats[-1]', video_json)
-
 
     @RequestRetry
     async def retrieve_webpapge(self, webpage_url):

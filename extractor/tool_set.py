@@ -15,22 +15,11 @@ import re
 from os.path import splitext
 import html
 import time
+import traceback
 from urllib.parse import (
     urlparse,
     parse_qs,
 )
-
-from abc import (
-    ABCMeta,
-    abstractmethod
-)
-
-
-class meta(metaclass=ABCMeta):
-
-    @abstractmethod
-    def entrance(self, *args, **kwargs):
-        pass
 
 
 @wrapt.decorator
@@ -144,7 +133,7 @@ def validate_(result, check_field):
         return output
 
 
-class ToolSet(meta):
+class ToolSet:
     """
     Providing the most basic tools
 
@@ -193,22 +182,22 @@ class ToolSet(meta):
         # self.results = []
         return self
 
-    @validate
-    @RequestRetry
-    async def entrance(self, webpage_url, session):
-        """
-
-        If you want to add a new extractor for a specific website,
-        this is the top level API you are looking for.
-
-        This API will not show you how to deintegrate(request and scrubbing) a website,
-        but give you some convinence apis(self.extract_iframe(), @validate, @RequestRetry) and tools(self.general_headers())
-        Should return necessary field
-        :param webpage_url:
-        :param session: aiohttp.ClientSession()
-        :return:
-        """
-        print("You should have overwritten this function")
+    # @validate
+    # @RequestRetry
+    # async def entrance(self, webpage_url, session):
+    #     """
+    #
+    #     If you want to add a new extractor for a specific website,
+    #     this is the top level API you are looking for.
+    #
+    #     This API will not show you how to deintegrate(request and scrubbing) a website,
+    #     but give you some convinence apis(self.extract_iframe(), @validate, @RequestRetry) and tools(self.general_headers())
+    #     Should return necessary field
+    #     :param webpage_url:
+    #     :param session: aiohttp.ClientSession()
+    #     :return:
+    #     """
+    #     print("You should have overwritten this function")
 
     def sync_entrance(self, webpage_url):
         """
@@ -219,7 +208,11 @@ class ToolSet(meta):
 
         async def wrapper():
             async with aiohttp.ClientSession() as session:
-                return await self.entrance(webpage_url=webpage_url, session=session)
+                try:
+                    return await self.entrance(webpage_url=webpage_url, session=session)
+                except:
+                    traceback.print_exc()
+
 
         python_version = float(".".join(platform.python_version_tuple()[0:2]))
         if python_version >= 3.7:

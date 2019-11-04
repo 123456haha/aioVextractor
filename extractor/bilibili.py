@@ -16,13 +16,14 @@ else:
     import json
 
 from aioVextractor.extractor.base_extractor import (
+    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor):
+class Extractor(BaseExtractor, ExtractorMeta):
     target_website = [
         "http[s]?://www\.bilibili\.com/video/av\d{4,9}",
         "http[s]?://b23\.tv/av\d{1,10}",

@@ -7,10 +7,15 @@ import jmespath
 import re
 import traceback
 
-from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, RequestRetry)
+from aioVextractor.extractor.base_extractor import (
+    ExtractorMeta,
+    BaseExtractor,
+    validate,
+    RequestRetry
+)
 
 
-class Extractor(BaseExtractor):
+class Extractor(BaseExtractor, ExtractorMeta):
     target_website = [
         "http[s]?://www\.eyepetizer\.net/detail\.html\?vid=\d{3,8}",
         "www\.eyepetizer\.net/detail\.html\?vid=\d{3,8}",

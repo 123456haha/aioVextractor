@@ -3,16 +3,23 @@
 # Created by panos on 10/07/19
 # IDE: PyCharm
 
-from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, RequestRetry)
 import jmespath
 import platform
+
+from aioVextractor.extractor.base_extractor import (
+    ExtractorMeta,
+    BaseExtractor,
+    validate,
+    RequestRetry
+)
+
 if platform.system() in {"Linux", "Darwin"}:
     import ujson as json
 else:
     import json
 
 
-class Extractor(BaseExtractor):
+class Extractor(BaseExtractor, ExtractorMeta):
     target_website = [
         "http[s]?://www\.instagram\.com/p/[\w-]*",
         "http[s]?://www\.instagram\.com/tv/[\w-]*",

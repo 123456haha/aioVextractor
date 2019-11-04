@@ -7,10 +7,15 @@ import jmespath
 from urllib.parse import urlparse
 
 
-from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, RequestRetry)
+from aioVextractor.extractor.base_extractor import (
+    ExtractorMeta,
+    BaseExtractor,
+    validate,
+    RequestRetry
+)
 
 
-class Extractor(BaseExtractor):
+class Extractor(BaseExtractor, ExtractorMeta):
     target_website = [
         "http[s]?://v\.douyin\.com/\w{3,9}/",
     ]

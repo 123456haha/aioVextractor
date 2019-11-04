@@ -10,13 +10,14 @@ import os
 import re
 import traceback
 from aioVextractor.extractor.base_extractor import (
+    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor):
+class Extractor(BaseExtractor, ExtractorMeta):
     target_website = [
         "http[s]?://www\.behance\.net/gallery/\d{1,15}/[\w-]{1,36}",
     ]
@@ -84,8 +85,9 @@ class Extractor(BaseExtractor):
                 for f in futures.as_completed(future_to_url, timeout=max([len(iframe_src) * 3, 15])):
                     try:
                         result = f.result()
-                        result['from'] = self.from_
-                        results.append(result)
+                        for ele in result:
+                            ele['from'] = self.from_
+                            results.append(ele)
                     except:
                         traceback.print_exc()
                         continue
@@ -99,5 +101,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[2])
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)

@@ -9,6 +9,7 @@ from scrapy.selector import Selector
 import asyncio
 import platform
 from aioVextractor.extractor.base_extractor import (
+    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
@@ -20,7 +21,7 @@ else:
     import json
 
 
-class Extractor(BaseExtractor):
+class Extractor(BaseExtractor, ExtractorMeta):
     target_website = [
         "http[s]?://www\.vmovier\.com/\d{2,8}",
     ]

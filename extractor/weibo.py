@@ -9,6 +9,7 @@ from urllib.parse import unquote
 import platform
 import jmespath
 from aioVextractor.extractor.base_extractor import (
+    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
@@ -20,7 +21,7 @@ else:
     import json
 
 
-class Extractor(BaseExtractor):
+class Extractor(BaseExtractor, ExtractorMeta):
     target_website = [
         "http[s]?://m\.weibo\.cn/status/\d{5,25}",
         "http[s]?://weibo\.com/tv/v/[\w]{5,15}\?fid=1034\:\d{5,25}",

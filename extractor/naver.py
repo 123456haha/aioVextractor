@@ -7,15 +7,15 @@ import jmespath
 from urllib.parse import urlparse, parse_qs
 import time
 from scrapy.selector import Selector
-import traceback
 from aioVextractor.extractor.base_extractor import (
+    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor):
+class Extractor(BaseExtractor, ExtractorMeta):
     target_website = [
         "http[s]?://blog\.naver\.com/PostView\.nhn\?blogId=\w*?&logNo=\d{9,15}",
         "http[s]?://blog\.naver\.com/PostList\.nhn\?blogId=\w*",

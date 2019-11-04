@@ -5,12 +5,16 @@
 
 import re, json, time
 import jmespath
-import traceback
 
-from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, RequestRetry)
+from aioVextractor.extractor.base_extractor import (
+    ExtractorMeta,
+    BaseExtractor,
+    validate,
+    RequestRetry
+)
 
 
-class Extractor(BaseExtractor):
+class Extractor(BaseExtractor, ExtractorMeta):
     target_website = [
         "http[s]?://carben\.me/video/\d{1,6}",
     ]

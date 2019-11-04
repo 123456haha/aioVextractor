@@ -13,10 +13,15 @@ else:
     import json
 
 
-from aioVextractor.extractor.base_extractor import (BaseExtractor, validate, RequestRetry)
+from aioVextractor.extractor.base_extractor import (
+    ExtractorMeta,
+    BaseExtractor,
+    validate,
+    RequestRetry
+)
 
 
-class Extractor(BaseExtractor):
+class Extractor(BaseExtractor, ExtractorMeta):
     target_website = [
         "http[s]?://www\.hellorf\.com/video.show/\d{5,10}",
     ]
