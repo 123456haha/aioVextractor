@@ -20,6 +20,17 @@ from urllib.parse import (
     parse_qs,
 )
 
+from abc import (
+    ABCMeta,
+    abstractmethod
+)
+
+class meta(metaclass=ABCMeta):
+
+    @abstractmethod
+    def entrance(self):
+        pass
+
 
 @wrapt.decorator
 async def validate(func, extractor_instace, args, kwargs):
@@ -132,7 +143,7 @@ def validate_(result, check_field):
 
 
 
-class ToolSet:
+class ToolSet(meta):
     """
     Providing the most basic tools
 
