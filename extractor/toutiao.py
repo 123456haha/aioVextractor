@@ -13,7 +13,6 @@ import jmespath
 import execjs
 import platform
 from aioVextractor.extractor.base_extractor import (
-    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
@@ -24,7 +23,7 @@ if platform.system() in {"Linux", "Darwin"}:
 else:
     import json
 
-class Extractor(BaseExtractor, ExtractorMeta):
+class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://m\.toutiaoimg\.com/a\d{10,36}",
         "http[s]?://m\.toutiaocdn\.com/a\d{10,36}",

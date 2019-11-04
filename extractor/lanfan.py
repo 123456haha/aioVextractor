@@ -7,13 +7,12 @@ from bs4 import BeautifulSoup
 import re, json, time
 import traceback
 from aioVextractor.extractor.base_extractor import (
-    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
 )
 
-class Extractor(BaseExtractor, ExtractorMeta):
+class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://lanfanapp\.com/recipe/\d{1,6}",
     ]

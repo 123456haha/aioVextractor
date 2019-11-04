@@ -5,7 +5,6 @@
 
 from aioVextractor.breaker.base_breaker import (
     BaseBreaker,
-    BreakerMeta
 )
 from aioVextractor.breaker.base_breaker import validate as BreakerValidater
 from aioVextractor.breaker.breakers import *

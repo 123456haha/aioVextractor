@@ -7,13 +7,12 @@ import time
 import re
 import jmespath
 from aioVextractor.breaker import (
-    BreakerMeta,
     BaseBreaker,
     BreakerValidater
 )
 import json
 
-class Breaker(BaseBreaker, BreakerMeta):
+class Breaker(BaseBreaker):
     target_website = [
         "http[s]://www\.pinterest.com/[\w-]{5,36}/video_pins/",
     ]

@@ -4,7 +4,7 @@
 # IDE: PyCharm
 
 from aioVextractor.extractor.tool_set import (
-    ToolSet,
+    BasicToolSet,
     validate_,
 )
 
@@ -83,15 +83,21 @@ async def validate(func, extractor_instace, args, kwargs):
         return outputs, has_more, params
 
 
-class BreakerMeta(metaclass=ABCMeta):
+# class BreakerMeta(metaclass=ABCMeta):
+#
+#     @abstractmethod
+#     def breakdown(self, *args, **kwargs):
+#         pass
 
+
+class BaseBreaker(BasicToolSet, metaclass=ABCMeta):
+    downloader = 'aria2c'
+
+    @validate
     @abstractmethod
-    def breakdown(self, *args, **kwargs):
+    async def breakdown(self, *args, **kwargs):
         pass
 
-
-class BaseBreaker(ToolSet):
-    downloader = 'aria2c'
 
     def sync_breakdown(self, webpage_url, *args, **kwargs):
         """

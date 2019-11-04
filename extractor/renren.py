@@ -7,14 +7,13 @@ import re
 import asyncio
 import jmespath
 from aioVextractor.extractor.base_extractor import (
-    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor, ExtractorMeta):
+class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://mobile\.rr\.tv/mission/#/share/video\?id=\d{3,7}",
     ]

@@ -8,14 +8,13 @@ from urllib.parse import urlparse, parse_qs
 import time
 from scrapy.selector import Selector
 from aioVextractor.extractor.base_extractor import (
-    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor, ExtractorMeta):
+class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://blog\.naver\.com/PostView\.nhn\?blogId=\w*?&logNo=\d{9,15}",
         "http[s]?://blog\.naver\.com/PostList\.nhn\?blogId=\w*",

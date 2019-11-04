@@ -6,14 +6,13 @@
 from scrapy.selector import Selector
 import asyncio
 from aioVextractor.extractor.base_extractor import (
-    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor, ExtractorMeta):
+class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://mp\.weixin\.qq\.com/s/[\w-]{10,36}",
     ]

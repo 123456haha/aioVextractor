@@ -8,7 +8,6 @@ import time, json
 import jmespath
 from scrapy import Selector
 import asyncio
-import re
 from aioVextractor.extractor.tool_set import (
     ToolSet,
     validate,

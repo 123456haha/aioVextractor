@@ -6,14 +6,13 @@
 from scrapy.selector import Selector
 import asyncio
 from aioVextractor.extractor.base_extractor import (
-    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor, ExtractorMeta):
+class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://iwebad\.com/video/\d{1,7}\.html",
     ]

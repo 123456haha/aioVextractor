@@ -9,18 +9,16 @@ import sys, os
 curPath = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(curPath)
 
-# from aioVextractor.utils.requests_retry import RequestRetry
-
 from aioVextractor.utils import RequestRetry
 
 from aioVextractor.extractor.tool_set import (
+    BasicToolSet,
     ToolSet,
     validate,
 )
 
 from aioVextractor.extractor.base_extractor import (
     BaseExtractor,
-    ExtractorMeta,
 )
 
 from aioVextractor.distributor import (

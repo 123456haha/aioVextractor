@@ -7,14 +7,13 @@ import re, json, time
 import jmespath
 
 from aioVextractor.extractor.base_extractor import (
-    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor, ExtractorMeta):
+class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://carben\.me/video/\d{1,6}",
     ]

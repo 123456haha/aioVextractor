@@ -20,6 +20,10 @@ from urllib.parse import (
     urlparse,
     parse_qs,
 )
+from abc import (
+    ABCMeta,
+    abstractmethod
+)
 
 
 @wrapt.decorator
@@ -133,7 +137,7 @@ def validate_(result, check_field):
         return output
 
 
-class ToolSet:
+class BasicToolSet:
     """
     Providing the most basic tools
 
@@ -199,34 +203,6 @@ class ToolSet:
     #     """
     #     print("You should have overwritten this function")
 
-    def sync_entrance(self, webpage_url):
-        """
-        A synchronous entrance to call self.entrance()
-        :param webpage_url:
-        :return:
-        """
-
-        async def wrapper():
-            async with aiohttp.ClientSession() as session:
-                try:
-                    return await self.entrance(webpage_url=webpage_url, session=session)
-                except:
-                    traceback.print_exc()
-
-
-        python_version = float(".".join(platform.python_version_tuple()[0:2]))
-        if python_version >= 3.7:
-            return asyncio.run(wrapper())
-        elif 3.5 <= python_version <= 3.6:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            results = loop.run_until_complete(wrapper())
-            loop.close()
-            return results
-        else:
-            return f"The Python Interpreter you are using is {python_version}.\n" \
-                   f"You should consider switching it to some more modern one such as Python 3.7+ " \
-                .format(python_version=python_version)
 
     @staticmethod
     def janitor(string):
@@ -360,3 +336,40 @@ class ToolSet:
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
         # print(f"exc_type, exc_val, exc_tb: {exc_type, exc_val, exc_tb}")
+
+class ToolSet(BasicToolSet, metaclass=ABCMeta):
+
+    @validate
+    @RequestRetry
+    @abstractmethod
+    async def entrance(self, *args, **kwargs):
+        pass
+
+    def sync_entrance(self, webpage_url):
+        """
+        A synchronous entrance to call self.entrance()
+        :param webpage_url:
+        :return:
+        """
+
+        async def wrapper():
+            async with aiohttp.ClientSession() as session:
+                try:
+                    return await self.entrance(webpage_url=webpage_url, session=session)
+                except:
+                    traceback.print_exc()
+
+
+        python_version = float(".".join(platform.python_version_tuple()[0:2]))
+        if python_version >= 3.7:
+            return asyncio.run(wrapper())
+        elif 3.5 <= python_version <= 3.6:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            results = loop.run_until_complete(wrapper())
+            loop.close()
+            return results
+        else:
+            return f"The Python Interpreter you are using is {python_version}.\n" \
+                   f"You should consider switching it to some more modern one such as Python 3.7+ " \
+                .format(python_version=python_version)

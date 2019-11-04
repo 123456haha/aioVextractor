@@ -29,14 +29,7 @@ from abc import (
 )
 
 
-class ExtractorMeta(metaclass=ABCMeta):
-
-    @abstractmethod
-    def entrance(self, *args, **kwargs):
-        pass
-
-
-class BaseExtractor(ToolSet):
+class BaseExtractor(ToolSet, metaclass=ABCMeta):
     """
     When you define a new extractor base on this class
     1. specify target_website as class variable
@@ -47,42 +40,48 @@ class BaseExtractor(ToolSet):
 
     @validate
     @RequestRetry
-    async def entrance(self, webpage_url, session):
-        """
+    @abstractmethod
+    def entrance(self, *args, **kwargs):
+        pass
 
-        If you want to add a new extractor for a specific website,
-        this is the top level API you are looking for.
-
-        This API will not show you how to deintegrate(request and scrubbing) a website,
-        but give you some convinence apis(self.extract_iframe(), @validate, @RequestRetry) and tools(self.general_headers())
-        Should return necessary field
-        :param webpage_url:
-        :param session: aiohttp.ClientSession()
-        :return:
-        """
-        headers = self.general_headers(user_agent=self.random_ua())
-        async with session.get(webpage_url, headers=headers) as response:
-            text = await response.text(encoding='utf8', errors='ignore')
-            selector = Selector(text=text)
-            urls = selector.css('iframe[src]::attr(src)').extract()
-
-            if urls:
-                outputs = []
-                results = await asyncio.gather(
-                    *[self.extract_iframe(
-                        iframe_url=iframe_url,
-                        session=session
-                    ) for iframe_url in urls])
-                for result in results:
-                    for ele in result:
-                        if ele:
-                            ele['from'] = self.from_
-                            ele['webpage_url'] = webpage_url
-                            outputs.append(ele)
-                # self.results += results
-                return outputs
-            else:  ## webpage having no iframe with attr of `src`
-                return False
+    # @validate
+    # @RequestRetry
+    # async def entrance(self, webpage_url, session):
+    #     """
+    #
+    #     If you want to add a new extractor for a specific website,
+    #     this is the top level API you are looking for.
+    #
+    #     This API will not show you how to deintegrate(request and scrubbing) a website,
+    #     but give you some convinence apis(self.extract_iframe(), @validate, @RequestRetry) and tools(self.general_headers())
+    #     Should return necessary field
+    #     :param webpage_url:
+    #     :param session: aiohttp.ClientSession()
+    #     :return:
+    #     """
+    #     headers = self.general_headers(user_agent=self.random_ua())
+    #     async with session.get(webpage_url, headers=headers) as response:
+    #         text = await response.text(encoding='utf8', errors='ignore')
+    #         selector = Selector(text=text)
+    #         urls = selector.css('iframe[src]::attr(src)').extract()
+    #
+    #         if urls:
+    #             outputs = []
+    #             results = await asyncio.gather(
+    #                 *[self.extract_iframe(
+    #                     iframe_url=iframe_url,
+    #                     session=session
+    #                 ) for iframe_url in urls])
+    #             for result in results:
+    #                 for ele in result:
+    #                     if ele:
+    #                         ele['from'] = self.from_
+    #                         ele['webpage_url'] = webpage_url
+    #                         outputs.append(ele)
+    #             # self.results += results
+    #             return outputs
+    #         else:  ## webpage having no iframe with attr of `src`
+    #             return False
 
     async def extract_iframe(self, iframe_url, session):
         """

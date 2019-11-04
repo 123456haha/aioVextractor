@@ -7,7 +7,6 @@ import jmespath
 import platform
 
 from aioVextractor.extractor.base_extractor import (
-    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
@@ -19,7 +18,7 @@ else:
     import json
 
 
-class Extractor(BaseExtractor, ExtractorMeta):
+class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://www\.instagram\.com/p/[\w-]*",
         "http[s]?://www\.instagram\.com/tv/[\w-]*",

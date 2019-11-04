@@ -9,14 +9,13 @@ import emoji
 import traceback
 from scrapy import Selector
 from aioVextractor.breaker import (
-    BreakerMeta,
     BaseBreaker,
     BreakerValidater
 )
 from aioVextractor.utils import RequestRetry
 
 
-class Breaker(BaseBreaker, BreakerMeta):
+class Breaker(BaseBreaker):
     target_website = [
         "http[s]?://www\.xinpianchang\.com/u\d{5,10}",
     ]

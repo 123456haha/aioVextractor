@@ -10,14 +10,13 @@ import os
 import re
 import traceback
 from aioVextractor.extractor.base_extractor import (
-    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor, ExtractorMeta):
+class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://www\.behance\.net/gallery/\d{1,15}/[\w-]{1,36}",
     ]

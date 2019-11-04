@@ -7,13 +7,12 @@ import re
 import traceback
 import jmespath
 from aioVextractor.breaker import (
-    BreakerMeta,
     BaseBreaker,
     BreakerValidater
 )
 
 
-class Breaker(BaseBreaker, BreakerMeta):
+class Breaker(BaseBreaker):
     target_website = [
         "https://space\.bilibili\.com/\d{5,10}",
     ]

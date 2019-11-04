@@ -7,13 +7,12 @@ from aioVextractor.utils.requests_retry import RequestRetry
 import re
 import jmespath
 from aioVextractor.breaker import (
-    BreakerMeta,
     BaseBreaker,
     BreakerValidater
 )
 
 
-class Breaker(BaseBreaker, BreakerMeta):
+class Breaker(BaseBreaker):
     target_website = [
         "http[s]?://weibo\.com/p/\d{5,36}",
         "http[s]?://weibo\.com/[\w\.-]{5,36}",

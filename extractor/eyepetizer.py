@@ -8,14 +8,13 @@ import re
 import traceback
 
 from aioVextractor.extractor.base_extractor import (
-    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor, ExtractorMeta):
+class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://www\.eyepetizer\.net/detail\.html\?vid=\d{3,8}",
         "www\.eyepetizer\.net/detail\.html\?vid=\d{3,8}",

@@ -10,14 +10,13 @@ from aioVextractor.utils.user_agent import safari
 from random import choice
 from scrapy import Selector
 from aioVextractor.extractor.base_extractor import (
-    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
 )
 
 
-class Extractor(BaseExtractor, ExtractorMeta):
+class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://vimeo\.com/\d{7,18}"
     ]

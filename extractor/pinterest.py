@@ -7,7 +7,6 @@ import jmespath
 import platform
 from scrapy import Selector
 from aioVextractor.extractor.base_extractor import (
-    ExtractorMeta,
     BaseExtractor,
     validate,
     RequestRetry
@@ -19,7 +18,7 @@ else:
     import json
 
 
-class Extractor(BaseExtractor, ExtractorMeta):
+class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://www\.pinterest\.com/pin/\d{15,23}",
     ]

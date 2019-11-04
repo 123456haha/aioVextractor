@@ -8,13 +8,12 @@ import jmespath
 import re
 from aioVextractor.utils import RequestRetry
 from aioVextractor.breaker import (
-    BreakerMeta,
     BaseBreaker,
     BreakerValidater
 )
 
 
-class Breaker(BaseBreaker, BreakerMeta):
+class Breaker(BaseBreaker):
     target_website = [
         "https://vimeo\.com/[\w]*",
     ]
