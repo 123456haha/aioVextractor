@@ -25,10 +25,11 @@ from abc import (
     abstractmethod
 )
 
+
 class meta(metaclass=ABCMeta):
 
     @abstractmethod
-    def entrance(self):
+    def entrance(self, *args, **kwargs):
         pass
 
 
@@ -96,6 +97,7 @@ async def validate(func, extractor_instace, args, kwargs):
     else:
         return outputs
 
+
 def validate_(result, check_field):
     """
     The actual function to validata the integrated of the result according the check_field
@@ -140,7 +142,6 @@ def validate_(result, check_field):
                 output[field] = result.get(field, field_info['default_value'])
     if output:  ## after scanning all the listed field in config.FIELDS
         return output
-
 
 
 class ToolSet(meta):

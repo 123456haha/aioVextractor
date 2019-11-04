@@ -198,32 +198,6 @@ class BaseExtractor(ToolSet):
         except:
             return jmespath.search('formats[-1]', video_json)
 
-    @staticmethod
-    def merge_dicts(*dict_args):
-        """
-        Given any number of dicts, shallow copy and merge into a new dict,
-
-        You may use new_dict = {**dict_num_one, **dict_num_two},
-        which will merge dict_num_one and dict_num_two,
-        and dict_num_two's value will replace dict_num_one's value when they have the same key
-
-        This method provide something more the the above method:
-        1. merging more than 2 dictionaries
-        2. only replace the previous value with the upcoming value if the previous value is in {None/False/0}
-        """
-
-        result = {}
-        for dictionary in dict_args:
-            for k, v in dictionary.items():
-                if k in result:
-                    if result[k] and not v:
-                        pass
-                    else:
-                        result[k] = v
-                else:
-                    result[k] = v
-            # result.update(dictionary)
-        return result
 
     @RequestRetry
     async def retrieve_webpapge(self, webpage_url):
