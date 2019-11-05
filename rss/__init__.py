@@ -8,3 +8,17 @@ from aioVextractor.rss.base_rss import (
     BaseRss,
     RequestRetry,
 )
+from aioVextractor.rss.rss import *
+
+
+_ALL_CLASSES = [
+    klass
+    for name, klass in globals().items()
+    if name.endswith('Rss') and name not in {"BaseRss"}
+]
+
+def gen_rss_classes():
+    """ Return a list of supported extractors.
+    The order does matter; the first extractor matched is the one handling the URL.
+    """
+    return _ALL_CLASSES

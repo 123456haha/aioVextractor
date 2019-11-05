@@ -16,10 +16,11 @@ def MysqlRetry(
         port,
         user_name,
         password,
-        database,
+        database=None,
         wrapped=None,
         default_exception_return=False,
         default_other_exception_return=False,
+        **kwargs
 ):
     """
     work as a decorator
@@ -31,7 +32,10 @@ def MysqlRetry(
     if wrapped is None:
         return functools.partial(MysqlRetry,
                                  default_exception_return=default_exception_return,
-                                 default_other_exception_return=default_other_exception_return)
+                                 default_other_exception_return=default_other_exception_return,
+                                 database=database,
+                                **kwargs
+                                 )
 
     @wrapt.decorator
     def wrapper(func, instance, args, kwargs):
@@ -44,7 +48,7 @@ def MysqlRetry(
                     user_name=user_name,
                     password=password,
                     database=database,
-
+                    **kwargs
                 )
                 res = func(*args, **kwargs)
             except mysql_exception:
@@ -70,14 +74,15 @@ def MysqlRetry(
     return wrapper(wrapped)
 
 
-def connect(host, port, user_name, password, database, dictionary=True):
+def connect(host, port, user_name, password, database, dictionary=True, **kwargs):
     # Construct MySQL connect
     conn = mysql.connector.connect(
         user=user_name,
         password=password,
         host=host,
         port=port,
-        database=database
+        database=database,
+        **kwargs
     )
     cur = conn.cursor(dictionary=dictionary)
     return conn, cur

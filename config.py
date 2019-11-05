@@ -24,8 +24,9 @@ FIELD_SIGNI_LEVEL = {
 ## default_value: the default value if the results of Extractor.entrance() does not return
 ## dependent_field_name: if signi_level == 2, this should be the dependent field name.
 ## i.e. `downloader` for `play_addr`
-## dependent_field_value: if signi_level == 2, this should be the dependent field name.
+## dependent_field_value: if signi_level == 2, this should be the dependent field value.
 ## i.e. `aria2c` for `play_addr`
+## or True: meaning that this field should be provided as long as dependent_field_name is not None
 FIELDS = {
     'ad_link': {"signi_level": 0, "default_value": None},
     'author': {"signi_level": 0, "default_value": None},
@@ -124,7 +125,60 @@ FIELDS_BREAKDOWN = {
     'width': {"signi_level": 0, "default_value": None},
 
 }
-FIELDS_RSS = FIELDS_BREAKDOWN
+
+FIELDS_RSS = {
+    'player': {"signi_level": 0, "default_value": None},
+    'player_id': {"signi_level": 2, "default_value": None,
+                  "dependent_field_name": "player",
+                  "dependent_field_value": True},  ## True meaning that this field should be provided as long as dependent_field_name is not None
+    'multiplier': {"signi_level": 0, "default_value": 0},
+
+    'ad_link': {"signi_level": 0, "default_value": None},
+    'author': {"signi_level": 0, "default_value": None},
+    'author_attention': {"signi_level": 0, "default_value": None},
+    'author_avatar': {"signi_level": 0, "default_value": None},
+    'author_birthday': {"signi_level": 0, "default_value": None},
+    'author_description': {"signi_level": 0, "default_value": None},
+    'author_follwer_count': {"signi_level": 0, "default_value": None},
+    'author_follwing_count': {"signi_level": 0, "default_value": None},
+    'author_gender': {"signi_level": 0, "default_value": None},
+    'author_id': {"signi_level": 0, "default_value": None},
+    'author_sign': {"signi_level": 0, "default_value": None},
+    'author_url': {"signi_level": 0, "default_value": None},
+    'author_videoNum': {"signi_level": 0, "default_value": None},
+    'category': {"signi_level": 0, "default_value": None},
+    'cdn_url': {"signi_level": 0, "default_value": None},
+    'collect_count': {"signi_level": 0, "default_value": None},
+    'comment_count': {"signi_level": 0, "default_value": None},
+    'cover': {"signi_level": 1},
+    # 'created_at': {"signi_level": 0, "default_value": int(time.time())},
+    'description': {"signi_level": 0, "default_value": None},
+    'dislike_count': {"signi_level": 0, "default_value": None},
+    'download_count': {"signi_level": 0, "default_value": None},
+    'downloader': {"signi_level": 0, "default_value": "aria2c"},
+    'duration': {"signi_level": 0, "default_value": None},
+    'forward_count': {"signi_level": 0, "default_value": None},
+    'from': {"signi_level": 1},
+    'gender': {"signi_level": 0, "default_value": None},
+    'height': {"signi_level": 0, "default_value": None},
+    'language': {"signi_level": 0, "default_value": None},
+    'like_count': {"signi_level": 0, "default_value": None},
+    'play_addr': {"signi_level": 0, "default_value": None},
+    # 'player_id',
+    'rating': {"signi_level": 0, "default_value": None},
+    'recommend': {"signi_level": 0, "default_value": None},
+    'region': {"signi_level": 0, "default_value": None},
+    'share_count': {"signi_level": 0, "default_value": None},
+    'tag': {"signi_level": 0, "default_value": None},
+    'title': {"signi_level": 0, "default_value": None},
+    'upload_date': {"signi_level": 0, "default_value": None},
+    'upload_ts': {"signi_level": 0, "default_value": None},
+    'vid': {"signi_level": 1},
+    'view_count': {"signi_level": 0, "default_value": None},
+    'webpage_url': {"signi_level": 1},
+    'width': {"signi_level": 0, "default_value": None},
+
+}
 
 SANIC_PORT = 5555
 SANIC_WORKER = min([os.cpu_count(), 5])

@@ -5,8 +5,8 @@
 """
 HOW TO GENERATE THIS FILE:
 import os
-extractor_path = "/path/to/breker"
-res = [ele for ele in os.listdir(extractor_path) if ele not in {'__init__.py', 'extractors.py', '__pycache__', 'breakers.py'}]
+breaker_path = "/path/to/breker"
+res = [ele for ele in os.listdir(breaker_path) if ele not in {'__init__.py', 'extractors.py', '__pycache__', 'breakers.py'}]
 for ele in res:
     print(f"from aioVextractor.breker.{ele.replace('.py', '')} import Breaker as {ele.replace('.py', '')}BK")
 
