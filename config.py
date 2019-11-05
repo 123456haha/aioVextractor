@@ -131,7 +131,7 @@ FIELDS_RSS = {
     'player_id': {"signi_level": 2, "default_value": None,
                   "dependent_field_name": "player",
                   "dependent_field_value": True},  ## True meaning that this field should be provided as long as dependent_field_name is not None
-    'multiplier': {"signi_level": 1},
+    'multiplier': {"signi_level": 0, "default_value": 0},
 
     'ad_link': {"signi_level": 0, "default_value": None},
     'author': {"signi_level": 0, "default_value": None},

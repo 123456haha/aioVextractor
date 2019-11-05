@@ -114,7 +114,22 @@ def validate_(result, check_field):
         elif signi_level == config.FIELD_SIGNI_LEVEL["condition_must"]:
             dependent_field_name = field_info["dependent_field_name"]
             dependent_field_value = field_info["dependent_field_value"]
-            if dependent_field_value is True:
+
+            dependent_field_value_actual = result.get(
+                dependent_field_name,  ## actual value
+                "f79e2450e6b911e99af648d705c16021"  ## should get the default
+            )
+            ## actual value of the dependent_field
+            ## if the dependent_field is not given
+            ## the default value is considered
+            if dependent_field_value_actual == "f79e2450e6b911e99af648d705c16021":
+                ## get the default value
+                dependent_field_value_actual = check_field[dependent_field_name]["default_value"]
+
+            if result.get(
+                    dependent_field_name,
+                    None
+            ):
                 ## True meaning that this field should be provided as long as dependent_field_name is not None
                 try:
                     output[field] = result[field]
@@ -124,16 +139,6 @@ def validate_(result, check_field):
                     output = False
                     break
             else:
-                dependent_field_value_actual = result.get(
-                    dependent_field_name,  ## actual value
-                    "f79e2450e6b911e99af648d705c16021"  ## should get the default
-                )
-                ## actual value of the dependent_field
-                ## if the dependent_field is not given
-                ## the default value is considered
-                if dependent_field_value_actual == "f79e2450e6b911e99af648d705c16021":
-                    ## get the default value
-                    dependent_field_value_actual = check_field[dependent_field_name]["default_value"]
 
                 if dependent_field_value_actual == dependent_field_value:
                     try:
