@@ -31,15 +31,17 @@ def MysqlRetry(
     """
     if wrapped is None:
         return functools.partial(MysqlRetry,
+                                 host=host,
+                                 port=port,
+                                 user_name=user_name,
+                                 password=password,
+                                 database=database,
                                  default_exception_return=default_exception_return,
                                  default_other_exception_return=default_other_exception_return,
-                                 database=database,
-                                **kwargs
+                                 **kwargs
                                  )
-
     @wrapt.decorator
     def wrapper(func, instance, args, kwargs):
-
         for _ in range(config.RETRY):
             try:
                 kwargs['conn'], kwargs['cur'] = connect(
@@ -70,7 +72,6 @@ def MysqlRetry(
                 return res
         else:
             return default_exception_return
-
     return wrapper(wrapped)
 
 
