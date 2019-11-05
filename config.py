@@ -124,7 +124,10 @@ FIELDS_BREAKDOWN = {
     'width': {"signi_level": 0, "default_value": None},
 
 }
+FIELDS_RSS = FIELDS_BREAKDOWN
 
 SANIC_PORT = 5555
 SANIC_WORKER = min([os.cpu_count(), 5])
 LOCAL_IP_ADDR = '0.0.0.0'
+MAX_ESTIMATE_RECORD_NUMBER = 5000000
+check_latest_buffer = 5  ## check_latest_buffer
