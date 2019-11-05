@@ -32,7 +32,10 @@ def MysqlRetry(
     if wrapped is None:
         return functools.partial(MysqlRetry,
                                  default_exception_return=default_exception_return,
-                                 default_other_exception_return=default_other_exception_return)
+                                 default_other_exception_return=default_other_exception_return,
+                                 database=database,
+                                **kwargs
+                                 )
 
     @wrapt.decorator
     def wrapper(func, instance, args, kwargs):
