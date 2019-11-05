@@ -114,15 +114,8 @@ def validate_(result, check_field):
         elif signi_level == config.FIELD_SIGNI_LEVEL["condition_must"]:
             dependent_field_name = field_info["dependent_field_name"]
             dependent_field_value = field_info["dependent_field_value"]
-            dependent_field_value_actual = result.get(dependent_field_name,
-                                                      "f79e2450e6b911e99af648d705c16021")
-            ## actual value of the dependent_field
-            ## if the dependent_field is not given
-            ## the default value is considered
-            dependent_field_value_actual = check_field[dependent_field_name]["default_value"] \
-                if dependent_field_value_actual == "f79e2450e6b911e99af648d705c16021" \
-                else dependent_field_value_actual
-            if dependent_field_value_actual == dependent_field_value:
+            if dependent_field_value is True:
+                ## True meaning that this field should be provided as long as dependent_field_name is not None
                 try:
                     output[field] = result[field]
                 except KeyError:
@@ -131,8 +124,28 @@ def validate_(result, check_field):
                     output = False
                     break
             else:
-                ## SIGNI_LEVEL=0
-                output[field] = result.get(field, field_info['default_value'])
+                dependent_field_value_actual = result.get(
+                    dependent_field_name,  ## actual value
+                    "f79e2450e6b911e99af648d705c16021"  ## should get the default
+                )
+                ## actual value of the dependent_field
+                ## if the dependent_field is not given
+                ## the default value is considered
+                if dependent_field_value_actual == "f79e2450e6b911e99af648d705c16021":
+                    ## get the default value
+                    dependent_field_value_actual = check_field[dependent_field_name]["default_value"]
+
+                if dependent_field_value_actual == dependent_field_value:
+                    try:
+                        output[field] = result[field]
+                    except KeyError:
+                        print(f"You should have specify field `{field}` "
+                              f"while field `{dependent_field_name}` == {dependent_field_value}")
+                        output = False
+                        break
+                else:
+                    ## SIGNI_LEVEL=0
+                    output[field] = result.get(field, field_info['default_value'])
     if output:  ## after scanning all the listed field in config.FIELDS
         return output
 
@@ -202,7 +215,6 @@ class BasicToolSet:
     #     :return:
     #     """
     #     print("You should have overwritten this function")
-
 
     @staticmethod
     def janitor(string):
@@ -337,6 +349,7 @@ class BasicToolSet:
         pass
         # print(f"exc_type, exc_val, exc_tb: {exc_type, exc_val, exc_tb}")
 
+
 class ToolSet(BasicToolSet, metaclass=ABCMeta):
 
     @validate
@@ -358,7 +371,6 @@ class ToolSet(BasicToolSet, metaclass=ABCMeta):
                     return await self.entrance(webpage_url=webpage_url, session=session)
                 except:
                     traceback.print_exc()
-
 
         python_version = float(".".join(platform.python_version_tuple()[0:2]))
         if python_version >= 3.7:
