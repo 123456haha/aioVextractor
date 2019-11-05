@@ -26,6 +26,7 @@ class Extractor(BaseExtractor):
         "http[s]?://weibo\.com/tv/v/[\w]{5,15}\?fid=1034\:\d{5,25}",
         "http[s]?://weibo\.com/tv/v/[\w]{5,15}\?from=\w{1,10}",
         "http[s]?://t\.cn/[\w-]{3,10}",
+        "http[s]?://m\.weibo\.cn/\d{5,25}/\d{5,25}",
     ]
 
     TEST_CASE = [
@@ -38,6 +39,7 @@ class Extractor(BaseExtractor):
         "https://m.weibo.cn/status/4428801453021670?wm=3333_2001&from=109A193010&sourcetype=dingding",
         "http://t.cn/Ai8Bj0z6",
         "https://m.weibo.cn/status/4428801453021670?wm=3333_2001&from=109A193010&sourcetype=dingding",
+        "https://m.weibo.cn/7156659085/4434862959838949",
 
     ]
 
@@ -48,7 +50,8 @@ class Extractor(BaseExtractor):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
-        if re.match("https://m\.weibo\.cn/status/\d{5,25}", webpage_url):
+        if re.match("https://m\.weibo\.cn/status/\d{5,25}", webpage_url) or \
+                re.match("http[s]?://m\.weibo\.cn/\d{5,25}/\d{5,25}", webpage_url):
             headers = {
                 'Upgrade-Insecure-Requests': '1',
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) '
@@ -143,5 +146,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[8])
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)
