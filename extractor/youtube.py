@@ -33,6 +33,7 @@ class Extractor(BaseExtractor):
         "https://www.youtube.com/watch?v=jDO2YPGv9fw&list=PLNHZSfaJJc25zChky2JaM99ba8I2bVUza&index=15&t=0s",
         "https://www.youtube.com/watch?v=JGwWNGJdvx8&list=PLDcnymzs18LU4Kexrs91TVdfnplU3I5zs&index=28&t=0s",
         "https://youtu.be/NJbWAMCM1P4",
+        "https://www.youtube.com/watch?v=D2LsdT-hldY",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -42,22 +43,17 @@ class Extractor(BaseExtractor):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
-
-        try:
-            gather_results = await asyncio.gather(*[
-                self.extract_info(webpage_url=webpage_url),
-                self.extract_author(webpage_url=webpage_url, session=session)
-            ])
-            if all(gather_results):
-                if isinstance(gather_results[0], list):
-                    results = [self.merge_dicts(ele, gather_results[1]) for ele in gather_results[0]]
-                    return results
-                else:
-                    return self.merge_dicts(*gather_results)
+        gather_results = await asyncio.gather(*[
+            self.extract_info(webpage_url=webpage_url),
+            self.extract_author(webpage_url=webpage_url, session=session)
+        ])
+        if all(gather_results):
+            if isinstance(gather_results[0], list):
+                results = [self.merge_dicts(ele, gather_results[1]) for ele in gather_results[0]]
+                return results
             else:
-                return False
-        except:
-            traceback.print_exc()
+                return self.merge_dicts(*gather_results)
+        else:
             return False
 
     @RequestRetry
@@ -107,5 +103,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        ress = extractor.sync_entrance(webpage_url="https://www.youtube.com/watch?v=tofSaLB9kwE")
+        ress = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(ress)

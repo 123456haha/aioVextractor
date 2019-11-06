@@ -129,7 +129,7 @@ def validate_(result, check_field):
             if result.get(
                     dependent_field_name,
                     None
-            ):
+            ) is True:
                 ## True meaning that this field should be provided as long as dependent_field_name is not None
                 try:
                     output[field] = result[field]
