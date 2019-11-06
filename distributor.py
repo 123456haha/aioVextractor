@@ -49,7 +49,7 @@ def distribute_hybrid(webpage_url):
     Extractor: An instance of Extractor/Breaker if suitable Extractor/Breaker existed
     str: "No suitable Extractor/Breaker is provided" if no suitable Extractor/Breaker
     """
-    for instance in gen_extractor_classes()[:-2] + gen_breaker_classes() + gen_extractor_classes()[-2:]:
+    for instance in gen_extractor_classes()[:-1] + gen_breaker_classes() + gen_extractor_classes()[-1:]:
         if instance.suitable(webpage_url):
             return instance
         else:

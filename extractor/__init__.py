@@ -31,7 +31,7 @@ _ALL_CLASSES = [
     if name.endswith('IE') and name not in {"baseIE", "commonIE"}
 ]
 _ALL_CLASSES.append(commonIE)
-_ALL_CLASSES.append(baseIE)
+# _ALL_CLASSES.append(baseIE)
 
 def gen_extractor_classes():
     """ Return a list of supported extractors.

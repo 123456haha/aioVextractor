@@ -14,7 +14,7 @@ _ALL_CLASSES = [
     for name, klass in globals().items()
     if name.endswith('BK') and name not in {"baseBK"}
 ]
-_ALL_CLASSES.append(baseBK)
+# _ALL_CLASSES.append(baseBK)
 
 
 def gen_breaker_classes():
