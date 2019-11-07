@@ -27,6 +27,7 @@ class Breaker(BaseBreaker):
         "https://www.instagram.com/filmmkrs?igshid=186z6y04dov3y",
         "https://www.instagram.com/cchannel_beauty/",
         "https://www.instagram.com/psg/",
+        "https://www.instagram.com/fashion.upk/",
     ]
 
     def __init__(self, *args, **kwargs):
