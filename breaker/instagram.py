@@ -28,6 +28,7 @@ class Breaker(BaseBreaker):
         "https://www.instagram.com/cchannel_beauty/",
         "https://www.instagram.com/psg/",
         "https://www.instagram.com/fashion.upk/",
+        "https://www.instagram.com/hano.gram",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -37,7 +38,8 @@ class Breaker(BaseBreaker):
     @BreakerValidater
     @RequestRetry
     async def breakdown(self, webpage_url, session, **kwargs):
-        if kwargs:
+        page = kwargs.get("page", 1)
+        if page > 1:
             results = await self.GetOther(kwargs, session, webpage_url)
             return results
         else:

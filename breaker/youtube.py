@@ -49,7 +49,9 @@ class Breaker(BaseBreaker):
         ParseResult = urlsplit(webpage_url)
         path = ParseResult.path
         if re.match('/playlist', path):
-            if kwargs:
+
+            page = kwargs.get("page", 1)
+            if page > 1:
                 webpage_content = await self.retrieve_youtube_pageing_api(
                     referer=webpage_url,
                     continuation=kwargs['continuation'],
@@ -80,7 +82,9 @@ class Breaker(BaseBreaker):
                 return results
 
         elif re.match('/channel/', path) or re.match('/user/', path):
-            if kwargs:
+
+            page = kwargs.get("page", 1)
+            if page > 1:
                 webpage_content = await self.retrieve_youtube_pageing_api(
                     referer=webpage_url,
                     continuation=kwargs['continuation'],

@@ -41,7 +41,9 @@ class Breaker(BaseBreaker):
                 uid = re.findall("CONFIG\['oid'\]='(\d{4,20})';", user_page_response)[0]
             except:
                 return False
-        if kwargs:
+
+        page = kwargs.get("page", 1)
+        if page > 1:
             container_id = kwargs['container_id']
             since_id = kwargs['since_id']
             response_user_video_page = await self.request_user_video_page(
