@@ -42,8 +42,7 @@ class Breaker(BaseBreaker):
             except:
                 return False
 
-        page = kwargs.get("page", 1)
-        if page > 1:
+        if kwargs:
             container_id = kwargs['container_id']
             since_id = kwargs['since_id']
             response_user_video_page = await self.request_user_video_page(

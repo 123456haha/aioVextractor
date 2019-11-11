@@ -12,6 +12,7 @@ from aioVextractor.breaker import (
 )
 import json
 
+
 class Breaker(BaseBreaker):
     target_website = [
         "http[s]://www\.pinterest.com/[\w-]{5,36}/video_pins/",
@@ -33,8 +34,7 @@ class Breaker(BaseBreaker):
         user_name = re.findall("http[s]://www\.pinterest.com/([\w-]{5,36})/video_pins/", webpage_url)[0]
         source_url = f"/{user_name}/video_pins"
 
-        page = kwargs.get("page", 1)
-        if page > 1:
+        if kwargs:
             data = json.dumps(kwargs)
         else:
             data = '{"options":{"isPrefetch":false,"exclude_add_pin_rep":true,"username":"' \
@@ -103,12 +103,14 @@ if __name__ == '__main__':
     with Breaker() as breaker:
         res = breaker.sync_breakdown(
             webpage_url=Breaker.TEST_CASE[-1],
-            # params={'context': {},
-            #         'options': {'bookmarks': [
-            #             'Pz9mZmZmZmZmZmEyZjY1ZTdmMDM5MTQwMTAwMTA1OTg0YXxhMjc5Yjk1MmVhNjAyNGNjZjRmODc4ZDU4MzI5MDNhZmM1NzQ5Yzk0MzE1ZjdmMjM3MDE0MDM5MDRkMTI4MmEyfE5FV3w='],
-            #                     'exclude_add_pin_rep': True,
-            #                     'field_set_key': 'grid_item',
-            #                     'isPrefetch': False,
-            #                     'username': 'luvbridal'}}
+            params={'context': {},
+                    'options': {'bookmarks': [
+                        'Pz9mZmZmZmZmZmEyM2U3YWZmMGI1YjQwMTAwMGU2ZDc1NXw5NTc0YTY4ZDAzZmU2Zjc0MmVmMWI3Y2Q2NmI1YWQxMmMwNTBhMTEzYzE4ZWNjMjMzN2ZmYjU4OWRhOTZkYTdmfE5FV3w='],
+                                'exclude_add_pin_rep': True,
+                                'field_set_key': 'grid_item',
+                                'isPrefetch': False,
+                                'username': 'viralanimalfun'},
+                    'page':2
+                    }
         )
         pprint(res)

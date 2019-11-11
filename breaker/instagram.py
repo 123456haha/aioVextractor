@@ -38,8 +38,7 @@ class Breaker(BaseBreaker):
     @BreakerValidater
     @RequestRetry
     async def breakdown(self, webpage_url, session, **kwargs):
-        page = kwargs.get("page", 1)
-        if page > 1:
+        if kwargs:
             results = await self.GetOther(kwargs, session, webpage_url)
             return results
         else:
