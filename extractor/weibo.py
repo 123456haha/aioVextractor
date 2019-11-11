@@ -27,6 +27,7 @@ class Extractor(BaseExtractor):
         "http[s]?://weibo\.com/tv/v/[\w]{5,15}\?from=\w{1,10}",
         "http[s]?://t\.cn/[\w-]{3,10}",
         "http[s]?://m\.weibo\.cn/\d{5,25}/\d{5,25}",
+        "http[s]?://weibointl\.api\.weibo\.cn/share/\d{5,15}\.html[\s|\S]*",
     ]
 
     TEST_CASE = [
@@ -40,6 +41,7 @@ class Extractor(BaseExtractor):
         "http://t.cn/Ai8Bj0z6",
         "https://m.weibo.cn/status/4428801453021670?wm=3333_2001&from=109A193010&sourcetype=dingding",
         "https://m.weibo.cn/7156659085/4434862959838949",
+        "https://weibointl.api.weibo.cn/share/101945758.html?weibo_id=4437220557550474&from=timeline&isappinstalled=0",
 
     ]
 
@@ -66,6 +68,22 @@ class Extractor(BaseExtractor):
                 headers=headers
             )
             results = self.extract_mobile(response=response_text)
+            return results
+        elif re.match("http[s]?://weibointl\.api\.weibo\.cn/share/\d{5,15}\.html", webpage_url):
+            headers = {
+                'Upgrade-Insecure-Requests': '1',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) '
+                              'AppleWebKit/537.36 (KHTML, like Gecko) '
+                              'Chrome/77.0.3865.120 Safari/537.36',
+                'Sec-Fetch-Mode': 'navigate',
+                'Sec-Fetch-User': '?1',
+            }
+            response_text = await self.request(
+                url=webpage_url,
+                session=session,
+                headers=headers
+            )
+            results = self.extract_international(response=response_text, webpage_url=webpage_url)
             return results
 
         else:
@@ -139,6 +157,23 @@ class Extractor(BaseExtractor):
             pass
         result['play_addr'] = jmespath.search("page_info.urls.mp4_720p_mp4", status)
 
+        return result
+
+    def extract_international(self, response, webpage_url):
+        try:
+            selector = Selector(text=response)
+        except:
+            return None
+        result = dict()
+        result['from'] = self.from_
+        result['vid'] = re.findall("\d{16}", webpage_url)[0]
+        result['author'] = selector.css(".m-avatar-box b::text").extract_first()
+        result['avatar'] = selector.css(".m-avatar-box img::attr(src)").extract_first()
+        result['comment_count'] = selector.css(".comment-top h3::text").re_first("\d{1,10}")
+        result['cover'] = selector.css("#video::attr(poster)").extract_first()
+        result['webpage_url'] = webpage_url
+        result['description'] = selector.css(".weibo-text::text").extract_first()
+        result['play_addr'] = selector.css("#video::attr(src)").extract_first()
         return result
 
 
