@@ -28,6 +28,7 @@ class Extractor(BaseExtractor):
         "http[s]?://t\.cn/[\w-]{3,10}",
         "http[s]?://m\.weibo\.cn/\d{5,25}/\d{5,25}",
         "http[s]?://weibointl\.api\.weibo\.cn/share/\d{5,15}\.html[\s|\S]*",
+        "http[s]?://video\.h5\.weibo\.cn/1034\:\d{5,25}/\d{5,25}",
     ]
 
     TEST_CASE = [
@@ -42,6 +43,7 @@ class Extractor(BaseExtractor):
         "https://m.weibo.cn/status/4428801453021670?wm=3333_2001&from=109A193010&sourcetype=dingding",
         "https://m.weibo.cn/7156659085/4434862959838949",
         "https://weibointl.api.weibo.cn/share/101945758.html?weibo_id=4437220557550474&from=timeline&isappinstalled=0",
+        "https://video.h5.weibo.cn/1034:4437219750963677/4437220557550474",
 
     ]
 
@@ -86,6 +88,24 @@ class Extractor(BaseExtractor):
             results = self.extract_international(response=response_text, webpage_url=webpage_url)
             return results
 
+        elif re.match("http[s]?://video\.h5\.weibo\.cn/1034:\d{5,25}/\d{5,25}", webpage_url):
+            vid = re.findall("http[s]?://video\.h5\.weibo\.cn/1034:\d{5,25}/(\d{5,25})", webpage_url)[0]
+            url = f"https://m.weibo.cn/status/{vid}"
+            headers = {
+                'Upgrade-Insecure-Requests': '1',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) '
+                              'AppleWebKit/537.36 (KHTML, like Gecko) '
+                              'Chrome/77.0.3865.120 Safari/537.36',
+                'Sec-Fetch-Mode': 'navigate',
+                'Sec-Fetch-User': '?1',
+            }
+            response_text = await self.request(
+                url=url,
+                session=session,
+                headers=headers
+            )
+            results = self.extract_mobile(response=response_text)
+            return results
         else:
             cookies = {
                 'SUB': '_2AkMq-6mNf8NxqwJRmPEWymvraIVyyA7EieKcp1hWJRMxHRl-yT83qkhYtRB6AXuHYVsPmdY9Wu5j06JDOol1qhbRJy9F',
