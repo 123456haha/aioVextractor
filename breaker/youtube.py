@@ -48,8 +48,9 @@ class Breaker(BaseBreaker):
     async def breakdown(self, webpage_url, session, **kwargs):
         ParseResult = urlsplit(webpage_url)
         path = ParseResult.path
+        page = int(kwargs.pop("page", 1))
         if re.match('/playlist', path):
-            if kwargs:
+            if page > 1:
                 webpage_content = await self.retrieve_youtube_pageing_api(
                     referer=webpage_url,
                     continuation=kwargs['continuation'],
@@ -80,7 +81,7 @@ class Breaker(BaseBreaker):
                 return results
 
         elif re.match('/channel/', path) or re.match('/user/', path):
-            if kwargs:
+            if page > 1:
                 webpage_content = await self.retrieve_youtube_pageing_api(
                     referer=webpage_url,
                     continuation=kwargs['continuation'],

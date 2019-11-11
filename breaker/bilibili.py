@@ -29,7 +29,7 @@ class Breaker(BaseBreaker):
 
     @BreakerValidater
     async def breakdown(self, webpage_url, session, **kwargs):
-        page = kwargs.get("page", 1)
+        page = int(kwargs.pop("page", 1))
         headers = {
             'Accept': 'application/json, text/plain, */*',
             'Referer': f'{webpage_url}/video?tid=0&page={page-1}&keyword=&order=pubdate'

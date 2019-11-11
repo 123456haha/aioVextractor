@@ -33,8 +33,8 @@ class Breaker(BaseBreaker):
     async def breakdown(self, webpage_url, session, **kwargs):
         user_name = re.findall("http[s]://www\.pinterest.com/([\w-]{5,36})/video_pins/", webpage_url)[0]
         source_url = f"/{user_name}/video_pins"
-
-        if kwargs:
+        page = int(kwargs.pop("page", 1))
+        if page > 1:
             data = json.dumps(kwargs)
         else:
             data = '{"options":{"isPrefetch":false,"exclude_add_pin_rep":true,"username":"' \
@@ -106,11 +106,11 @@ if __name__ == '__main__':
             params={'context': {},
                     'options': {'bookmarks': [
                         'Pz9mZmZmZmZmZmEyM2U3YWZmMGI1YjQwMTAwMGU2ZDc1NXw5NTc0YTY4ZDAzZmU2Zjc0MmVmMWI3Y2Q2NmI1YWQxMmMwNTBhMTEzYzE4ZWNjMjMzN2ZmYjU4OWRhOTZkYTdmfE5FV3w='],
-                                'exclude_add_pin_rep': True,
-                                'field_set_key': 'grid_item',
-                                'isPrefetch': False,
-                                'username': 'viralanimalfun'},
-                    'page':2
+                        'exclude_add_pin_rep': True,
+                        'field_set_key': 'grid_item',
+                        'isPrefetch': False,
+                        'username': 'viralanimalfun'},
+                    'page': 2
                     }
         )
         pprint(res)
