@@ -24,6 +24,7 @@ class Extractor(BaseExtractor):
     TEST_CASE = [
         "www.eyepetizer.net/detail.html?vid=119611&utm_campaign=routine&utm_medium=share&utm_source=others&uid=0&resourceType=video&udid=1bb9f2f14545490c9168f7b99d89136e8ff14724&vc=443&vn=4.9.1&size=1080X1920&deviceModel=vivo%20X9&first_channel=eyepetizer_vivo_market&last_channel=eyepetizer_vivo_market&system_version_code=25",
         "https://www.eyepetizer.net/detail.html?vc=6401&uid=300826523&utm_medium=share&vid=177155&utm_source=wechat-moments&udid=7e4f6c3caf2a388c48cb4817fba24bea71e738c9&vn=5.9.1&resourceType=video&deviceModel=iPhone&utm_campaign=routine",
+        "https://www.eyepetizer.net/detail.html?vc=6401&uid=300826523&utm_medium=share&vid=177155&utm_source=wechat-moments&udid=7e4f6c3caf2a388c48cb4817fba24bea71e738c9&vn=5.9.1&resourceType=video&deviceModel=iPhone&utm_campaign=routine",
     ]
 
     def __init__(self, *args, **kwargs):

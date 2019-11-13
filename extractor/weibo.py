@@ -44,6 +44,7 @@ class Extractor(BaseExtractor):
         "https://m.weibo.cn/7156659085/4434862959838949",
         "https://weibointl.api.weibo.cn/share/101945758.html?weibo_id=4437220557550474&from=timeline&isappinstalled=0",
         "https://video.h5.weibo.cn/1034:4437219750963677/4437220557550474",
+        "https://weibo.com/tv/v/IfIZrymE6?fid=1034:4437478581411755",
 
     ]
 
