@@ -30,6 +30,7 @@ from aioVextractor.extractor.renren import Extractor as renrenIE
 from aioVextractor.extractor.socialbeta import Extractor as socialbetaIE
 from aioVextractor.extractor.tencent import Extractor as tencentIE
 from aioVextractor.extractor.toutiao import Extractor as toutiaoIE
+from aioVextractor.extractor.tvcbook import Extractor as tvcbookIE
 from aioVextractor.extractor.tvcf import Extractor as tvcfIE
 from aioVextractor.extractor.vimeo import Extractor as vimeoIE
 from aioVextractor.extractor.vmovier import Extractor as vmovierIE
