@@ -26,6 +26,7 @@ class Extractor(BaseExtractor):
         "https://vimeo.com/344361560",
         "https://vimeo.com/5721553",
         "https://vimeo.com/368525290",
+        "https://vimeo.com/348128702",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -68,10 +69,9 @@ class Extractor(BaseExtractor):
         selector = Selector(text=text)
         try:
             clip_page_config = selector.css('script').re_first(regex)
-        except TypeError:
-            return False
-        else:
             avatar = clip_page_config.replace('\\/', '/')
+        except (TypeError, AttributeError):
+            return False
         return {"author_avatar": avatar,
                 'from': self.from_
                 }
