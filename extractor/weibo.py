@@ -29,6 +29,7 @@ class Extractor(BaseExtractor):
         "http[s]?://m\.weibo\.cn/\d{5,25}/\d{5,25}",
         "http[s]?://weibointl\.api\.weibo\.cn/share/\d{5,15}\.html[\s|\S]*",
         "http[s]?://video\.h5\.weibo\.cn/1034\:\d{5,25}/\d{5,25}",
+        "http[s]?://video\.weibo\.com/show\?fid=1034\:\d{5,25}",
     ]
 
     TEST_CASE = [
@@ -45,6 +46,7 @@ class Extractor(BaseExtractor):
         "https://weibointl.api.weibo.cn/share/101945758.html?weibo_id=4437220557550474&from=timeline&isappinstalled=0",
         "https://video.h5.weibo.cn/1034:4437219750963677/4437220557550474",
         "https://weibo.com/tv/v/IfIZrymE6?fid=1034:4437478581411755",
+        "https://video.weibo.com/show?fid=1034:4437478581411755",
 
     ]
 
