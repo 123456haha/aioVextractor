@@ -6,7 +6,7 @@
 import jmespath
 # from urllib.parse import urlparse
 from pyppeteer import launch
-import asyncio
+# import asyncio
 import re
 from scrapy import Selector
 from aioVextractor.extractor.base_extractor import (
@@ -38,7 +38,6 @@ class Extractor(BaseExtractor):
         page = await browser.newPage()
         await page.goto(webpage_url)
         response_text = await page.content()
-        # await page.screenshot({'path': 'www.baidu.png'})
         results = self.extract_page(response=response_text, page=page)
         await browser.close()
         return results
