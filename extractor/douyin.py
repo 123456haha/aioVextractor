@@ -4,9 +4,11 @@
 # IDE: PyCharm
 
 import jmespath
-from urllib.parse import urlparse
-
-
+# from urllib.parse import urlparse
+from pyppeteer import launch
+import asyncio
+import re
+from scrapy import Selector
 from aioVextractor.extractor.base_extractor import (
     BaseExtractor,
     validate,
@@ -31,21 +33,31 @@ class Extractor(BaseExtractor):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
-        download_headers = {'Connection': 'keep-alive',
-                            'Upgrade-Insecure-Requests': '1',
-                            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
-                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-                            'Accept-Encoding': 'gzip, deflate',
-                            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
-        async with session.get(webpage_url, headers=download_headers, allow_redirects=False) as response_getinfo:
-            Location = response_getinfo.headers['Location']
-            get_aweme_id = lambda location: urlparse(location).path.strip('/').split('/')[-1]
-            aweme_id = get_aweme_id(Location)
-            # print(f"aweme_id: {aweme_id}")
-            result = self.extract(response_json=await self.aweme_detail(aweme_id=aweme_id,
-                                                                        session=session))
 
-            return result if result else False
+        browser = await launch()
+        page = await browser.newPage()
+        await page.goto(webpage_url)
+        response_text = await page.content()
+        # await page.screenshot({'path': 'www.baidu.png'})
+        results = self.extract_page(response=response_text, page=page)
+        await browser.close()
+        return results
+
+        # download_headers = {'Connection': 'keep-alive',
+        #                     'Upgrade-Insecure-Requests': '1',
+        #                     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+        #                     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        #                     'Accept-Encoding': 'gzip, deflate',
+        #                     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7'}
+        # async with session.get(webpage_url, headers=download_headers, allow_redirects=False) as response_getinfo:
+        #     Location = response_getinfo.headers['Location']
+        #     get_aweme_id = lambda location: urlparse(location).path.strip('/').split('/')[-1]
+        #     aweme_id = get_aweme_id(Location)
+        #     # print(f"aweme_id: {aweme_id}")
+        #     result = self.extract(response_json=await self.aweme_detail(aweme_id=aweme_id,
+        #                                                                 session=session))
+        #
+        #     return result if result else False
 
     @RequestRetry
     async def aweme_detail(self, aweme_id, session):
@@ -109,6 +121,21 @@ class Extractor(BaseExtractor):
             result['duration'] = int(int(video_duration) / 1000) if video_duration else None
             return result
 
+    def extract_page(self, response, page):
+        selector = Selector(text=response)
+        result = dict()
+        result['from'] = self.from_
+        result['author'] = selector.css(".detail .user-info .name::text").extract_first().lstrip("@")
+        result['author_avatar'] = selector.css(".detail .user-info img::attr(src)").extract_first()
+        result['play_addr'] = selector.css("script").re_first('playAddr: "([\s|\S]*?)"')
+        result['title'] = selector.css(".desc::text").extract_first()
+        result['vid'] = re.findall("\d{15,21}", page.url)[0]
+        result['cover'] =  selector.css("script").re_first('cover: "([\s|\S]*?)"')
+        result['tag'] = selector.css(".inner::text").extract()
+        result['webpage_url'] = page.url
+        result['height'] = selector.css("script").re_first('videoHeight: ([\s|\S]*?),')
+        result['width'] = selector.css("script").re_first('videoWidth: ([\s|\S]*?),')
+        return result
 
 if __name__ == '__main__':
     from pprint import pprint
