@@ -34,7 +34,7 @@ class Extractor(BaseExtractor):
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
 
-        browser = await launch()
+        browser = await launch(args=['--no-sandbox'])
         page = await browser.newPage()
         await page.goto(webpage_url)
         response_text = await page.content()
