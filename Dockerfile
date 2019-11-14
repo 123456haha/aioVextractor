@@ -10,4 +10,5 @@ RUN apt-get update \
     && pip3 install --upgrade pip \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 RUN pip3 install -r requirements.txt \
+    && pyppeteer-install
 #ENV PATH=/usr/local/bin:/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin

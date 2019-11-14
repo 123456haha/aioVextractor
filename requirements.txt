@@ -9,6 +9,7 @@ jmespath==0.9.4
 lxml==4.3.4
 mysql-connector-python==8.0.18
 PyExecJS==1.5.1
+pyppeteer==0.0.25
 python-dateutil==2.8.0
 sanic==19.9.0
 sanic-cors==0.9.9.post3
