@@ -141,9 +141,9 @@ def validate_(result, check_field):
             else:
 
                 if dependent_field_value_actual == dependent_field_value:
-                    try:
+                    if result.get(field, None):
                         output[field] = result[field]
-                    except KeyError:
+                    else:
                         print(f"You should have specify field `{field}` "
                               f"while field `{dependent_field_name}` == {dependent_field_value}")
                         output = False
