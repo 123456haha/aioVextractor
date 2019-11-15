@@ -72,6 +72,8 @@ class Extractor(BaseExtractor):
         result['duration'] = jmespath.search('duration', response_json)
         result['vid'] = jmespath.search('id', response_json)
         result['play_addr'] = jmespath.search('max_by(playInfo, &height).url', response_json)
+        if not result['play_addr']:
+            result['play_addr'] = jmespath.search("playUrl", response_json)
         result['tag'] = jmespath.search('tags[*].name', response_json)
         result['cover'] = jmespath.search('coverForFeed', response_json)
         return result
