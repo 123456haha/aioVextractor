@@ -9,7 +9,7 @@ from aioVextractor.breaker import (
     BreakerValidater
 )
 import jmespath
-
+import time
 
 class Breaker(BaseBreaker):
     target_website = [
@@ -19,6 +19,7 @@ class Breaker(BaseBreaker):
     TEST_CASE = [
         "https://v.douyin.com/QXJURv",
         "https://v.douyin.com/QXJ6oG",
+        "https://v.douyin.com/Q4E5R8/",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -27,12 +28,13 @@ class Breaker(BaseBreaker):
         self.results = []
         self.has_more = True
         self.playlist_url = None
+        self.last_response = time.time()
 
     @BreakerValidater
     async def breakdown(self, webpage_url, session, **kwargs):
         self.playlist_url = webpage_url
         browser = await launch(
-            # {"headless": False},
+            {"headless": False},
             args=[
                 '--no-sandbox',
             ])
@@ -40,7 +42,7 @@ class Breaker(BaseBreaker):
         page = await browser.newPage()
         page.on('response', self.intercept_response)
         await page.goto(webpage_url)
-        while self.has_more:
+        while self.has_more and time.time() - self.last_response <= 2:
             await page.keyboard.press("Space")
         await browser.close()
         return self.results, False, {}
@@ -48,6 +50,7 @@ class Breaker(BaseBreaker):
     async def intercept_response(self, response):
         resourceType = response.request.resourceType
         if resourceType in ['xhr'] and 'sec_uid=' in response.url:
+            self.last_response = time.time()
             response_json = await response.json()
             self.extract(response=response_json)
             has_more = response_json['has_more']
