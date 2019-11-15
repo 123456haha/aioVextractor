@@ -16,7 +16,7 @@ class Extractor(BaseExtractor):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
-        results = await self.breakdown(webpage_url=webpage_url)
+        results = await self.breakdown(webpage_url=webpage_url, session=session)
         return results
 
 

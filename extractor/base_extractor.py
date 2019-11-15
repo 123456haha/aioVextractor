@@ -61,7 +61,7 @@ class BaseExtractor(ToolSet, metaclass=ABCMeta):
             with xinpianchangIE() as proxy_extractor:
                 return await proxy_extractor.entrance(webpage_url=iframe_url, session=session)
         else:
-            return await self.breakdown(webpage_url=iframe_url)
+            return await self.breakdown(webpage_url=iframe_url, session=session)
 
     async def extract_info(self, webpage_url, collaborate=True):
         """
@@ -182,10 +182,9 @@ class BaseExtractor(ToolSet, metaclass=ABCMeta):
             async with session.get(webpage_url, headers=self.general_headers(self.random_ua())) as response:
                 return await response.text()
 
-    async def breakdown(self, webpage_url):
+    async def breakdown(self, webpage_url, session):
         """
         extract iframes from webpage_url and extract these iframe_urls concurrently
-        :param webpage_url:
         :return:
         """
 
@@ -200,7 +199,11 @@ class BaseExtractor(ToolSet, metaclass=ABCMeta):
                 traceback.print_exc()
                 return False
 
-        webpage_content = await self.retrieve_webpapge(webpage_url=webpage_url)
+        webpage_content = await self.request(
+            url=webpage_url,
+            session=session,
+            headers=self.general_headers(user_agent=self.random_ua())
+        )
         selector = Selector(text=webpage_content)
         iframe_src = selector.css('iframe::attr(src)').extract()
         with futures.ThreadPoolExecutor(max_workers=min(10, os.cpu_count())) as executor:  ## set up processes
