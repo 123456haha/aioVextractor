@@ -13,7 +13,7 @@ import time
 
 class Breaker(BaseBreaker):
     target_website = [
-        "https://v\.douyin\.com/\w{4,7}",
+        "http[s]?://v\.douyin\.com/[A-Z\d]{3,9}",
     ]
 
     TEST_CASE = [

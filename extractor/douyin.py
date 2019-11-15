@@ -18,7 +18,7 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "http[s]?://v\.douyin\.com/\w{3,9}/",
+        "http[s]?://v\.douyin\.com/[a-z\d]{3,9}",
         "http[s]?://www\.iesdouyin\.com/share/video/\d{15,25}/.*?mid=\d{15,25}",
     ]
 
