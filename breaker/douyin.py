@@ -58,15 +58,15 @@ class Breaker(BaseBreaker):
         aweme_list = response['aweme_list']
         for ele in aweme_list:
             try:
-                duration = jmespath.search("video.duration", aweme_list) // 1000
+                duration = jmespath.search("video.duration", ele) // 1000
             except:
                 duration = None
             self.results.append({
                 "vid": ele['aweme_id'],
                 "webpage_url": f"https://www.iesdouyin.com/share/video/{ele['aweme_id']}/?region=CN&mid={ele['aweme_id']}",
                 "title": ele['desc'],
-                "cover": jmespath.search("video.origin_cover.url_list[0]", aweme_list),
-                "play_addr": jmespath.search("video.download_addr.url_list[0]", aweme_list),
+                "cover": jmespath.search("video.origin_cover.url_list[0]", ele),
+                "play_addr": jmespath.search("video.download_addr.url_list[0]", ele),
                 "duration": duration,
                 "playlist_url": self.playlist_url,
                 "from": self.from_,
