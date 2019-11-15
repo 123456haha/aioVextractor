@@ -13,6 +13,7 @@ for ele in res:
 """
 from aioVextractor.breaker.base_breaker import BaseBreaker as baseBK
 from aioVextractor.breaker.bilibili import Breaker as bilibiliBK
+from aioVextractor.breaker.douyin import Breaker as douyinBK
 from aioVextractor.breaker.instagram import Breaker as instagramBK
 from aioVextractor.breaker.pinterest import Breaker as pinterestBK
 from aioVextractor.breaker.vimeo import Breaker as vimeoBK
