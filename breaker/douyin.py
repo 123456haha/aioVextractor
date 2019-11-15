@@ -34,7 +34,7 @@ class Breaker(BaseBreaker):
     async def breakdown(self, webpage_url, session, **kwargs):
         self.playlist_url = webpage_url
         browser = await launch(
-            {"headless": False},
+            # {"headless": False},
             args=[
                 '--no-sandbox',
             ])
