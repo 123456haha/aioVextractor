@@ -128,7 +128,7 @@ class Extractor(BaseExtractor):
         result['from'] = self.from_
         result['author'] = selector.css(".detail .user-info .name::text").extract_first().lstrip("@")
         result['author_avatar'] = selector.css(".detail .user-info img::attr(src)").extract_first()
-        result['play_addr'] = selector.css("script").re_first('playAddr: "([\s|\S]*?)"')
+        result['play_addr'] = selector.css("script").re_first('playAddr: "([\s|\S]*?)"').replace("playwm", "play")
         result['title'] = selector.css(".desc::text").extract_first()
         result['vid'] = re.findall("\d{15,21}", page.url)[0]
         result['cover'] =  selector.css("script").re_first('cover: "([\s|\S]*?)"')
