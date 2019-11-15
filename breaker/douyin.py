@@ -41,8 +41,7 @@ class Breaker(BaseBreaker):
         page.on('response', self.intercept_response)
         await page.goto(webpage_url)
         while self.has_more:
-            for i in range(0, 4):
-                await page.keyboard.press("Space")
+            await page.keyboard.press("Space")
         await browser.close()
         return self.results, False, {}
 
