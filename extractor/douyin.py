@@ -27,6 +27,8 @@ class Extractor(BaseExtractor):
         "http://v.douyin.com/hd9sb3/",
         "https://www.iesdouyin.com/share/video/6759299526001052940/?region=CN&mid=6759299526001052940",
         "http://v.douyin.com/QcJtPC/",
+        "https://www.iesdouyin.com/share/video/6649998096799501571/?region=CN&mid=6649998096799501571",
+        "http://v.douyin.com/Q3bqGn/",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -143,5 +145,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="http://v.douyin.com/hd9sb3/")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)
