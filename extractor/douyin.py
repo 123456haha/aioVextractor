@@ -18,7 +18,7 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "http[s]?://v\.douyin\.com/[a-z\d]{3,9}",
+        "http[s]?://v\.douyin\.com/[\w\d]{3,9}",
         "http[s]?://www\.iesdouyin\.com/share/video/\d{15,25}/.*?mid=\d{15,25}",
     ]
 
@@ -26,6 +26,7 @@ class Extractor(BaseExtractor):
         "#在抖音，记录美好生活#球球老婆怀孕之后就爱睡这个洗脸巢 睡姿也太可爱了8#猫 http://v.douyin.com/hd9sb3/ 复制此链接，打开【抖音短视频】，直接观看视频！",
         "http://v.douyin.com/hd9sb3/",
         "https://www.iesdouyin.com/share/video/6759299526001052940/?region=CN&mid=6759299526001052940",
+        "http://v.douyin.com/QcJtPC/",
     ]
 
     def __init__(self, *args, **kwargs):
