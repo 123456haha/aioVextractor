@@ -13,13 +13,15 @@ import time
 
 class Breaker(BaseBreaker):
     target_website = [
-        "http[s]?://v\.douyin\.com/[A-Z\d]{3,9}",
+        # "http[s]?://v\.douyin\.com/[A-Z\d]{3,9}",  ## not avaliable, cause it overlap with extractor.douyin
+        "http[s]?://www\.iesdouyin\.com/share/user/\d{5,25}",
     ]
 
     TEST_CASE = [
-        "https://v.douyin.com/QXJURv",
-        "https://v.douyin.com/QXJ6oG",
-        "https://v.douyin.com/Q4E5R8/",
+        # "https://v.douyin.com/QXJURv",
+        # "https://v.douyin.com/QXJ6oG",
+        # "https://v.douyin.com/Q4E5R8/",
+        "https://www.iesdouyin.com/share/user/56035330573",
     ]
 
     def __init__(self, *args, **kwargs):
