@@ -4,7 +4,10 @@
 # IDE: PyCharm
 
 from aioVextractor.utils import RequestRetry
-from aioVextractor.utils.user_agent import UserAgent
+from aioVextractor.utils.user_agent import (
+    UserAgent,
+    safari,
+)
 from random import choice
 import asyncio
 import aiohttp
@@ -201,6 +204,7 @@ class BasicToolSet:
             'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
         }
         self.random_ua = lambda: choice(UserAgent)
+        self.random_safari = lambda: choice(safari)
         # self.results = []
         return self
 
