@@ -17,11 +17,15 @@ from aioVextractor.extractor.base_extractor import (
     validate,
     RequestRetry
 )
+from aiohttp.client_exceptions import (
+    ServerConnectionError,
+)
 
 if platform.system() in {"Linux", "Darwin"}:
     import ujson as json
 else:
     import json
+
 
 class Extractor(BaseExtractor):
     target_website = [
@@ -40,6 +44,7 @@ class Extractor(BaseExtractor):
         "https://m.toutiaocdn.net/a6752504513917092359/?app=news_article&is_hit_share_recommend=0",
         "https://m.toutiaocdn.com/i6752291249207640590/?app=news_article&timestamp=1572147617&req_id=201910271140170100140481310BDEA279&group_id=6752291249207640590&wxshare_count=20&tt_from=weixin_moments&utm_source=weixin_moments&utm_medium=toutiao_android&utm_campaign=client_share&share_type=original&pbid=6751721020236875277&from=singlemessage&isappinstalled=0",
         "https://m.toutiaoimg.com/group/6739755269032509966/?app=news_article_lite&timestamp=1572244151&req_id=20191028142911010011048231030168A8&group_id=6739755269032509966",
+        "https://m.toutiaoimg.com/group/6758768712024588295/?app=news_article&timestamp=1573886933",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -72,7 +77,10 @@ class Extractor(BaseExtractor):
 
         else:
             selector = Selector(text=html)
-            SSR_HYDRATED_DATA = json.loads(selector.css("#SSR_HYDRATED_DATA::text").extract_first())
+            try:
+                SSR_HYDRATED_DATA = json.loads(selector.css("#SSR_HYDRATED_DATA::text").extract_first())
+            except TypeError:
+                raise ServerConnectionError ## let the RequestRetry work the rest
             result = self.extract(response=SSR_HYDRATED_DATA, webpage_url=webpage_url)
             vid = re.findall('"vid"\s?:\s?"(\w{5,40})"', html)[0]
         play_addr = await self.cal_play_addr(vid=vid, webpage_url=webpage_url, session=session)
@@ -166,9 +174,10 @@ class Extractor(BaseExtractor):
             token_dict = json.loads(token)
             return token_dict['as'], token_dict['cp'], token_dict['_signature']
 
+
 if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[4])
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)
