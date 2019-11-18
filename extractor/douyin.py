@@ -28,7 +28,7 @@ class Extractor(BaseExtractor):
         "https://www.iesdouyin.com/share/video/6759299526001052940/?region=CN&mid=6759299526001052940",
         "http://v.douyin.com/QcJtPC/",
         "https://www.iesdouyin.com/share/video/6649998096799501571/?region=CN&mid=6649998096799501571",
-        "http://v.douyin.com/Q3bqGn/",
+        "http://v.douyin.com/Q3bqGN/",
     ]
 
     def __init__(self, *args, **kwargs):
