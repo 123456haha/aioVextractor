@@ -11,15 +11,18 @@ from aioVextractor.breaker import (
 import jmespath
 import time
 
+
 class Breaker(BaseBreaker):
     target_website = [
-        "http[s]?://v\.douyin\.com/[A-Z\d]{3,9}",
+        "http[s]?://v\.douyin\.com/[\w\d]{3,9}",  ## not avaliable, cause it overlap with extractor.douyin
+        "http[s]?://www\.iesdouyin\.com/share/user/\d{5,25}",
     ]
 
     TEST_CASE = [
         "https://v.douyin.com/QXJURv",
         "https://v.douyin.com/QXJ6oG",
-        "https://v.douyin.com/Q4E5R8/",
+        "https://v.douyin.com/Q4E5R8/6725365523015581704",
+        "https://www.iesdouyin.com/share/user/56035330573",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -43,7 +46,7 @@ class Breaker(BaseBreaker):
         page.on('response', self.intercept_response)
         await page.goto(webpage_url)
         while self.has_more and time.time() - self.last_response <= 2:
-            await page.keyboard.press("Space")
+            await page.evaluate('window.scrollBy(0, window.innerHeight)')
         await browser.close()
         return self.results, False, {}
 
