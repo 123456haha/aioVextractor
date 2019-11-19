@@ -25,12 +25,14 @@ from aioVextractor.extractor.base_extractor import (
 class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://www\.bilibili\.com/video/av\d{4,9}",
+        "http[s]?://m\.bilibili\.com/video/av\d{4,9}",
         "http[s]?://b23\.tv/av\d{1,10}",
     ]
 
     TEST_CASE = [
         "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4",
         "https://b23.tv/av68290345",
+        "https://m.bilibili.com/video/av75755418?spm_id_from=333.400.b_766964656f5f30.1",
     ]
 
     def __init__(self, *args, **kwargs):
