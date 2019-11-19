@@ -22,6 +22,7 @@ import traceback
 from urllib.parse import (
     urlparse,
     parse_qs,
+    unquote,
 )
 from abc import (
     ABCMeta,
@@ -44,7 +45,7 @@ async def validate(func, extractor_instace, args, kwargs):
     urls = []
     ## match url form webpage_url
     for regex in target_website:
-        urls += re.findall(regex, webpage_url)
+        urls += re.findall(regex, unquote(webpage_url))
 
     if not urls:
         print("There has no suitable url match!")  ## can only occurs in testing
