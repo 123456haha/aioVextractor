@@ -21,10 +21,12 @@ else:
 class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://www\.pinterest\.com/pin/\d{15,23}",
+        "http[s]?://www\.pinterest\.com/pin/.*",
     ]
 
     TEST_CASE = [
         "https://www.pinterest.com/pin/457256168416688731",
+        "https://www.pinterest.com/pin/ARcZcYFNPiz50mXPWWpHt9G6aU2goEVhi-Jvtl8A2z-ptXYirv0z8bM/",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -80,5 +82,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)
