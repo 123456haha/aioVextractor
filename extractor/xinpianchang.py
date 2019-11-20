@@ -6,6 +6,7 @@
 import jmespath
 from scrapy.selector import Selector
 import emoji
+import re
 import dateutil.parser
 import traceback
 import os
@@ -19,10 +20,12 @@ from aioVextractor.extractor.tool_set import (
 class Extractor(ToolSet):
     target_website = [
         "http[s]?://www\.xinpianchang\.com/a\d{7,10}",
+        "http[s]?://h5\.xinpianchang\.com/article/index.html\?id=\d{7,10}",
     ]
 
     TEST_CASE = [
         "https://www.xinpianchang.com/a10475334?from=ArticleList",
+        "https://h5.xinpianchang.com/article/index.html?id=10595587",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -32,6 +35,10 @@ class Extractor(ToolSet):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
+        if re.match("http[s]?://h5\.xinpianchang\.com/article/index.html\?id=\d{7,10}", webpage_url):
+            vid = re.findall('id=(\d{7,10})', webpage_url)[0]
+            webpage_url = f"https://www.xinpianchang.com/a{vid}?from=ArticleList"
+
         headers = self.general_headers(user_agent=self.random_ua())
         params = {'from': 'ArticleList'}
         response_text = await self.request(
@@ -138,5 +145,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)
