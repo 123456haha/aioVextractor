@@ -35,6 +35,7 @@ class Extractor(BaseExtractor):
         "http[s]?://m\.toutiaocdn\.net/a\d{10,36}",
         "http[s]?://m\.toutiaocdn\.com/i\d{10,36}",
         "http[s]?://m\.toutiaoimg\.com/group/\d{10,36}",
+        "http[s]?://m\.ixigua\.com/i\d{10,36}",
     ]
 
     TEST_CASE = [
@@ -45,8 +46,9 @@ class Extractor(BaseExtractor):
         "https://m.toutiaocdn.com/i6752291249207640590/?app=news_article&timestamp=1572147617&req_id=201910271140170100140481310BDEA279&group_id=6752291249207640590&wxshare_count=20&tt_from=weixin_moments&utm_source=weixin_moments&utm_medium=toutiao_android&utm_campaign=client_share&share_type=original&pbid=6751721020236875277&from=singlemessage&isappinstalled=0",
         "https://m.toutiaoimg.com/group/6739755269032509966/?app=news_article_lite&timestamp=1572244151&req_id=20191028142911010011048231030168A8&group_id=6739755269032509966",
         "https://m.toutiaoimg.com/group/6758768712024588295/?app=news_article&timestamp=1573886933",
-        "来看看@光头强捡到冒菜的视频https://m.toutiaoimg.cn/group/6760527483755449611/?app=news_article&timestamp=1574258101",
-        # "https://m.toutiaocdn.net/a6761067781120066062/?app=news_article&is_hit_share_recommend=0",
+        # "来看看@光头强捡到冒菜的视频https://m.toutiaoimg.cn/group/6760527483755449611/?app=news_article&timestamp=1574258101",
+        "https://m.toutiaocdn.net/a6761067781120066062/?app=news_article&is_hit_share_recommend=0",
+        "https://m.ixigua.com/i6761248990626316811/?channel=video",
     ]
 
     def __init__(self, *args, **kwargs):
