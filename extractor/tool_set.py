@@ -111,9 +111,9 @@ def validate_(result, check_field):
         if signi_level == config.FIELD_SIGNI_LEVEL["else"]:
             output[field] = result.get(field, field_info["default_value"])
         elif signi_level == config.FIELD_SIGNI_LEVEL["must"]:
-            try:
+            if result.get(field, None):
                 output[field] = result[field]
-            except KeyError:
+            else:
                 print(f"You should have specify field `{field}`")
                 output = False
                 break
