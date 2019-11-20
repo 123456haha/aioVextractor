@@ -19,6 +19,7 @@ class Extractor(ToolSet):
     target_website = [
         "http[s]?://v\.youku\.com/v_show/id_\w{10,36}",
         "http[s]?://player\.youku\.com/embed/\w{10,36}",
+        "http[s]?://m\.youku\.com/video/id_\w{10,36}",
     ]
 
     TEST_CASE = [
@@ -31,6 +32,7 @@ class Extractor(ToolSet):
         "https://v.youku.com/v_show/id_XNDI0ODk0ODUzNg==.html?spm=a2ha1.12675304.m_2556_c_8261.d_1&s=de83005bc0ba4a9284b3&scm=20140719.manual.2556.show_de83005bc0ba4a9284b3",
         "https://v.youku.com/v_show/id_XNDEyNDE5NzQ1Mg==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5NzQ1Mg%3D%3D",
         'http://player.youku.com/embed/XNDA3MjU1MzY3Ng==',
+        'https://m.youku.com/video/id_XNDQ0MTY5MDc0OA==.html?%3Fspm=a2hww.12518357.yknav.14&spm=a2hww.12630586.entDrawer0.i0',
     ]
 
     def __init__(self, *args, **kwargs):
@@ -216,5 +218,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)
