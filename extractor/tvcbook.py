@@ -57,7 +57,7 @@ class Extractor(BaseExtractor):
         result['height'] = 9  # videoitem.get('title','')
         result['play_addr'] = f"https://api.tvcbook.com/video/tvindownload/{vid}"
         result['author'] = jmespath.search("user.name", data)
-        result['cover'] = jmespath.search("cover_url.name", data)
+        result['cover'] = jmespath.search("cover_url", data)
         result['desc'] = jmespath.search("introduction", data)
         result['upload_ts'] = jmespath.search("created_at", data)
         result['from'] = self.from_
