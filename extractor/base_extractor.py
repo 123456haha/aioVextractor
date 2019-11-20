@@ -204,7 +204,10 @@ class BaseExtractor(ToolSet, metaclass=ABCMeta):
             session=session,
             headers=self.general_headers(user_agent=self.random_ua())
         )
-        selector = Selector(text=webpage_content)
+        try:
+            selector = Selector(text=webpage_content)
+        except TypeError:
+            return False
         iframe_src = selector.css('iframe::attr(src)').extract()
         with futures.ThreadPoolExecutor(max_workers=min(10, os.cpu_count())) as executor:  ## set up processes
             executor.submit(wrapper)
