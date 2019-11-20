@@ -20,6 +20,7 @@ class Extractor(ToolSet):
         "http[s]?://v\.youku\.com/v_show/id_\w{10,36}",
         "http[s]?://player\.youku\.com/embed/\w{10,36}",
         "http[s]?://m\.youku\.com/video/id_\w{10,36}",
+        "http[s]?://m\.youku\.com/alipay_video/id_\w{10,36}",
     ]
 
     TEST_CASE = [
@@ -33,6 +34,7 @@ class Extractor(ToolSet):
         "https://v.youku.com/v_show/id_XNDEyNDE5NzQ1Mg==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5NzQ1Mg%3D%3D",
         'http://player.youku.com/embed/XNDA3MjU1MzY3Ng==',
         'https://m.youku.com/video/id_XNDQ0MTY5MDc0OA==.html?%3Fspm=a2hww.12518357.yknav.14&spm=a2hww.12630586.entDrawer0.i0',
+        'https://m.youku.com/alipay_video/id_XNDQ0MTg2MDk1Ng==.html?spm=a2hww.12630586.entDrawer2.1',
     ]
 
     def __init__(self, *args, **kwargs):
