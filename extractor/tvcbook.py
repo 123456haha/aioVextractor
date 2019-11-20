@@ -14,10 +14,12 @@ from aioVextractor.extractor.base_extractor import (
 class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://www\.tvcbook\.com/showVideo\.html\?.*?vid=[\d]{1,10}",
+        "http[s]?://www\.tvcbook\.com/showVideo_mobile\.html\?.*?vid=[\d]{1,10}",
     ]
 
     TEST_CASE = [
         "https://www.tvcbook.com/showVideo.html?vid=544444",
+        "https://www.tvcbook.com/showVideo_mobile.html?vid=788239&code=f856T3YAgx7kcyaCyQ5jUIjkGKmh8-67TOvL0DQm1YjDkLBgsg",
     ]
 
     def __init__(self, *args, **kwargs):
