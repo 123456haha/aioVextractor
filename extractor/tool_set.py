@@ -19,6 +19,8 @@ from os.path import splitext
 import html
 import time
 import traceback
+from pyppeteer import launch
+from scrapy import Selector
 from urllib.parse import (
     urlparse,
     parse_qs,
@@ -354,6 +356,16 @@ class BasicToolSet:
                     return await response.text()
                 elif response_type == "json":
                     return await response.json()
+
+    @staticmethod
+    async def launch_browers(**kwargs):
+        browser = await launch(args=['--no-sandbox'], **kwargs)
+        return browser
+
+    @staticmethod
+    def Selector(**kwargs):
+        selector = Selector(**kwargs)
+        return selector
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
