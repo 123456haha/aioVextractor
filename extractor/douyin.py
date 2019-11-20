@@ -4,11 +4,7 @@
 # IDE: PyCharm
 
 import jmespath
-# from urllib.parse import urlparse
-from pyppeteer import launch
-# import asyncio
 import re
-from scrapy import Selector
 from aioVextractor.extractor.base_extractor import (
     BaseExtractor,
     validate,
@@ -38,8 +34,8 @@ class Extractor(BaseExtractor):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
-
-        browser = await launch(args=['--no-sandbox'])
+        browser = await self.launch_browers()
+        # browser = await launch(args=['--no-sandbox'])
         page = await browser.newPage()
         await page.goto(webpage_url)
         response_text = await page.content()
@@ -126,7 +122,7 @@ class Extractor(BaseExtractor):
             return result
 
     def extract_page(self, response, page):
-        selector = Selector(text=response)
+        selector = self.Selector(text=response)
         result = dict()
         result['from'] = self.from_
         result['author'] = selector.css(".detail .user-info .name::text").extract_first().lstrip("@")
