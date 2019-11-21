@@ -12,6 +12,7 @@ from scrapy import Selector
 import jmespath
 import execjs
 import platform
+import os
 from aioVextractor.extractor.base_extractor import (
     BaseExtractor,
     validate,
@@ -83,7 +84,8 @@ class Extractor(BaseExtractor):
             headers=headers
         )
         if re.match("http[s]?://m\.toutiaocdn\.com/i\d{10,36}", webpage_url) or re.match("http[s]?://m\.toutiao\.com/i\d{10,36}", webpage_url):
-            AS, CP, _signature = self.get_token()
+            js_file_path = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "special/generate_signature.js")
+            AS, CP, _signature = self.get_token(path=js_file_path)
             i = re.findall("i(\d{10,36})", webpage_url)[0]
             api = f'https://m.toutiao.com/i{i}/info/?_signature={_signature}&i={i}'
             response = await self.request(
@@ -183,6 +185,7 @@ class Extractor(BaseExtractor):
         获取头条url中的各种token
         :return: as, cp, _signature
         """
+
         with open(path, "r") as js_file:
             lines = js_file.readlines()
             js_code = ""
