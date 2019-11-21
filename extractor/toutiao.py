@@ -36,6 +36,7 @@ class Extractor(BaseExtractor):
         "http[s]?://m\.toutiaocdn\.com/i\d{10,36}",
         "http[s]?://m\.toutiaoimg\.com/group/\d{10,36}",
         "http[s]?://m\.ixigua\.com/i\d{10,36}",
+        "http[s]?://m\.toutiao\.com/i\d{10,36}",
     ]
 
     TEST_CASE = [
@@ -49,6 +50,7 @@ class Extractor(BaseExtractor):
         # "来看看@光头强捡到冒菜的视频https://m.toutiaoimg.cn/group/6760527483755449611/?app=news_article&timestamp=1574258101",
         "https://m.toutiaocdn.net/a6761067781120066062/?app=news_article&is_hit_share_recommend=0",
         "https://m.ixigua.com/i6761248990626316811/?channel=video",
+        "https://m.toutiao.com/i6744316180397294094/?channel=video",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -80,9 +82,9 @@ class Extractor(BaseExtractor):
             session=session,
             headers=headers
         )
-        if re.match("http[s]?://m\.toutiaocdn\.com/i\d{10,36}", webpage_url):
+        if re.match("http[s]?://m\.toutiaocdn\.com/i\d{10,36}", webpage_url) or re.match("http[s]?://m\.toutiao\.com/i\d{10,36}", webpage_url):
             AS, CP, _signature = self.get_token()
-            i = re.findall("http[s]?://m\.toutiaocdn\.com/i(\d{10,36})", webpage_url)[0]
+            i = re.findall("i(\d{10,36})", webpage_url)[0]
             api = f'https://m.toutiao.com/i{i}/info/?_signature={_signature}&i={i}'
             response = await self.request(
                 url=api,
