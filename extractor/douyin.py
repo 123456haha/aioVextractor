@@ -5,6 +5,7 @@
 
 import jmespath
 import re
+import requests
 from aioVextractor.extractor.base_extractor import (
     BaseExtractor,
     validate,
@@ -127,7 +128,7 @@ class Extractor(BaseExtractor):
         result['from'] = self.from_
         result['author'] = selector.css(".detail .user-info .name::text").extract_first().lstrip("@")
         result['author_avatar'] = selector.css(".detail .user-info img::attr(src)").extract_first()
-        result['play_addr'] = selector.css("script").re_first('playAddr: "([\s|\S]*?)"').replace("playwm", "play")
+        result['play_addr'] = self.redirect_play_addr(selector.css("script").re_first('playAddr: "([\s|\S]*?)"').replace("playwm", "play"))
         result['title'] = selector.css(".desc::text").extract_first()
         result['vid'] = re.findall("\d{15,21}", page.url)[0]
         result['cover'] =  selector.css("script").re_first('cover: "([\s|\S]*?)"')
@@ -136,6 +137,23 @@ class Extractor(BaseExtractor):
         result['height'] = selector.css("script").re_first('videoHeight: ([\s|\S]*?),')
         result['width'] = selector.css("script").re_first('videoWidth: ([\s|\S]*?),')
         return result
+
+    @staticmethod
+    def redirect_play_addr(play_addr):
+        headers = {
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
+        }
+        response = requests.get(play_addr,
+                                allow_redirects=False,
+                                # headers=self.general_headers(user_agent=self.random_ua())
+                                headers=headers
+                                )
+        return response.headers['Location']
 
 if __name__ == '__main__':
     from pprint import pprint
