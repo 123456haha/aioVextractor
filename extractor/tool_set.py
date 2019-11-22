@@ -359,7 +359,11 @@ class BasicToolSet:
 
     @staticmethod
     async def launch_browers(**kwargs):
-        browser = await launch(args=['--no-sandbox'], **kwargs)
+        browser = await launch(
+            # headless=False,
+            args=['--no-sandbox'],
+            **kwargs
+        )
         return browser
 
     @staticmethod
