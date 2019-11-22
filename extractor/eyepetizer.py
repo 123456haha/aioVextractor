@@ -19,6 +19,7 @@ class Extractor(BaseExtractor):
         "http[s]?://www\.eyepetizer\.net/detail\.html\?vid=\d{3,8}",
         "http[s]?://www\.eyepetizer\.net/detail\.html\?.*?vid=\d{3,8}",
         "www\.eyepetizer\.net/detail\.html\?vid=\d{3,8}",
+        "http[s]?://www\.kaiyanapp\.com/detail\.html\?.*?vid=\d{3,8}",
     ]
 
     TEST_CASE = [
@@ -26,6 +27,7 @@ class Extractor(BaseExtractor):
         "https://www.eyepetizer.net/detail.html?vc=6401&uid=300826523&utm_medium=share&vid=177155&utm_source=wechat-moments&udid=7e4f6c3caf2a388c48cb4817fba24bea71e738c9&vn=5.9.1&resourceType=video&deviceModel=iPhone&utm_campaign=routine",
         "https://www.eyepetizer.net/detail.html?vc=6401&uid=300826523&utm_medium=share&vid=177155&utm_source=wechat-moments&udid=7e4f6c3caf2a388c48cb4817fba24bea71e738c9&vn=5.9.1&resourceType=video&deviceModel=iPhone&utm_campaign=routine",
         "https://www.eyepetizer.net/detail.html?utm_source=wechat-moments&resourceType=video&vc=6509&utm_campaign=routine&uid=0&deviceModel=iPhone&udid=751761748642f6b8e6ce0f0d588921033ab1883c&vn=5.10.0&vid=178112",
+        "https://www.kaiyanapp.com/detail.html?vid=179056&utm_source=eyepetizer-homepage&utm_medium=internal&utm_campaign=routine",
     ]
 
     def __init__(self, *args, **kwargs):
