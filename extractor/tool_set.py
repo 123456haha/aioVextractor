@@ -350,12 +350,16 @@ class BasicToolSet:
                     return await response.text()
                 elif response_type == "json":
                     return await response.json()
+                elif response_type == "raw":
+                    return response
         elif method == "post":
             async with session.post(url, **kwargs) as response:
                 if response_type == "text":
                     return await response.text()
                 elif response_type == "json":
                     return await response.json()
+                elif response_type == "raw":
+                    return response
 
     @staticmethod
     async def launch_browers(**kwargs):
