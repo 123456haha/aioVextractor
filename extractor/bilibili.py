@@ -27,12 +27,14 @@ class Extractor(BaseExtractor):
         "http[s]?://www\.bilibili\.com/video/av\d{4,9}",
         "http[s]?://m\.bilibili\.com/video/av\d{4,9}",
         "http[s]?://b23\.tv/av\d{1,10}",
+        "http[s]?://t\.cn/\w{1,10}",
     ]
 
     TEST_CASE = [
         "https://www.bilibili.com/video/av5546345?spm_id_from=333.334.b_62696c695f646f756761.4",
         "https://b23.tv/av68290345",
         "https://m.bilibili.com/video/av75755418?spm_id_from=333.400.b_766964656f5f30.1",
+        "http://t.cn/R3LCQFl",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -42,22 +44,28 @@ class Extractor(BaseExtractor):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
-        try:
-            result = {'vid': re.findall("/av(\d{5,20})", webpage_url)[0]}
-            gather_results = await asyncio.gather(*[
-                self.extract_info(webpage_url=webpage_url),
-                self.extract_video(result=result, session=session)
-            ])
-            if all(gather_results):
-                if isinstance(gather_results[0], list):
-                    results = [self.merge_dicts(ele, gather_results[1]) for ele in gather_results[0]]
-                    return results
-                else:
-                    return self.merge_dicts(*gather_results)
+        if re.match("http[s]?://t\.cn/\w{1,10}", webpage_url):
+            response = await self.request(
+                url=webpage_url,
+                session=session,
+                headers=self.general_headers(user_agent=self.random_ua()),
+                allow_redirects=False,
+                response_type="raw",
+            )
+            webpage_url = response.headers['Location']
+
+        result = {'vid': re.findall("/av(\d{5,20})", webpage_url)[0]}
+        gather_results = await asyncio.gather(*[
+            self.extract_info(webpage_url=webpage_url),
+            self.extract_video(result=result, session=session)
+        ])
+        if all(gather_results):
+            if isinstance(gather_results[0], list):
+                results = [self.merge_dicts(ele, gather_results[1]) for ele in gather_results[0]]
+                return results
             else:
-                return False
-        except:
-            traceback.print_exc()
+                return self.merge_dicts(*gather_results)
+        else:
             return False
 
     @RequestRetry
