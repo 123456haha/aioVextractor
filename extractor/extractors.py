@@ -36,6 +36,7 @@ from aioVextractor.extractor.vimeo import Extractor as vimeoIE
 from aioVextractor.extractor.vmovier import Extractor as vmovierIE
 from aioVextractor.extractor.weibo import Extractor as weiboIE
 from aioVextractor.extractor.weixin import Extractor as weixinIE
+from aioVextractor.extractor.xiaohongshu import Extractor as xiaohongshuIE
 from aioVextractor.extractor.xinpianchang import Extractor as xinpianchangIE
 from aioVextractor.extractor.youku import Extractor as youkuIE
 from aioVextractor.extractor.youtube import Extractor as youtubeIE
