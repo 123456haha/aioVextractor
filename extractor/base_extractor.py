@@ -11,6 +11,7 @@ import traceback
 import jmespath
 import time
 import os
+from aioVextractor import config
 from concurrent import futures  ## lib for multiprocessing and threading
 from aioVextractor.extractor.tencent import Extractor as tencentIE
 from aioVextractor.extractor.youku import Extractor as youkuIE
@@ -80,6 +81,7 @@ class BaseExtractor(ToolSet, metaclass=ABCMeta):
             "youtube_include_dash_manifest": False,
             'simulate': True,
             'user-agent': self.general_headers(user_agent=self.random_ua()),
+            "proxy": config.proxy,
         }
         try:
             with youtube_dl.YoutubeDL(args) as ydl:
