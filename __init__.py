@@ -31,4 +31,5 @@ from aioVextractor.api import (
     hybrid_worker,
     breakdown,
     extract,
+    set_up_proxy,
 )
