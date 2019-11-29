@@ -49,16 +49,15 @@ class Extractor(BaseExtractor):
             self.extract_info(webpage_url=webpage_url),
             self.extract_author(webpage_url=webpage_url, session=session)
         ])
-        if all(gather_results):
-            if isinstance(gather_results[0], list):
-                results = [self.merge_dicts(ele, gather_results[1]) for ele in gather_results[0]]
-                return results
-            else:
-                return self.merge_dicts(*gather_results)
+        if isinstance(gather_results[0], list):
+            results = [self.merge_dicts(ele, gather_results[1]) for ele in gather_results[0]]
+            return results
         else:
-            return False
+            return self.merge_dicts(*gather_results)
 
-    @RequestRetry
+    @RequestRetry(
+        default_other_exception_return={}
+    )
     async def extract_author(self, webpage_url, session):
         headers = {'authority': 'www.youtube.com',
                    'upgrade-insecure-requests': '1',
@@ -97,7 +96,6 @@ class Extractor(BaseExtractor):
         author_avatar = 'http:' + author_avatar if (author_avatar and author_avatar.startswith('//')) else author_avatar
         return {
             "author_avatar": author_avatar,
-            'from': self.from_
         }
 
 
