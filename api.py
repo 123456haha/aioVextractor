@@ -76,7 +76,8 @@ def set_up_proxy(proxy):
     Run this before you set up aiohttp.ClientSession(trust_env=True) if you would like to use proxy
     :param proxy: format like "http://ip_addr:port"
     """
-    os.environ['HTTP_PROXY'] = proxy
+    if proxy:
+        os.environ['HTTP_PROXY'] = proxy
 
 if __name__ == '__main__':
     import aiohttp
