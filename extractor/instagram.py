@@ -53,10 +53,10 @@ class Extractor(BaseExtractor):
             item['upload_ts'] = jmespath.search("taken_at_timestamp", shortcode_media)
             item['title'] = jmespath.search("title", shortcode_media)
             item['vid'] = jmespath.search("shortcode", shortcode_media)
-            item['from'] = self.from_
+            # item['from'] = self.from_
             item['like_count'] = jmespath.search("edge_media_preview_like.count", shortcode_media)
             item['comment_count'] = jmespath.search("edge_media_to_parent_comment.count", shortcode_media)
-            item['webpage_url'] = webpage_url
+            # item['webpage_url'] = webpage_url
             item['cover'] = jmespath.search("display_url", shortcode_media)
             item['width'] = jmespath.search("dimensions.width", shortcode_media)
             item['height'] = jmespath.search("dimensions.height", shortcode_media)

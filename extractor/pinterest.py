@@ -57,9 +57,9 @@ class Extractor(BaseExtractor):
         except:
             duration = None
         result = {
-            "from": self.from_,
+            # "from": self.from_,
             "vid": video['id'],
-            "webpage_url": f"https://www.pinterest.com/pin/{video['id']}",
+            # "webpage_url": f"https://www.pinterest.com/pin/{video['id']}",
             "playlist_url": webpage_url,
             "cover": jmespath.search("max_by(images.*, &width).url", video),
             "title": jmespath.search("title", video),

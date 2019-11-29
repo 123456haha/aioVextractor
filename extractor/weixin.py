@@ -25,7 +25,7 @@ class Extractor(BaseExtractor):
         "http://mp.weixin.qq.com/s/2Y5rEq4HXtOAcHtYBNeebQ",
         # "https://mp.weixin.qq.com/s/Ld6tw7ZjzFcUkPXa79HH5Q",
         # "https://mp.weixin.qq.com/s/6lDIjP799J2b07RHoNil1A",
-        # "https://mp.weixin.qq.com/s/yjzmRFDEwJgXDfGaK_ooUQ",
+        "https://mp.weixin.qq.com/s/yjzmRFDEwJgXDfGaK_ooUQ",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -68,8 +68,8 @@ class Extractor(BaseExtractor):
         for result in results:
             for ele in result:
                 if ele:
-                    ele['from'] = self.from_
-                    ele['webpage_url'] = webpage_url
+                    # ele['from'] = self.from_
+                    # ele['webpage_url'] = webpage_url
                     outputs.append(ele)
         self.results += outputs
 
@@ -85,7 +85,7 @@ class Extractor(BaseExtractor):
         cover_list = list(map(lambda x:unquote(x), selector.css(".video_iframe::attr(data-cover)").extract()))
         for num, ele in enumerate(self.result):
             ele["cover"] = cover_list[num]
-            ele["webpage_url"] = webpage_url
+            # ele["webpage_url"] = webpage_url
         self.results += self.result
         # await page.waitForResponse(lambda response: "mp.weixin.qq.com/mp/videoplayer" in response.url)
         # await page.waitForRequest(lambda response: "mp.weixin.qq.com/mp/videoplayer" in response.url, timeout=3)
@@ -107,7 +107,7 @@ class Extractor(BaseExtractor):
                 '}', response)
         result['duration'] = result['duration']//1000 if result['duration'] else None
         result['vid'] =  result['play_addr'].split("/")[-1].split(".")[0]
-        result['from'] =  self.from_
+        # result['from'] =  self.from_
         self.result.append(result)
 
 

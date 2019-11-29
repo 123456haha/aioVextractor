@@ -103,16 +103,16 @@ class Extractor(BaseExtractor):
                 SSR_HYDRATED_DATA = json.loads(selector.css("#SSR_HYDRATED_DATA::text").extract_first())
             except TypeError:
                 raise ServerConnectionError ## let the RequestRetry work the rest
-            result = self.extract(response=SSR_HYDRATED_DATA, webpage_url=webpage_url)
+            result = self.extract(response=SSR_HYDRATED_DATA)
             vid = re.findall('"vid"\s?:\s?"(\w{5,40})"', html)[0]
-        play_addr = await self.cal_play_addr(vid=vid, webpage_url=webpage_url, session=session)
+        play_addr = await self.cal_play_addr(vid=vid, session=session)
         return self.merge_dicts(result, play_addr)
 
     @staticmethod
     def right_shift(val, n):
         return val >> n if val >= 0 else (val + 0x100000000) >> n
 
-    async def cal_play_addr(self, vid, webpage_url, session):
+    async def cal_play_addr(self, vid, session):
         api = f'http://i.snssdk.com/video/urls/v/1/toutiao/mp4/{vid}'
         r = str(random.random())[2:]
         s = self.right_shift(binascii.crc32(f"{urlparse(api).path}?r={r}".encode()), 0)
@@ -138,11 +138,12 @@ class Extractor(BaseExtractor):
             "vid": jmespath.search("data.video_id", video_json),
             "duration": duration,
             "cover": jmespath.search("data.poster_url", video_json),
-            "from": self.from_,
-            "webpage_url": webpage_url,
+            # "from": self.from_,
+            # "webpage_url": webpage_url,
         }
 
-    def extract(self, response, webpage_url):
+    @staticmethod
+    def extract(response):
         video = jmespath.search('Projection.video', response)
         user_info = jmespath.search('Projection.video.user_info', response)
         result = {
@@ -157,12 +158,13 @@ class Extractor(BaseExtractor):
             "vid": jmespath.search("vid", video),
             "title": jmespath.search("title", video),
             "cover": "http://p3.pstatp.com/large/" + jmespath.search("poster_uri", video),
-            "from": self.from_,
-            "webpage_url": webpage_url,
+            # "from": self.from_,
+            # "webpage_url": webpage_url,
         }
         return result
 
-    def extract_ipage(self, response):
+    @staticmethod
+    def extract_ipage(response):
         data = jmespath.search("data", response)
         result = {
             "author": jmespath.search("detail_source", data),
@@ -171,11 +173,11 @@ class Extractor(BaseExtractor):
             "upload_ts": jmespath.search("publish_time", data),
             "view_count": jmespath.search("video_play_count", data),
             "title": jmespath.search("title", data),
-            "webpage_url": jmespath.search("url", data),
+            # "webpage_url": jmespath.search("url", data),
             "comment_count": jmespath.search("comment_count", data),
             "cover": jmespath.search("poster_url", data),
             "vid": jmespath.search("video_id", data),
-            "from": self.from_,
+            # "from": self.from_,
         }
         return result
 

@@ -36,7 +36,7 @@ class Extractor(BaseExtractor):
             return False
         else:
             result = await asyncio.gather(self.extract_playLink(vid=vid, session=session),
-                                          self.extract(vid=vid, session=session, webpage_url=webpage_url))
+                                          self.extract(vid=vid, session=session))
             if all(result):
                 result_playLink, result_info = result
                 return {**result_playLink, **result_info}
@@ -68,7 +68,7 @@ class Extractor(BaseExtractor):
             return {'vid': vid, 'play_addr': ResJson['data']['playLink']}
 
     @RequestRetry
-    async def extract(self, vid, session, webpage_url):
+    async def extract(self, vid, session):
         headers = {'Origin': 'https://mobile.rr.tv',
                    'Accept-Encoding': 'gzip, deflate, br',
                    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
@@ -88,8 +88,8 @@ class Extractor(BaseExtractor):
             response_type="json"
         )
         result = dict()
-        result['webpage_url'] = webpage_url
-        result['from'] = self.from_
+        # result['webpage_url'] = webpage_url
+        # result['from'] = self.from_
         videoDetailView = jmespath.search('data.videoDetailView', VideoDetail)
         result['author'] = jmespath.search('author.nickName', videoDetailView)
         result['avatar'] = jmespath.search('author.headImgUrl', videoDetailView)

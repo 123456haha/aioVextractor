@@ -66,7 +66,7 @@ class Extractor(ToolSet):
             traceback.print_exc()
             return False
         vid = selector.css('body script').re_first('vid: "([\s|\S]*?)",')
-        result['from'] = self.from_
+        # result['from'] = self.from_
         result['vid'] = vid
         try:
             result['author'] = emoji.demojize(selector.css('.creator-info .name::text').extract_first().strip())
@@ -134,7 +134,7 @@ class Extractor(ToolSet):
         result = {
             "play_addr": play_addr,
             "duration": int(int(duration) / 1000) if duration else duration,
-            "webpage_url": referer,
+            # "webpage_url": referer,
             "width": width,
             "height": height,
         }

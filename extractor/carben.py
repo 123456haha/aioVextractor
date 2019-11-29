@@ -46,8 +46,6 @@ class Extractor(BaseExtractor):
         else:
             author_url=None
         result = {
-            "from": self.from_,
-            "webpage_url": webpage_url,
             "cover": video['cover'],
             "vid": video['id'],
             "description": jmespath.search("description", video),

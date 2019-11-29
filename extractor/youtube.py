@@ -4,7 +4,6 @@
 # IDE: PyCharm
 
 import jmespath
-import traceback
 from scrapy import Selector
 import asyncio
 import platform

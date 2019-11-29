@@ -57,11 +57,12 @@ class Extractor(BaseExtractor):
                 params=params,
                 response_type="json"
             )
-            return {**self.extract(response_json), **{"webpage_url": webpage_url}}
+            return self.extract(response_json)
 
-    def extract(self, response_json):
+    @staticmethod
+    def extract(response_json):
         result = dict()
-        result['from'] = self.from_
+        # result['from'] = self.from_
         result['title'] = jmespath.search('title', response_json)
         result['author'] = jmespath.search('author.name', response_json)
         result['author_description'] = jmespath.search('author.description', response_json)

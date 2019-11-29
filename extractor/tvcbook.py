@@ -44,10 +44,11 @@ class Extractor(BaseExtractor):
             headers=headers,
             response_type="json"
         )
-        video = await self.extract_video_info(vid=vid, response=response, webpage_url=webpage_url)
+        video = await self.extract_video_info(vid=vid, response=response)
         return video
 
-    async def extract_video_info(self, vid, response, webpage_url):
+    @staticmethod
+    async def extract_video_info(vid, response):
         result = dict()
         data = jmespath.search("data.data", response)
         result['title'] = jmespath.search("title", data)
@@ -60,8 +61,8 @@ class Extractor(BaseExtractor):
         result['cover'] = jmespath.search("cover_url", data)
         result['desc'] = jmespath.search("introduction", data)
         result['upload_ts'] = jmespath.search("created_at", data)
-        result['from'] = self.from_
-        result['webpage_url'] = webpage_url
+        # result['from'] = self.from_
+        # result['webpage_url'] = webpage_url
         return result
 
 

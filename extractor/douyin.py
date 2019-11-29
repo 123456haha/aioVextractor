@@ -78,7 +78,8 @@ class Extractor(BaseExtractor):
 
         return jmespath.search('aweme_detail', response)
 
-    def extract(self, response_json):
+    @staticmethod
+    def extract(response_json):
         """
         extract all info from response_json
         """
@@ -86,7 +87,7 @@ class Extractor(BaseExtractor):
             return False
         else:
             result = dict()
-            result['from'] = self.from_
+            # result['from'] = self.from_
             result['author'] = jmespath.search('author.nickname', response_json)
             result['author_avatar'] = jmespath.search('author.avatar_larger.url_list[0]', response_json)
             result['author_description'] = jmespath.search('author.signature', response_json)
@@ -111,7 +112,7 @@ class Extractor(BaseExtractor):
             result['language'] = jmespath.search('desc_language', response_json)
             result['region'] = jmespath.search('region', response_json)
             result['upload_ts'] = jmespath.search('create_time', response_json)
-            result['webpage_url'] = jmespath.search('share_url', response_json)
+            # result['webpage_url'] = jmespath.search('share_url', response_json)
             result['comment_count'] = jmespath.search('statistics.comment_count', response_json)
             result['like_count'] = jmespath.search('statistics.digg_count', response_json)
             result['download_count'] = jmespath.search('statistics.download_count', response_json)
@@ -126,7 +127,7 @@ class Extractor(BaseExtractor):
     def extract_page(self, response, page):
         selector = self.Selector(text=response)
         result = dict()
-        result['from'] = self.from_
+        # result['from'] = self.from_
         result['author'] = selector.css(".detail .user-info .name::text").extract_first().lstrip("@")
         result['author_avatar'] = selector.css(".detail .user-info img::attr(src)").extract_first()
         result['play_addr'] = self.redirect_play_addr(selector.css("script").re_first('playAddr: "([\s|\S]*?)"').replace("playwm", "play"))
@@ -134,7 +135,7 @@ class Extractor(BaseExtractor):
         result['vid'] = re.findall("\d{15,21}", page.url)[0]
         result['cover'] =  selector.css("script").re_first('cover: "([\s|\S]*?)"')
         result['tag'] = selector.css(".inner::text").extract()
-        result['webpage_url'] = page.url
+        # result['webpage_url'] = page.url
         result['height'] = selector.css("script").re_first('videoHeight: ([\s|\S]*?),')
         result['width'] = selector.css("script").re_first('videoWidth: ([\s|\S]*?),')
         return result

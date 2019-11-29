@@ -74,15 +74,15 @@ class Extractor(ToolSet):
                 self.extract_webpage(url=webpage_url, session=session)
             ])
             result = self.merge_dicts(
-                {"webpage_url": webpage_url,
-                 "vid": vid,
-                 "downloader": "ytd",
-                 },
+                {
+                    # "webpage_url": webpage_url,
+                    "vid": vid,
+                    "downloader": "ytd",
+                },
                 *gather_results[:2]
             )
             result['category'] += gather_results[2]['category']
             return {**gather_results[2], **result}
-
 
     @RequestRetry(default_exception_return={},
                   default_other_exception_return={})
@@ -138,7 +138,7 @@ class Extractor(ToolSet):
             # item['cdn_url'] = jmespath.search('data.stream[-1].segs[].cdn_url', videodata)
             play_addr = jmespath.search('data.stream[-1].segs[].cdn_url', videodata)[0]
         result = {
-            "from": self.from_,
+            # "from": self.from_,
             "duration": jmespath.search('video.seconds', data),
             "cover": jmespath.search('video.logo', data),
             "author": jmespath.search('uploader.username', data),
@@ -154,7 +154,6 @@ class Extractor(ToolSet):
             "play_addr": play_addr,
         }
         return result
-
 
     @RequestRetry(default_exception_return={},
                   default_other_exception_return={})
@@ -179,7 +178,6 @@ class Extractor(ToolSet):
         )
         response_json = json.loads(response_text[len('  n_commentList('):-1])
         return {'comment_count': jmespath.search('data.totalSize', response_json)}
-
 
     async def extract_webpage(self, url, session):
 
@@ -215,6 +213,7 @@ class Extractor(ToolSet):
                     return {'category': category, 'rating': rating, "tag": tag, "description": description}
             else:
                 return {'category': category, "tag": tag, "description": description}
+
 
 if __name__ == '__main__':
     from pprint import pprint

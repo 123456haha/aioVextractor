@@ -59,8 +59,8 @@ class Extractor(BaseExtractor):
                 # async with session.get('http://www.tvcf.co.kr/YCf/V.asp', headers=headers, params=params) as response:
                 #     response_text = await response.text(encoding='utf8', errors='ignore')
                 result = dict()
-                result['webpage_url'] = webpage_url
-                result['from'] = self.from_
+                # result['webpage_url'] = webpage_url
+                # result['from'] = self.from_
                 result = await self.extract_old(response_text, code, result=result)
                 return result
         else:  ## new version https://v.tvcf.co.kr/728764
@@ -88,11 +88,11 @@ class Extractor(BaseExtractor):
                 # print(f"response_text: {response_text}")
                 r_code_json = json.loads(response_text)
                 code = jmespath.search('video.code', r_code_json)
-                result['from'] = self.from_
+                # result['from'] = self.from_
                 result['duration'] = jmespath.search('video.duration', r_code_json)
                 result['width'] = jmespath.search('video.width', r_code_json)
                 result['height'] = jmespath.search('video.height', r_code_json)
-                result['webpage_url'] = webpage_url
+                # result['webpage_url'] = webpage_url
                 result['vid'] = code
                 result['cover'] = jmespath.search('video.cut', r_code_json)
                 result['title'] = jmespath.search('video.title', r_code_json)

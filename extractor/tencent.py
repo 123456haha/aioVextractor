@@ -83,7 +83,7 @@ class Extractor(ToolSet):
             except (TypeError, IndexError):
                 vid = re.findall('(\w{11})\.html', text)[0]
         selector = Selector(text=text)
-        result, commentId = self.extract(response=text, webpage_url=webpage_url, vid=vid)
+        result, commentId = self.extract(response=text, vid=vid)
         gather_results = await asyncio.gather(*[
             self.extract_comment_count(commentId=commentId, session=session),
             self.extract_author_info(selector=selector, session=session),
@@ -92,7 +92,7 @@ class Extractor(ToolSet):
         result = self.merge_dicts(result, *gather_results)
         return result
 
-    def extract(self, response, webpage_url, vid):
+    def extract(self, response, vid):
         selector = Selector(text=response)
         try:
             title = selector.css('meta[name*=title]::attr(content)').extract_first()
@@ -147,11 +147,11 @@ class Extractor(ToolSet):
             view_count = None
 
         result = {
-            "webpage_url": webpage_url,
+            # "webpage_url": webpage_url,
             "vid": vid if vid else re.compile('&vid=(.*?)&').findall(response)[0],
             "title": title,
             "tag": tag.split(',') if tag else None,
-            "from": self.from_,
+            # "from": self.from_,
             "description": selector.css("._video_summary::text").extract_first(),
             "category": ','.join(category) if category else None,
             "cover": 'http://vpic.video.qq.com/0/{vid}.png'.format(vid=vid),

@@ -67,7 +67,6 @@ class Extractor(BaseExtractor):
 
         results = self.extract(
             response=response,
-            webpage_url=webpage_url,
         )
         return results
         # browser = await self.launch_browers()
@@ -82,11 +81,11 @@ class Extractor(BaseExtractor):
         # )
         # return results
 
-    def extract(self, response, webpage_url):
+    def extract(self, response):
         result = dict()
-        result['from'] = self.from_
+        # result['from'] = self.from_
         selector = Selector(text=response)
-        result['webpage_url'] = webpage_url
+        # result['webpage_url'] = webpage_url
         result['title'] = selector.css(".title::text").extract_first()
         try:
             result['author'] = selector.css(".nickname a::text").extract_first().strip()

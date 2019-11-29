@@ -85,8 +85,8 @@ class Extractor(BaseExtractor):
                     try:
                         result = f.result()
                         for ele in result:
-                            ele['from'] = self.from_
-                            results.append(ele)
+                            if ele:
+                                results.append(ele)
                     except:
                         traceback.print_exc()
                         continue

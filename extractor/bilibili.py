@@ -102,7 +102,6 @@ class Extractor(BaseExtractor):
             result['description'] = jmespath.search('videoData.desc', jsondata)
             result['duration'] = jmespath.search('videoData.duration', jsondata)
             result['title'] = jmespath.search('videoData.title', jsondata)
-            result['from'] = self.from_
             return result
         except:
             traceback.print_exc()

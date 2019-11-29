@@ -135,16 +135,17 @@ class Extractor(BaseExtractor):
                 headers=headers,
                 cookies=cookies
             )
-            results = self.extract(response=text, webpage_url=webpage_url)
+            results = self.extract(response=text)
             return results
 
-    def extract(self, response, webpage_url):
+    @staticmethod
+    def extract(response):
         try:
             selector = Selector(text=response)
         except:
             return None
         result = dict()
-        result['from'] = self.from_
+        # result['from'] = self.from_
         result['title'] = selector.css(".player_info .info_txt::text").extract_first()
         result['avatar'] = selector.css(".player_info .W_face_radius img::attr(src)").extract_first()
         result['author'] = selector.css('.player_info span[class*="name"]::text').extract_first()
@@ -153,10 +154,11 @@ class Extractor(BaseExtractor):
         result['author_id'] = re.search("uid=(\d{1,36})", action_data).group(1)
         result['play_addr'] = "http://" + re.search("video_src=//([\s|\S]{1,250})&cover_img", action_data).group(1)
         result['cover'] = re.search("cover_img=([\s|\S]*?)&short_url", action_data).group(1)
-        result['webpage_url'] = webpage_url
+        # result['webpage_url'] = webpage_url
         return result
 
-    def extract_mobile(self, response):
+    @staticmethod
+    def extract_mobile(response):
         try:
             selector = Selector(text=response)
             render_data = json.loads(selector.css("script").re_first("\$render_data = (\[[\s|\S]*?\])\[0\]"))[0]
@@ -164,7 +166,7 @@ class Extractor(BaseExtractor):
         except:
             return None
         result = dict()
-        result['from'] = self.from_
+        # result['from'] = self.from_
         result['vid'] = jmespath.search("id", status)
         result['author_id'] = jmespath.search("user.id", status)
         result['author'] = jmespath.search("user.screen_name", status)
@@ -172,7 +174,7 @@ class Extractor(BaseExtractor):
         result['follower'] = jmespath.search("user.followers_count", status)
         result['comment_count'] = jmespath.search("comments_count", status)
         result['cover'] = jmespath.search("page_info.page_pic.url", status)
-        result['webpage_url'] = jmespath.search("page_info.page_url", status)
+        # result['webpage_url'] = jmespath.search("page_info.page_url", status)
         result['title'] = jmespath.search("page_info.title", status)
         result['description'] = jmespath.search("page_info.content2", status)
         try:
@@ -183,19 +185,20 @@ class Extractor(BaseExtractor):
 
         return result
 
-    def extract_international(self, response, webpage_url):
+    @staticmethod
+    def extract_international(response, webpage_url):
         try:
             selector = Selector(text=response)
         except:
             return None
         result = dict()
-        result['from'] = self.from_
+        # result['from'] = self.from_
         result['vid'] = re.findall("\d{16}", webpage_url)[0]
         result['author'] = selector.css(".m-avatar-box b::text").extract_first()
         result['avatar'] = selector.css(".m-avatar-box img::attr(src)").extract_first()
         result['comment_count'] = selector.css(".comment-top h3::text").re_first("\d{1,10}")
         result['cover'] = selector.css("#video::attr(poster)").extract_first()
-        result['webpage_url'] = webpage_url
+        # result['webpage_url'] = webpage_url
         result['description'] = selector.css(".weibo-text::text").extract_first()
         result['play_addr'] = selector.css("#video::attr(src)").extract_first()
         return result

@@ -43,6 +43,7 @@ async def validate(func, extractor_instace, args, kwargs):
     """
     ## list of regexs for matching exact webpage_url for extractor_instance
     target_website = extractor_instace.target_website
+    from_ = extractor_instace.from_
     webpage_url = kwargs['webpage_url']
     urls = []
     ## match url form webpage_url
@@ -78,6 +79,8 @@ async def validate(func, extractor_instace, args, kwargs):
         ## validate the integrity of the output
         for result in results:
             ## filter by `vid`
+            result['from'] = from_
+            result['webpage_url'] = webpage_url
             try:
                 vid = result['vid']
                 if vid in vid_filter:

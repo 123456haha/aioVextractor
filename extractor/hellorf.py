@@ -52,8 +52,8 @@ class Extractor(BaseExtractor):
             result['cover'] = jmespath.search('video.preview_jpg_url', detail)
             result['duration'] = jmespath.search('video.duration', detail)
             result['tag'] = jmespath.search('video.keywords', detail)
-            result['from'] = self.from_
-            result['webpage_url'] = webpage_url
+            # result['from'] = self.from_
+            # result['webpage_url'] = webpage_url
             return result
 
 if __name__ == '__main__':

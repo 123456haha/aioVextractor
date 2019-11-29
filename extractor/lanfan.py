@@ -36,8 +36,8 @@ class Extractor(BaseExtractor):
         item = dict()
         soup = BeautifulSoup(text, 'lxml')
         video = soup.find("video", attrs={"id": "recipe-media"})
-        item['from'] = self.from_
-        item['webpage_url'] = webpage_url
+        # item['from'] = self.from_
+        # item['webpage_url'] = webpage_url
         item['cover'] = video.get("poster")
         item['play_addr'] = video.get("src")
         item['width'] = video.get("width")

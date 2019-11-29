@@ -50,9 +50,9 @@ class Extractor(BaseExtractor):
         author_videoNum = selector.css('.category_title::text').re('([\d|,]*)')
         result['author_videoNum'] = sorted(author_videoNum)[-1].replace(',', '')
         result['vid'] = vid
-        result['from'] = self.from_
+        # result['from'] = self.from_
         result['upload_ts'] = self.format_upload_ts(selector.css("p[class*='_postAddDate']::text").extract_first())
-        result['webpage_url'] = webpage_url
+        # result['webpage_url'] = webpage_url
         VideoJson = await self.request_naver_api(iframe_url=iframe_url, in_key=inKey, session=session, vid=vid)
         return self.extract(video_json=VideoJson, result=result)
 
