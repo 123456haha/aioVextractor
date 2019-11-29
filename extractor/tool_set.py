@@ -343,9 +343,9 @@ class BasicToolSet:
             return None
 
     @RequestRetry
-    async def request(self, url, session, response_type="text", method="get", proxy=config.proxy, **kwargs):
+    async def request(self, url, session, response_type="text", method="get", **kwargs):
         if method == "get":
-            async with session.get(url, proxy=proxy, **kwargs) as response:
+            async with session.get(url, **kwargs) as response:
                 if response_type == "text":
                     return await response.text()
                 elif response_type == "json":
@@ -353,7 +353,7 @@ class BasicToolSet:
                 elif response_type == "raw":
                     return response
         elif method == "post":
-            async with session.post(url, proxy=proxy, **kwargs) as response:
+            async with session.post(url, **kwargs) as response:
                 if response_type == "text":
                     return await response.text()
                 elif response_type == "json":
