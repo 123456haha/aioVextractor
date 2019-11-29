@@ -81,7 +81,7 @@ class BaseExtractor(ToolSet, metaclass=ABCMeta):
             "youtube_include_dash_manifest": False,
             'simulate': True,
             'user-agent': self.general_headers(user_agent=self.random_ua()),
-            "proxy": config.proxy,
+            "proxy": os.environ.get('HTTP_PROXY', None),
         }
         try:
             with youtube_dl.YoutubeDL(args) as ydl:
