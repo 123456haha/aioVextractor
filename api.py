@@ -70,6 +70,13 @@ async def hybrid_worker(webpage_url, session, *args, **kwargs):
                 )
         return result
 
+def set_up_proxy(proxy):
+    """
+    Set up http proxy globally.
+    Run this before you set up aiohttp.ClientSession(trust_env=True) if you would like to use proxy
+    :param proxy: format like "http://ip_addr:port"
+    """
+    os.environ['HTTP_PROXY'] = proxy
 
 if __name__ == '__main__':
     import aiohttp
