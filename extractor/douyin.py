@@ -3,7 +3,7 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
-import jmespath
+# import jmespath
 import re
 import requests
 from aioVextractor.extractor.base_extractor import (
@@ -61,68 +61,68 @@ class Extractor(BaseExtractor):
         #
         #     return result if result else False
 
-    @RequestRetry
-    async def aweme_detail(self, aweme_id, session):
-        """
-        get all info of the video
-        """
-        api = f'https://aweme-hl.snssdk.com/aweme/v1/aweme/detail/?aweme_id={aweme_id}&device_platform=ios&app_name=aweme&aid=1128'
-        aweme_detail_headers = {'user-agent': 'Mozilla/5.0'}
+    # @RequestRetry
+    # async def aweme_detail(self, aweme_id, session):
+    #     """
+    #     get all info of the video
+    #     """
+    #     api = f'https://aweme-hl.snssdk.com/aweme/v1/aweme/detail/?aweme_id={aweme_id}&device_platform=ios&app_name=aweme&aid=1128'
+    #     aweme_detail_headers = {'user-agent': 'Mozilla/5.0'}
+    #
+    #     response = await self.request(
+    #         url=api,
+    #         session=session,
+    #         headers=aweme_detail_headers,
+    #         response_type="json"
+    #     )
+    #
+    #     return jmespath.search('aweme_detail', response)
 
-        response = await self.request(
-            url=api,
-            session=session,
-            headers=aweme_detail_headers,
-            response_type="json"
-        )
-
-        return jmespath.search('aweme_detail', response)
-
-    @staticmethod
-    def extract(response_json):
-        """
-        extract all info from response_json
-        """
-        if response_json is False:
-            return False
-        else:
-            result = dict()
-            # result['from'] = self.from_
-            result['author'] = jmespath.search('author.nickname', response_json)
-            result['author_avatar'] = jmespath.search('author.avatar_larger.url_list[0]', response_json)
-            result['author_description'] = jmespath.search('author.signature', response_json)
-            author_gender = jmespath.search('author.gender', response_json)
-            if author_gender == 2:
-                result['author_gender'] = '女'
-            elif author_gender == 1:
-                result['author_gender'] = '男'
-            else:
-                result['author_gender'] = None
-            result['author_id'] = jmespath.search('author.uid', response_json)
-            result['play_addr'] = jmespath.search("video.play_addr.url_list[?contains(@, 'bytecdn')] | [0]",
-                                                  response_json)
-            if not result['play_addr']:
-                result['play_addr'] = jmespath.search("video.play_addr.url_list[0]", response_json)
-            if not result['play_addr']:
-                return False
-            result['title'] = jmespath.search('desc', response_json)
-            result['vid'] = jmespath.search('aweme_id', response_json)
-            result['cover'] = jmespath.search('video.cover.url_list[0]', response_json)
-            result['tag'] = jmespath.search('text_extra[].hashtag_name', response_json)
-            result['language'] = jmespath.search('desc_language', response_json)
-            result['region'] = jmespath.search('region', response_json)
-            result['upload_ts'] = jmespath.search('create_time', response_json)
-            # result['webpage_url'] = jmespath.search('share_url', response_json)
-            result['comment_count'] = jmespath.search('statistics.comment_count', response_json)
-            result['like_count'] = jmespath.search('statistics.digg_count', response_json)
-            result['download_count'] = jmespath.search('statistics.download_count', response_json)
-            result['forward_count'] = jmespath.search('statistics.forward_count', response_json)
-            result['share_count'] = jmespath.search('statistics.share_count', response_json)
-            result['height'] = jmespath.search('video.height', response_json)
-            result['width'] = jmespath.search('video.width', response_json)
-            video_duration = jmespath.search('video.duration', response_json)
-            result['duration'] = int(int(video_duration) / 1000) if video_duration else None
-            return result
+    # @staticmethod
+    # def extract(response_json):
+    #     """
+    #     extract all info from response_json
+    #     """
+    #     if response_json is False:
+    #         return False
+    #     else:
+    #         result = dict()
+    #         # result['from'] = self.from_
+    #         result['author'] = jmespath.search('author.nickname', response_json)
+    #         result['author_avatar'] = jmespath.search('author.avatar_larger.url_list[0]', response_json)
+    #         result['author_description'] = jmespath.search('author.signature', response_json)
+    #         author_gender = jmespath.search('author.gender', response_json)
+    #         if author_gender == 2:
+    #             result['author_gender'] = '女'
+    #         elif author_gender == 1:
+    #             result['author_gender'] = '男'
+    #         else:
+    #             result['author_gender'] = None
+    #         result['author_id'] = jmespath.search('author.uid', response_json)
+    #         result['play_addr'] = jmespath.search("video.play_addr.url_list[?contains(@, 'bytecdn')] | [0]",
+    #                                               response_json)
+    #         if not result['play_addr']:
+    #             result['play_addr'] = jmespath.search("video.play_addr.url_list[0]", response_json)
+    #         if not result['play_addr']:
+    #             return False
+    #         result['title'] = jmespath.search('desc', response_json)
+    #         result['vid'] = jmespath.search('aweme_id', response_json)
+    #         result['cover'] = jmespath.search('video.cover.url_list[0]', response_json)
+    #         result['tag'] = jmespath.search('text_extra[].hashtag_name', response_json)
+    #         result['language'] = jmespath.search('desc_language', response_json)
+    #         result['region'] = jmespath.search('region', response_json)
+    #         result['upload_ts'] = jmespath.search('create_time', response_json)
+    #         # result['webpage_url'] = jmespath.search('share_url', response_json)
+    #         result['comment_count'] = jmespath.search('statistics.comment_count', response_json)
+    #         result['like_count'] = jmespath.search('statistics.digg_count', response_json)
+    #         result['download_count'] = jmespath.search('statistics.download_count', response_json)
+    #         result['forward_count'] = jmespath.search('statistics.forward_count', response_json)
+    #         result['share_count'] = jmespath.search('statistics.share_count', response_json)
+    #         result['height'] = jmespath.search('video.height', response_json)
+    #         result['width'] = jmespath.search('video.width', response_json)
+    #         video_duration = jmespath.search('video.duration', response_json)
+    #         result['duration'] = int(int(video_duration) / 1000) if video_duration else None
+    #         return result
 
     def extract_page(self, response, page):
         selector = self.Selector(text=response)
