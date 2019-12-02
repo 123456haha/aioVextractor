@@ -28,6 +28,7 @@ from aioVextractor.extractor.naver import Extractor as naverIE
 from aioVextractor.extractor.pinterest import Extractor as pinterestIE
 from aioVextractor.extractor.renren import Extractor as renrenIE
 from aioVextractor.extractor.socialbeta import Extractor as socialbetaIE
+from aioVextractor.extractor.taopiaopiao import Extractor as taopiaopiaoIE
 from aioVextractor.extractor.tencent import Extractor as tencentIE
 from aioVextractor.extractor.toutiao import Extractor as toutiaoIE
 from aioVextractor.extractor.tvcbook import Extractor as tvcbookIE
