@@ -16,6 +16,7 @@ from pyppeteer.errors import NetworkError
 import asyncio
 import json
 
+
 class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://h5\.m\.taopiaopiao\.com/app/movie/pages/index/show-preview.html.*",
@@ -34,7 +35,6 @@ class Extractor(BaseExtractor):
         self.from_ = "taopiaopiao"
         self.results = []
 
-
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
@@ -47,7 +47,7 @@ class Extractor(BaseExtractor):
             self.extract_page(response=response_text)
         else:
             now = time.time()
-            while not self.results and time.time()-now < 3:
+            while not self.results and time.time() - now < 3:
                 asyncio.sleep(0.1)
         await browser.close()
         return self.results
@@ -58,8 +58,8 @@ class Extractor(BaseExtractor):
         result['play_addr'] = os.path.join("http://", selector.css("video::attr(src)").extract_first().lstrip("//"))
         result['title'] = selector.css("title::text").extract_first()
         result['vid'] = selector.css("meta").re_first("videoId=(\d{1,10})")
-        result['cover'] =  os.path.join("http://", selector.css("article img::attr(src)").extract_first().lstrip("//"))
-        result['comment_count'] =  selector.css(".floor-comments-count::text").extract_first()[1:-2]
+        result['cover'] = os.path.join("http://", selector.css("article img::attr(src)").extract_first().lstrip("//"))
+        result['comment_count'] = selector.css(".floor-comments-count::text").extract_first()[1:-2]
         self.results.append(result)
 
     async def intercept_response(self, response):
@@ -75,7 +75,7 @@ class Extractor(BaseExtractor):
         response_json = json.loads(re.findall("\w.*?\(([\s|\S]*)\)", response)[0])
         video = jmespath.search("data.returnValue.video", response_json)
         result = {
-            "author":jmespath.search("author", video),
+            "author": jmespath.search("author", video),
             "avatar": os.path.join("http://gw.alicdn.com", jmespath.search("avatar", video)),
             "cover": os.path.join("http://gw.alicdn.com", jmespath.search("coverUrl", video)),
             "duration": jmespath.search("duration", video),
@@ -86,9 +86,11 @@ class Extractor(BaseExtractor):
             "title": jmespath.search("showName", video),
         }
         self.results.append(result)
+
+
 if __name__ == '__main__':
     from pprint import pprint
+
     with Extractor() as extractor:
         res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
         pprint(res)
-

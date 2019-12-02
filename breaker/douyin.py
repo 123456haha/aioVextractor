@@ -36,12 +36,7 @@ class Breaker(BaseBreaker):
     @BreakerValidater
     async def breakdown(self, webpage_url, session, **kwargs):
         self.playlist_url = webpage_url
-        browser = await launch(
-            # {"headless": False},
-            args=[
-                '--no-sandbox',
-            ])
-
+        browser = await self.launch_browers()
         page = await browser.newPage()
         page.on('response', self.intercept_response)
         await page.goto(webpage_url)
