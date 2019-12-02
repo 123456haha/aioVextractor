@@ -24,6 +24,7 @@ from aioVextractor.extractor.hellorf import Extractor as hellorfIE
 from aioVextractor.extractor.instagram import Extractor as instagramIE
 from aioVextractor.extractor.iwebad import Extractor as iwebadIE
 from aioVextractor.extractor.lanfan import Extractor as lanfanIE
+from aioVextractor.extractor.music163 import Extractor as music163IE
 from aioVextractor.extractor.naver import Extractor as naverIE
 from aioVextractor.extractor.pinterest import Extractor as pinterestIE
 from aioVextractor.extractor.renren import Extractor as renrenIE
