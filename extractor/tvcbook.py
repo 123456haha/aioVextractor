@@ -59,7 +59,7 @@ class Extractor(BaseExtractor):
         result['play_addr'] = f"https://api.tvcbook.com/video/tvindownload/{vid}"
         result['author'] = jmespath.search("user.name", data)
         result['cover'] = jmespath.search("cover_url", data)
-        result['desc'] = jmespath.search("introduction", data)
+        result['description'] = jmespath.search("introduction", data)
         result['upload_ts'] = jmespath.search("created_at", data)
         # result['from'] = self.from_
         # result['webpage_url'] = webpage_url
