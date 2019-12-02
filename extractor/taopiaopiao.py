@@ -34,6 +34,7 @@ class Extractor(BaseExtractor):
         BaseExtractor.__init__(self, *args, **kwargs)
         self.from_ = "taopiaopiao"
         self.results = []
+        self.last_response = time.time()
 
     @validate
     @RequestRetry
@@ -46,8 +47,7 @@ class Extractor(BaseExtractor):
             response_text = await page.content()
             self.extract_page(response=response_text)
         else:
-            now = time.time()
-            while not self.results and time.time() - now < 3:
+            while not self.results and time.time() - self.last_response < 3:
                 asyncio.sleep(0.1)
         await browser.close()
         return self.results
