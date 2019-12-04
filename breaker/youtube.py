@@ -121,7 +121,7 @@ class Breaker(BaseBreaker):
                    'x-youtube-client-version': '2.20190702',
                    'user-agent': choice(safari),
                    'accept': '*/*',
-                   'referer': 'https://www.youtube.com/playlist?list=PLs54iBUqIopDv2wRhkqArl9AEV1PU-gmc',
+                   'referer': referer,
                    'x-youtube-client-name': '1',
                    'authority': 'www.youtube.com',
                    }
@@ -392,7 +392,7 @@ if __name__ == '__main__':
 
     with Breaker() as breaker:
         res = breaker.sync_breakdown(
-            webpage_url=Breaker.TEST_CASE[2],
+            webpage_url=Breaker.TEST_CASE[-1],
             # params={'clickTrackingParams': 'CDwQybcCIhMI0rC0jdi05QIVlxxgCh23ZQF8',
             #         'continuation': '4qmFsgI0EhhVQ1NScENCcTJ4b21qN1N6MG9kNzNqV3caGEVnWjJhV1JsYjNNZ0FEZ0JlZ0V5dUFFQQ%3D%3D'}
         )
