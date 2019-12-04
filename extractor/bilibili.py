@@ -91,7 +91,6 @@ class Extractor(BaseExtractor):
             result['author_avatar'] = jmespath.search('upData.face', jsondata)
             result['author_description'] = jmespath.search('upData.description', jsondata)
             result['author_birthday'] = jmespath.search('upData.birthday', jsondata)
-            result['author_attention'] = jmespath.search('upData.attention', jsondata)
             result['author_follwer_count'] = jmespath.search('upData.fans', jsondata)
             result['author_follwing_count'] = jmespath.search('upData.friend', jsondata)
             result['author_id'] = jmespath.search('upData.mid', jsondata)
