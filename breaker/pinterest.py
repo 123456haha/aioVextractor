@@ -44,7 +44,7 @@ class Breaker(BaseBreaker):
         jsondata = await self.request(
             url='https://www.pinterest.com/_ngjs/resource/UserVideoPinsFeedResource/get/',
             session=session,
-            verify_ssl=False,
+            ssl=False,
             params=(
                 (f'source_url{source_url}', ''),
                 ('data', data),
