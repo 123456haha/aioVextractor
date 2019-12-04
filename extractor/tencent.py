@@ -6,7 +6,6 @@
 from random import choice
 from urllib.parse import urlparse, parse_qs
 import traceback
-import ujson as json
 import jmespath
 import math
 import random
@@ -20,7 +19,11 @@ from aioVextractor.extractor.tool_set import (
     validate,
     RequestRetry
 )
-
+import platform
+if platform.system() in {"Linux", "Darwin"}:
+    import ujson as json
+else:
+    import json
 
 class Extractor(ToolSet):
     target_website = [
