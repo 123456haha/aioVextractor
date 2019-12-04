@@ -88,10 +88,7 @@ class Extractor(ToolSet):
 
         video_create_time = selector.css('meta[property="article:published_time"]::attr(content)').extract_first()
         result['upload_ts'] = int(dateutil.parser.parse(video_create_time).timestamp()) if video_create_time else None
-        try:
-            result['upload_date'] = dateutil.parser.parse(video_create_time).strftime('%Y%m%d')
-        except TypeError:
-            result['upload_date'] = None
+
         try:
             result['description'] = self.unescape('\n'.join(
                 map(lambda x: x.strip(), selector.css('.filmplay-info-desc>p[class~="desc"]::text').extract())))
