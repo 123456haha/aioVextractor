@@ -20,11 +20,11 @@ class Extractor(BaseExtractor):
     ]
 
     TEST_CASE = [
-        # "https://mp.weixin.qq.com/s/IqbmeLcurLXvCj-LefJfYw",
-        # "https://mp.weixin.qq.com/s/PZ0JBxMIAP5zVhsSxpxu7Q",
-        "http://mp.weixin.qq.com/s/2Y5rEq4HXtOAcHtYBNeebQ",
-        # "https://mp.weixin.qq.com/s/Ld6tw7ZjzFcUkPXa79HH5Q",
-        # "https://mp.weixin.qq.com/s/6lDIjP799J2b07RHoNil1A",
+        "https://mp.weixin.qq.com/s/IqbmeLcurLXvCj-LefJfYw",
+        "https://mp.weixin.qq.com/s/PZ0JBxMIAP5zVhsSxpxu7Q",
+        # "http://mp.weixin.qq.com/s/2Y5rEq4HXtOAcHtYBNeebQ",
+        "https://mp.weixin.qq.com/s/Ld6tw7ZjzFcUkPXa79HH5Q",
+        "https://mp.weixin.qq.com/s/6lDIjP799J2b07RHoNil1A",
         "https://mp.weixin.qq.com/s/yjzmRFDEwJgXDfGaK_ooUQ",
     ]
 

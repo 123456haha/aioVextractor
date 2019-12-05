@@ -55,7 +55,7 @@ class Breaker(BaseBreaker):
         html = await self.request(
             url=tagurl,
             session=session,
-            verify_ssl=False
+            ssl=False
         )
         jsondata = json.loads(html)
         user = jmespath.search("data.user", jsondata)
@@ -96,7 +96,7 @@ class Breaker(BaseBreaker):
         html = await self.request(
             url=webpage_url,
             session=session,
-            verify_ssl=False
+            ssl=False
         )
         jsondata = json.loads(html)
         user = jmespath.search("graphql.user", jsondata)

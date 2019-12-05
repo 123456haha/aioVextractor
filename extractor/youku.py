@@ -63,7 +63,7 @@ class Extractor(ToolSet):
                 url=yk_url,
                 session=session,
                 params=data,
-                verify_ssl=False,
+                ssl=False,
             )
 
             customdata = json.loads(html)
@@ -122,7 +122,7 @@ class Extractor(ToolSet):
             session=session,
             headers=headers,
             params=new_parm,
-            verify_ssl=False
+            ssl=False
         )
         videodata = json.loads(html.replace(new_parm['callback'], '')[1:-1])
         data = jmespath.search("data", videodata)
@@ -174,7 +174,7 @@ class Extractor(ToolSet):
             session=session,
             headers=headers,
             params=params,
-            verify_ssl=False
+            ssl=False
         )
         response_json = json.loads(response_text[len('  n_commentList('):-1])
         return {'comment_count': jmespath.search('data.totalSize', response_json)}
@@ -189,7 +189,7 @@ class Extractor(ToolSet):
             url=url,
             session=session,
             headers=headers,
-            verify_ssl=False
+            ssl=False
         )
         try:
             selector = Selector(text=text)
