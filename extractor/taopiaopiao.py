@@ -42,6 +42,7 @@ class Extractor(BaseExtractor):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
+        print(f"HTTP_PROXY: {os.environ['HTTP_PROXY']}")
         browser = await self.launch_browers()
         page = await browser.newPage()
         page.on('response', self.intercept_response)
