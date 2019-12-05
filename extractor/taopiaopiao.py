@@ -21,6 +21,7 @@ class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://h5\.m\.taopiaopiao\.com/app/movie/pages/index/show-preview.html.*",
         "http[s]?://h5\.m\.taopiaopiao\.com/app/dianying/pages/mini-video/index.html.*",
+        "http[s]?://h5\.m\.taopiaopiao\.com/app/dianying/pages/show-preview/index.html.*",
     ]
 
     TEST_CASE = [
