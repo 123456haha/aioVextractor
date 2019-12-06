@@ -21,13 +21,16 @@ class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://h5\.m\.taopiaopiao\.com/app/movie/pages/index/show-preview.html.*",
         "http[s]?://h5\.m\.taopiaopiao\.com/app/dianying/pages/mini-video/index.html.*",
+        "http[s]?://h5\.m\.taopiaopiao\.com/app/dianying/pages/show-preview/index.html.*",
     ]
 
     TEST_CASE = [
-        # "http://h5.m.taopiaopiao.com/app/movie/pages/index/show-preview.html?showid=180169&previewid=240796884668",
-        # "https://h5.m.taopiaopiao.com/app/dianying/pages/mini-video/index.html?tbVideoId=244895745395&videoId=1567428&type=8&cityCode=440100",
-        # "https://h5.m.taopiaopiao.com/app/dianying/pages/mini-video/index.html?tbVideoId=244845440970&videoId=1567601&type=8&cityCode=440100",
+        "http://h5.m.taopiaopiao.com/app/movie/pages/index/show-preview.html?showid=180169&previewid=240796884668",
+        "https://h5.m.taopiaopiao.com/app/dianying/pages/mini-video/index.html?tbVideoId=244895745395&videoId=1567428&type=8&cityCode=440100",
+        "https://h5.m.taopiaopiao.com/app/dianying/pages/mini-video/index.html?tbVideoId=244845440970&videoId=1567601&type=8&cityCode=440100",
         "https://h5.m.taopiaopiao.com/app/dianying/pages/mini-video/index.html?tbVideoId=244637816398&videoId=1567210&type=8&cityCode=440100",
+        "http://h5.m.taopiaopiao.com/app/movie/pages/index/show-preview.html?showid=1211803&previewid=245165739831",
+        "https://h5.m.taopiaopiao.com/app/dianying/pages/show-preview/index.html?showid=1279058&previewid=237152859603",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -43,12 +46,14 @@ class Extractor(BaseExtractor):
         page = await browser.newPage()
         page.on('response', self.intercept_response)
         await page.goto(webpage_url)
-        if re.match("http[s]?://h5\.m\.taopiaopiao\.com/app/movie/pages/index/show-preview.html.*", webpage_url):
+        if re.match("http[s]?://h5\.m\.taopiaopiao\.com/app/movie/pages/index/show-preview.html.*", webpage_url) or \
+                re.match("http[s]?://h5\.m\.taopiaopiao\.com/app/dianying/pages/show-preview/index.html.*", webpage_url):
+            await asyncio.sleep(1)
             response_text = await page.content()
             self.extract_page(response=response_text)
         else:
             while not self.results and time.time() - self.last_response < 3:
-                asyncio.sleep(0.1)
+                await asyncio.sleep(0.1)
         await browser.close()
         return self.results
 
@@ -92,5 +97,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)

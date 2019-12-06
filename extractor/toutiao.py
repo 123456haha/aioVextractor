@@ -18,9 +18,8 @@ from aioVextractor.extractor.base_extractor import (
     validate,
     RequestRetry
 )
-from aiohttp.client_exceptions import (
-    ServerConnectionError,
-)
+import time
+import asyncio
 
 if platform.system() in {"Linux", "Darwin"}:
     import ujson as json
@@ -48,43 +47,27 @@ class Extractor(BaseExtractor):
         "https://m.toutiaocdn.com/i6752291249207640590/?app=news_article&timestamp=1572147617&req_id=201910271140170100140481310BDEA279&group_id=6752291249207640590&wxshare_count=20&tt_from=weixin_moments&utm_source=weixin_moments&utm_medium=toutiao_android&utm_campaign=client_share&share_type=original&pbid=6751721020236875277&from=singlemessage&isappinstalled=0",
         "https://m.toutiaoimg.com/group/6739755269032509966/?app=news_article_lite&timestamp=1572244151&req_id=20191028142911010011048231030168A8&group_id=6739755269032509966",
         "https://m.toutiaoimg.com/group/6758768712024588295/?app=news_article&timestamp=1573886933",
-        # "来看看@光头强捡到冒菜的视频https://m.toutiaoimg.cn/group/6760527483755449611/?app=news_article&timestamp=1574258101",
+        "来看看@光头强捡到冒菜的视频https://m.toutiaoimg.cn/group/6760527483755449611/?app=news_article&timestamp=1574258101",
         "https://m.toutiaocdn.net/a6761067781120066062/?app=news_article&is_hit_share_recommend=0",
         "https://m.ixigua.com/i6761248990626316811/?channel=video",
         "https://m.toutiao.com/i6744316180397294094/?channel=video",
+        "https://m.ixigua.com/i6738290326022128141/",
     ]
 
     def __init__(self, *args, **kwargs):
         BaseExtractor.__init__(self, *args, **kwargs)
         self.from_ = "toutiao"
+        self.last_response = time.time()
 
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
-        # headers = self.general_headers(user_agent=self.random_ua())
-        # headers['authority'] = urlparse(webpage_url).netloc
-
-        headers = {
-            'authority': 'www.ixigua.com',
-            'upgrade-insecure-requests': '1',
-            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.36',
-            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-            'accept-encoding': 'gzip, deflate, br',
-            'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,ko;q=0.7',
-            'cookie': 'xiguavideopcwebid=6761390915884172811; '
-                      'xiguavideopcwebid.sig=xC6iwbFu41lU5VCt_hAR_gynW2A; '
-                      'SLARDAR_WEB_ID=029b66c7-c6e3-4139-ba8d-1c2ae67e11fd; '
-                      '_ga=GA1.2.1492042655.1574259050; '
-                      '_gid=GA1.2.51220089.1574259050',
-        }
-
-        html = await self.request(
-            url=webpage_url,
-            session=session,
-            headers=headers
-        )
-        if re.match("http[s]?://m\.toutiaocdn\.com/i\d{10,36}", webpage_url) or re.match("http[s]?://m\.toutiao\.com/i\d{10,36}", webpage_url):
-            js_file_path = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "special/generate_signature.js")
+        if re.match("http[s]?://m\.toutiaocdn\.com/i\d{10,36}", webpage_url) \
+                or re.match("http[s]?://m\.toutiao\.com/i\d{10,36}", webpage_url):
+            js_file_path = os.path.join(
+                os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
+                "special/generate_signature.js"
+            )
             AS, CP, _signature = self.get_token(path=js_file_path)
             i = re.findall("i(\d{10,36})", webpage_url)[0]
             api = f'https://m.toutiao.com/i{i}/info/?_signature={_signature}&i={i}'
@@ -96,15 +79,22 @@ class Extractor(BaseExtractor):
             )
             result = self.extract_ipage(response=response)
             vid = result['vid']
-
         else:
-            selector = Selector(text=html)
-            try:
-                SSR_HYDRATED_DATA = json.loads(selector.css("#SSR_HYDRATED_DATA::text").extract_first())
-            except TypeError:
-                raise ServerConnectionError ## let the RequestRetry work the rest
+            browser = await self.launch_browers()
+            page = await browser.newPage()
+            await page.goto(webpage_url)
+            html = await page.content()
+            SSR_HYDRATED_DATA_RAW = Selector(text=html).css("#SSR_HYDRATED_DATA::text").extract_first()
+            while SSR_HYDRATED_DATA_RAW is None and time.time() - self.last_response <= 10:
+                html = await page.content()
+                SSR_HYDRATED_DATA_RAW = Selector(text=html).css("#SSR_HYDRATED_DATA::text").extract_first()
+                await asyncio.sleep(2)
+            else:
+                SSR_HYDRATED_DATA = json.loads(SSR_HYDRATED_DATA_RAW)
+
             result = self.extract(response=SSR_HYDRATED_DATA)
             vid = re.findall('"vid"\s?:\s?"(\w{5,40})"', html)[0]
+            await browser.close()
         play_addr = await self.cal_play_addr(vid=vid, session=session)
         return self.merge_dicts(result, play_addr)
 
