@@ -9,7 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-18.04
     strategy:
-      max-parallel: 1
+      max-parallel: 3
       matrix:
         python-version: [3.6, 3.7, 3.8]
     steps:
