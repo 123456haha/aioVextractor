@@ -20,6 +20,7 @@ from aioVextractor.extractor.base_extractor import (
 )
 import time
 import asyncio
+
 if platform.system() in {"Linux", "Darwin"}:
     import ujson as json
 else:
@@ -84,10 +85,10 @@ class Extractor(BaseExtractor):
             await page.goto(webpage_url)
             html = await page.content()
             SSR_HYDRATED_DATA_RAW = Selector(text=html).css("#SSR_HYDRATED_DATA::text").extract_first()
-            while SSR_HYDRATED_DATA_RAW is None and time.time() - self.last_response <=3:
+            while SSR_HYDRATED_DATA_RAW is None and time.time() - self.last_response <= 10:
                 html = await page.content()
                 SSR_HYDRATED_DATA_RAW = Selector(text=html).css("#SSR_HYDRATED_DATA::text").extract_first()
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(2)
             else:
                 SSR_HYDRATED_DATA = json.loads(SSR_HYDRATED_DATA_RAW)
 
