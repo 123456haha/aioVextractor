@@ -31,5 +31,17 @@ class Test_Extractor:
     async def test_extractor(self, case):
         async with aiohttp.ClientSession() as session:
             result = await hybrid_worker(webpage_url=case, session=session)
-            test_benchmark = isinstance(result, (list, tuple))
-            assert test_benchmark
+            if isinstance(result, str):
+                assert False
+            if isinstance(result, tuple):
+                try:
+                    outputs, has_more, params = result
+                except:
+                    assert False
+                else:
+                    assert True
+            elif isinstance(result, list):  ## webpage
+                if result:  ## outputs is not []
+                    assert True
+                else :
+                    assert False
