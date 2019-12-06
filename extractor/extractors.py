@@ -42,4 +42,5 @@ from aioVextractor.extractor.xiaohongshu import Extractor as xiaohongshuIE
 from aioVextractor.extractor.xinpianchang import Extractor as xinpianchangIE
 from aioVextractor.extractor.youku import Extractor as youkuIE
 from aioVextractor.extractor.youtube import Extractor as youtubeIE
+from aioVextractor.extractor.xiami import Extractor as xiamiIE
 
