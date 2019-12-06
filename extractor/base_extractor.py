@@ -219,8 +219,9 @@ class BaseExtractor(ToolSet, metaclass=ABCMeta):
                 for f in futures.as_completed(future_to_url, timeout=max([len(iframe_src) * 3, 15])):
                     try:
                         result = f.result()
-                        result['playlist_url'] = webpage_url
-                        results.append(result)
+                        for ele in result:
+                            ele['playlist_url'] = webpage_url
+                            results.append(ele)
                     except:
                         traceback.print_exc()
                         continue
