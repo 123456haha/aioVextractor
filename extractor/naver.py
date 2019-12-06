@@ -4,7 +4,6 @@
 # IDE: PyCharm
 
 import jmespath
-from urllib.parse import urlparse, parse_qs
 import re
 import time
 from scrapy.selector import Selector
