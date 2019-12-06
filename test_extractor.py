@@ -77,10 +77,12 @@ import pytest
 class Test_Extractor:
     @pytest.mark.parametrize(
         'case', [
-            sample
-            for instance in gen_extractor_classes() + gen_breaker_classes()
-            for sample in instance.TEST_CASE
-        ]
+        "https://movie.douban.com/trailer/256281/",
+        "https://movie.douban.com/trailer/255831/",
+        "https://movie.douban.com/trailer/255756/",
+        "https://movie.douban.com/trailer/118461/?trailer_id=118461&trailer_type=A",
+        "https://movie.douban.com/trailer/255756/?trailer_id=255756&trailer_type=A",
+    ]
     )
     @pytest.mark.asyncio
     async def test_extractor(self, case):
