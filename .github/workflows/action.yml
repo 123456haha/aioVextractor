@@ -9,9 +9,9 @@ jobs:
   test:
     runs-on: ubuntu-18.04
     strategy:
-      max-parallel: 3
+      max-parallel: 2
       matrix:
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.6, 3.7]
     steps:
     - uses: actions/checkout@master
       with:
