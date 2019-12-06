@@ -39,10 +39,7 @@ class Extractor(BaseExtractor):
             'sec-fetch-mode': 'navigate',
             'accept-encoding': 'gzip, deflate, br',
             'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
-            # 'cookie': 'xhsTrackerId=f283b793-59fb-4946-c9c2-b594d4bc08ab; rookieg=yes; timestamp1=4258271912; timestamp2=960887517; hasaki=%5B%22Mozilla%2F5.0%20(Macintosh%3B%20Intel%20Mac%20OS%20X%2010_14_3)%20AppleWebKit%2F537.36%20(KHTML%2C%20like%20Gecko)%20Chrome%2F78.0.3904.108%20Safari%2F537.36%22%2C%22zh-CN%22%2C24%2C-480%2Ctrue%2Ctrue%2Ctrue%2C%22undefined%22%2C%22function%22%2Cnull%2C%22MacIntel%22%2C4%2C4%2Cnull%2C%22Chrome%20PDF%20Plugin%3A%3APortable%20Document%20Format%3A%3Aapplication%2Fx-google-chrome-pdf~pdf%3BChrome%20PDF%20Viewer%3A%3A%3A%3Aapplication%2Fpdf~pdf%3BNative%20Client%3A%3A%3A%3Aapplication%2Fx-nacl~%2Capplication%2Fx-pnacl~%22%5D; xhs_spses.5dde=*; extra_exp_ids=; xhsTracker=url=/discovery/item/5dbd317b000000000100a5fe&xhsshare=CopyLink; noteIndex=1; xhs_spid.5dde=86895a64fc01c1ac.1574837443.2.1574847126.1574837446.025481b8-f8c1-433d-ac90-8b8cc24e7b74',
-            # 'cookie': res.headers['Set-Cookie'],
         }
-
         response = await self.request(
             url=webpage_url,
             session=session,
@@ -51,18 +48,37 @@ class Extractor(BaseExtractor):
             response_type="raw"
         )
         location = response.headers['Location']
-        response = await self.request(
-            url=webpage_url,
-            session=session,
-            headers=headers,
-            response_type="raw"
-        )
-        cookie = response.headers['Set-Cookie']
-        headers['cookie'] = cookie
+        # response = await self.request(
+        #     url=webpage_url,
+        #     session=session,
+        #     headers=headers,
+        #     response_type="raw"
+        # )
+        # cookie = ''
+        # for ele in response.raw_headers:
+        #     print(ele[0].decode(), ele[1].decode())
+        #     if "Set-Cookie" == ele[0].decode():
+        #         cookie += ele[1].decode().replace("Path=/", "")
+        # cookie = response.headers['Set-Cookie']
+        # headers['cookie'] = cookie
+        # cookie = {ele.split("=", 1)[0]: ele.split("=", 1)[1] for ele in cookie.strip("; ").split("; ")}
+        # cookie.pop("Max-Age", None)
+        # cookie.pop("Domain", None)
+
+        cookie = {
+            'xhsTracker': 'url=/discovery/item/5dbd317b000000000100a5fe&xhsshare=CopyLink',
+            'xhsTrackerId': 'b4eebbba-74f3-4f9b-cfb4-4d5059963ff2',
+            'extra_exp_ids': '',
+            'timestamp1': '2322974232',
+            'timestamp2': '3854455932',
+            'hasaki': '%5B%22Mozilla%2F5.0%20(X11%3B%20Linux%20x86_64)%20AppleWebKit%2F537.36%20(KHTML%2C%20like%20Gecko)%20Chrome%2F74.0.3729.108%20Safari%2F537.36%22%2C%22zh-CN%22%2C24%2C-480%2Ctrue%2Ctrue%2Ctrue%2C%22undefined%22%2C%22function%22%2Cnull%2C%22Linux%20x86_64%22%2C6%2C8%2Cnull%2C%22Chrome%20PDF%20Plugin%3A%3APortable%20Document%20Format%3A%3Aapplication%2Fx-google-chrome-pdf~pdf%3BChrome%20PDF%20Viewer%3A%3A%3A%3Aapplication%2Fpdf~pdf%3BNative%20Client%3A%3A%3A%3Aapplication%2Fx-nacl~%2Capplication%2Fx-pnacl~%22%5D',
+        }
+
         response = await self.request(
             url=location,
             session=session,
-            headers=headers
+            headers=headers,
+            cookies=cookie,
         )
 
         results = self.extract(
