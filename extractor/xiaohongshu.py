@@ -18,9 +18,9 @@ class Extractor(BaseExtractor):
     ]
 
     TEST_CASE = [
-        "http://xhsurl.com/21-cf",
-        "http://xhsurl.com/21-uc",
-        "http://xhsurl.com/21-E4",
+        # "http://xhsurl.com/21-cf",
+        # "http://xhsurl.com/21-uc",
+        # "http://xhsurl.com/21-E4",
     ]
 
     def __init__(self, *args, **kwargs):
