@@ -44,45 +44,40 @@ class Extractor(ToolSet):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
-        try:
-            vid = webpage_url.split('?')[0].split('/')[-1].replace('==', '').lstrip('id_').split('.')[0]
-        except:
-            traceback.print_exc()
-            return False
-        else:
-            webpage_url = f"https://v.youku.com/v_show/id_{vid}"
-            data = {"video_id": vid,
-                    "client_id": "b598bfd8ec862716",
-                    "callback": "f'youkuPlayer_call_{int(time.time() * 1000)}'",
-                    "type": "pc",
-                    "embsig": "",
-                    "version": "1.0",
-                    "_t": "006315043435963385"}
-            yk_url = 'https://api.youku.com/players/custom.json?'
-            html = await self.request(
-                url=yk_url,
-                session=session,
-                params=data,
-                ssl=False,
-            )
+        vid = webpage_url.split('?')[0].split('/')[-1].replace('==', '').lstrip('id_').split('.')[0]
+        webpage_url = f"https://v.youku.com/v_show/id_{vid}"
+        data = {"video_id": vid,
+                "client_id": "b598bfd8ec862716",
+                "callback": "f'youkuPlayer_call_{int(time.time() * 1000)}'",
+                "type": "pc",
+                "embsig": "",
+                "version": "1.0",
+                "_t": "006315043435963385"}
+        yk_url = 'https://api.youku.com/players/custom.json?'
+        html = await self.request(
+            url=yk_url,
+            session=session,
+            params=data,
+            ssl=False,
+        )
 
-            customdata = json.loads(html)
-            stealsign = customdata['stealsign']
-            gather_results = await asyncio.gather(*[
-                self.extract_info(vid=vid, sign=stealsign, client_id=data['client_id'], session=session),
-                self.extract_comment_count(vid=vid, session=session),
-                self.extract_webpage(url=webpage_url, session=session)
-            ])
-            result = self.merge_dicts(
-                {
-                    # "webpage_url": webpage_url,
-                    "vid": vid,
-                    "downloader": "ytd",
-                },
-                *gather_results[:2]
-            )
-            result['category'] += gather_results[2]['category']
-            return {**gather_results[2], **result}
+        customdata = json.loads(html)
+        stealsign = customdata['stealsign']
+        gather_results = await asyncio.gather(*[
+            self.extract_info(vid=vid, sign=stealsign, client_id=data['client_id'], session=session),
+            self.extract_comment_count(vid=vid, session=session),
+            self.extract_webpage(url=webpage_url, session=session)
+        ])
+        result = self.merge_dicts(
+            {
+                # "webpage_url": webpage_url,
+                "vid": vid,
+                "downloader": "ytd",
+            },
+            *gather_results[:2]
+        )
+        result['category'] += gather_results[2]['category']
+        return {**gather_results[2], **result}
 
     @RequestRetry(default_exception_return={},
                   default_other_exception_return={})
@@ -132,7 +127,6 @@ class Extractor(ToolSet):
             # item['cdn_url'] = jmespath.search('max_by(data.stream, &size).segs[].cdn_url', videodata)
             play_addr = jmespath.search('max_by(data.stream, &size).segs[].cdn_url', videodata)[0]
         except:
-            traceback.print_exc()
             height = jmespath.search('data.stream[-1].height', videodata)
             width = jmespath.search('data.stream[-1].width', videodata)
             # item['cdn_url'] = jmespath.search('data.stream[-1].segs[].cdn_url', videodata)

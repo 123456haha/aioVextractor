@@ -23,8 +23,6 @@ class Extractor(BaseExtractor):
         "#在抖音，记录美好生活#球球老婆怀孕之后就爱睡这个洗脸巢 睡姿也太可爱了8#猫 http://v.douyin.com/hd9sb3/ 复制此链接，打开【抖音短视频】，直接观看视频！",
         "http://v.douyin.com/hd9sb3/",
         "https://www.iesdouyin.com/share/video/6759299526001052940/?region=CN&mid=6759299526001052940",
-        "http://v.douyin.com/QcJtPC/",
-        "https://www.iesdouyin.com/share/video/6649998096799501571/?region=CN&mid=6649998096799501571",
         "http://v.douyin.com/Q3bqGN/",
         "#在抖音，记录美好生活#【60秒】讲拍摄的颜色对比#电影小丑#颜色对比#潮色#2019流行的颜色#小丑 https://v.douyin.com/C5qw3u/ 复制此链接，打开【抖音短视频】，直接观看视频！",
     ]

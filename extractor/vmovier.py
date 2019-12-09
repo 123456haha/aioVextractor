@@ -27,7 +27,6 @@ class Extractor(BaseExtractor):
 
     TEST_CASE = [
         ## xpc player:
-        "https://www.vmovier.com/55810?from=index_new_img",
         "https://www.vmovier.com/56000?from=index_new_img",
         ## youku player:
         "https://www.vmovier.com/56052?from=index_new_title",
@@ -117,5 +116,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[4])
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)

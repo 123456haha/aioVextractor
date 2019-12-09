@@ -25,7 +25,6 @@ class Extractor(BaseExtractor):
         "http[s]?://m\.weibo\.cn/status/\d{5,25}",
         "http[s]?://weibo\.com/tv/v/[\w]{5,15}\?fid=1034\:\d{5,25}",
         "http[s]?://weibo\.com/tv/v/[\w]{5,15}\?from=\w{1,10}",
-        "http[s]?://t\.cn/[\w-]{3,10}",
         "http[s]?://m\.weibo\.cn/\d{5,25}/\d{5,25}",
         "http[s]?://weibointl\.api\.weibo\.cn/share/\d{5,15}\.html[\s|\S]*",
         "http[s]?://video\.h5\.weibo\.cn/1034\:\d{5,25}/\d{5,25}",
@@ -37,17 +36,14 @@ class Extractor(BaseExtractor):
         "https://weibo.com/tv/v/FxTBC1Dp8?from=vhot",
         "https://weibo.com/tv/v/Ib31ooLdE?fid=1034:4426329710596386",
         "https://weibo.com/tv/v/IbOnau1mu?fid=1034:4428150730652786",
-        "https://weibo.com/tv/v/IbFq32OZd?fid=1034:4427803702006591",
         "https://weibo.com/tv/v/I4YSOoeCp?fid=1034:4411872741380331",
         "https://m.weibo.cn/status/4428801453021670?wm=3333_2001&from=109A193010&sourcetype=dingding",
-        "http://t.cn/Ai8Bj0z6",
         "https://m.weibo.cn/status/4428801453021670?wm=3333_2001&from=109A193010&sourcetype=dingding",
         "https://m.weibo.cn/7156659085/4434862959838949",
         "https://weibointl.api.weibo.cn/share/101945758.html?weibo_id=4437220557550474&from=timeline&isappinstalled=0",
         "https://video.h5.weibo.cn/1034:4437219750963677/4437220557550474",
         "https://weibo.com/tv/v/IfIZrymE6?fid=1034:4437478581411755",
         "https://video.weibo.com/show?fid=1034:4437478581411755",
-        "https://video.weibo.com/show?fid=1034%3A4440115129299917",
 
     ]
 

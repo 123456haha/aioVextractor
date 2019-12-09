@@ -4,7 +4,7 @@
 # IDE: PyCharm
 
 import jmespath
-from urllib.parse import urlparse, parse_qs
+import re
 import time
 from scrapy.selector import Selector
 from aioVextractor.extractor.base_extractor import (
@@ -42,9 +42,10 @@ class Extractor(BaseExtractor):
         # async with session.get(webpage_url, headers=self.general_headers(user_agent=self.random_ua())) as response:
         #     response_text = await response.text(encoding='utf8', errors='ignore')
         selector = Selector(text=response_text)
-        iframe_url = selector.css('iframe[src*=vid]::attr(src)').extract_first()
-        vid = parse_qs(urlparse(iframe_url).query)['vid'][0]
-        inKey = parse_qs(urlparse(iframe_url).query)['inKey'][0]
+        # iframe_url = selector.css('iframe[src*=vid]::attr(src)').extract_first()
+        vid = re.findall('vid="(\w{36})"', response_text)[0]
+        inKey = re.findall('key="(\w{20,100})"', response_text)[0]
+        # inKey = parse_qs(urlparse(iframe_url).query)['inKey'][0]
         result = dict()
         result['avatar'] = selector.css('.bloger .thumb img::attr(src)').extract_first().split('?')[0]
         author_videoNum = selector.css('.category_title::text').re('([\d|,]*)')
@@ -53,7 +54,7 @@ class Extractor(BaseExtractor):
         # result['from'] = self.from_
         result['upload_ts'] = self.format_upload_ts(selector.css("p[class*='_postAddDate']::text").extract_first())
         # result['webpage_url'] = webpage_url
-        VideoJson = await self.request_naver_api(iframe_url=iframe_url, in_key=inKey, session=session, vid=vid)
+        VideoJson = await self.request_naver_api(iframe_url=webpage_url, in_key=inKey, session=session, vid=vid)
         return self.extract(video_json=VideoJson, result=result)
 
     @RequestRetry
