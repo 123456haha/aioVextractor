@@ -5,7 +5,7 @@
 """
 RUN ME BEFORE GOING SERIOUS!
 
-python -m pytest test_extractor.py --verbose
+pytest test_extractor.py --concmode=mproc  --disable-pytest-warnings --color=yes
 
 """
 import sys, os
@@ -19,6 +19,7 @@ import aiohttp
 from aioVextractor import hybrid_worker
 import pytest
 
+
 class Test_Extractor:
     @pytest.mark.parametrize(
         'case', [
@@ -31,9 +32,10 @@ class Test_Extractor:
     async def test_extractor(self, case):
         async with aiohttp.ClientSession() as session:
             result = await hybrid_worker(webpage_url=case, session=session)
-            if isinstance(result, str):
+            print(f"result: {result}")
+            if isinstance(result, str):  ## fail
                 assert False
-            if isinstance(result, tuple):
+            if isinstance(result, tuple):  ## playlist
                 try:
                     outputs, has_more, params = result
                 except:
@@ -41,7 +43,8 @@ class Test_Extractor:
                 else:
                     assert True
             elif isinstance(result, list):  ## webpage
-                if result:  ## outputs is not []
+                print(f"result: {result}")
+                if result:  ## outputs is not [...]
                     assert True
-                else :
+                else:
                     assert False
