@@ -29,7 +29,7 @@ jobs:
         python -m pip install -r requirements-for-dev.txt
         python -m pip install -U "urllib3<1.25"
     - name: Test with pytest
-      run: sudo pytest test_extractor.py --concmode=mproc  --disable-pytest-warnings --color=yes
+      run: pytest test_extractor.py --concmode=mproc  --disable-pytest-warnings --color=yes
 
   build:
     needs: test
