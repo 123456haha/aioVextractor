@@ -177,7 +177,10 @@ class Extractor(ToolSet):
         else:
             return None
 
-    @RequestRetry
+    @RequestRetry(
+        default_exception_return={},
+        default_other_exception_return={},
+    )
     async def extract_comment_count(self, commentId, session):
         if commentId:
             pass
@@ -203,7 +206,10 @@ class Extractor(ToolSet):
         )
         return {"comment_count": jmespath.search('data[0].commentnum', response)}
 
-    @RequestRetry(default_exception_return={})
+    @RequestRetry(
+        default_exception_return={},
+        default_other_exception_return={},
+    )
     async def extract_author_info(self, selector, session):
         user_page_url = selector.css('.video_user a::attr(href)').extract_first()
         if not user_page_url or user_page_url == 'javascript:':
