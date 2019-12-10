@@ -14,13 +14,13 @@ from aioVextractor.extractor.base_extractor import (
 
 class Extractor(BaseExtractor):
     target_website = [
-        "http[s]?://xhsurl\.com/\d{2}-\w{2}",
+        "http[s]?://xhsurl\.com/\w{5}",
+        "http[s]?://www.xiaohongshu\.com/discovery/item/.*",
     ]
 
     TEST_CASE = [
-        # "http://xhsurl.com/21-cf",
-        # "http://xhsurl.com/21-uc",
-        # "http://xhsurl.com/21-E4",
+        "http://xhsurl.com/3umNO",
+        "https://www.xiaohongshu.com/discovery/item/5dea1545000000000100530b?xhsshare=CopyLink&appuid=5dd37f3c0000000001008b0b&apptime=1575963315",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -40,14 +40,17 @@ class Extractor(BaseExtractor):
             'accept-encoding': 'gzip, deflate, br',
             'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
         }
-        response = await self.request(
-            url=webpage_url,
-            session=session,
-            headers=headers,
-            allow_redirects=False,
-            response_type="raw"
-        )
-        location = response.headers['Location']
+        if 'https://www.xiaohongshu.com/discovery/item' in webpage_url:
+            location = webpage_url
+        else:
+            response = await self.request(
+                url=webpage_url,
+                session=session,
+                headers=headers,
+                allow_redirects=False,
+                response_type="raw"
+            )
+            location = response.headers['Location']
         # response = await self.request(
         #     url=webpage_url,
         #     session=session,
@@ -73,7 +76,6 @@ class Extractor(BaseExtractor):
             'timestamp2': '3854455932',
             'hasaki': '%5B%22Mozilla%2F5.0%20(X11%3B%20Linux%20x86_64)%20AppleWebKit%2F537.36%20(KHTML%2C%20like%20Gecko)%20Chrome%2F74.0.3729.108%20Safari%2F537.36%22%2C%22zh-CN%22%2C24%2C-480%2Ctrue%2Ctrue%2Ctrue%2C%22undefined%22%2C%22function%22%2Cnull%2C%22Linux%20x86_64%22%2C6%2C8%2Cnull%2C%22Chrome%20PDF%20Plugin%3A%3APortable%20Document%20Format%3A%3Aapplication%2Fx-google-chrome-pdf~pdf%3BChrome%20PDF%20Viewer%3A%3A%3A%3Aapplication%2Fpdf~pdf%3BNative%20Client%3A%3A%3A%3Aapplication%2Fx-nacl~%2Capplication%2Fx-pnacl~%22%5D',
         }
-
         response = await self.request(
             url=location,
             session=session,
@@ -119,7 +121,6 @@ class Extractor(BaseExtractor):
             pass
         result['play_addr'] = selector.css("video::attr(src)").extract_first()
         result['vid'] = result['play_addr'].split("?")[0].split("/")[-1]
-
         result['cover'] = os.path.join("http://", selector.css(".video-poster::attr(src)").extract_first().lstrip("//"))
         return result
 
