@@ -90,7 +90,7 @@ class Extractor(BaseExtractor):
         response = await self.request(
             url=url,
             session=session,
-            headers=self.general_headers(user_agent=self.random_ua())
+            headers=self.general_headers(user_agent=self.random_ua()),
         )
         video_json = json.loads(response)
         main_url = jmespath.search("max_by(data.video_list.*, &size).main_url", video_json)
