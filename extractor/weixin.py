@@ -3,9 +3,8 @@
 # Created by panos on 1/21/19
 # IDE: PyCharm
 
-import re, json
+import re
 from bs4 import BeautifulSoup
-import asyncio
 from aioVextractor.extractor.base_extractor import (
     BaseExtractor,
     validate,
@@ -40,36 +39,49 @@ class Extractor(BaseExtractor):
             'authority': 'mp.weixin.qq.com',
             'origin': 'https://mp.weixin.qq.com',
             'x-requested-with': 'XMLHttpRequest',
-            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
+            'user-agent': self.random_ua(),
             'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
             'accept': '*/*',
             'sec-fetch-site': 'same-origin',
             'sec-fetch-mode': 'cors',
-            'referer': 'https://mp.weixin.qq.com/s/yjzmRFDEwJgXDfGaK_ooUQ',
+            'referer': webpage_url,
             'accept-encoding': 'gzip, deflate, br',
             'accept-language': 'zh-CN,zh;q=0.9',
-            'cookie': 'tvfe_boss_uuid=40a1a90fe02e1541; pgv_pvid=585509504; rewardsn=; wxtokenkey=777; ua_id=7Oq2IR31TRYerQZIAAAAAO5-dmYN2D2W0TO7HAz1PsI=; pgv_pvi=2672868352; pgv_si=s7425719296',
+            'cookie': 'tvfe_boss_uuid=40a1a90fe02e1541; '
+                      'pgv_pvid=585509504; '
+                      'rewardsn=; '
+                      'wxtokenkey=777; '
+                      'ua_id=7Oq2IR31TRYerQZIAAAAAO5-dmYN2D2W0TO7HAz1PsI=; '
+                      'pgv_pvi=2672868352; '
+                      'pgv_si=s7425719296',
         }
         text = await self.request(
             url=webpage_url,
             session=session,
             headers=headers
         )
-        re_list = []
-        res = re.findall('<iframe.*?data-cover="(.*?)".*?data-src="(.*?)">', text)
-        for i in res:
+        results = []
+        iframes = re.findall('<iframe.*?data-cover="(.*?)".*?data-src="(.*?)">', text)
+        for iframe in iframes:
             item = dict()
             selector = BeautifulSoup(text, 'lxml')
             title = selector.find('h2', attrs={"class": "rich_media_title"})
             item['title'] = title.text.strip()
             author = selector.find('a', attrs={"id": "js_name"})
             item['author'] = author.text.strip()
-            item['cover_list'] = selector.find('img', attrs={"class": "rich_pages "})
-            item['play_addr'] = i[1].replace(";", "&")
-            item['cover'] = unquote(i[0])
-            item['vid'] = i[1].split(';')[-1].strip("vid=")
-            re_list.append(item)
-        return re_list
+            # item['cover_list'] = selector.find('img', attrs={"class": "rich_pages "})
+            item['play_addr'] = iframe[1].replace(";", "&")
+            if re.match("https://mp.weixin.qq.com/mp/readtemplate", item['play_addr']):
+                pass
+                ## item['play_addr'] = self.test()
+
+            ## 'https://mp.weixin.qq.com/mp/readtemplate?t=pages/video_player_tmpl&amp&action=mpvideo&amp&auto=0&amp&vid=wxv_1064559816019968002'
+            ## 'https://mp.weixin.qq.com/mp/readtemplate?t=pages/video_player_tmpl&amp&action=mpvideo&amp&auto=0&amp&vid=wxv_1081584742547505153'
+            ## 'https://v.qq.com/iframe/preview.html?width=500&amp&height=375&amp&auto=0&amp&vid=s0167ynbnt9'
+            item['cover'] = unquote(iframe[0])
+            item['vid'] = iframe[1].split(';')[-1].strip("vid=")
+            results.append(item)
+        return results
 
 
 if __name__ == '__main__':
