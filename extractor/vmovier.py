@@ -71,8 +71,6 @@ class Extractor(BaseExtractor):
         for result in results:
             for ele in result:
                 if ele:
-                    # ele['from'] = self.from_
-                    # ele['webpage_url'] = webpage_url
                     outputs.append(ele)
 
         return outputs
