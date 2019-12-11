@@ -64,6 +64,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(
-            webpage_url="http://iwebad.com/video/3577.html,   http://iwebad.com/video/3578.html")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)

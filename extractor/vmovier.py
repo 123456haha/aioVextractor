@@ -29,7 +29,7 @@ class Extractor(BaseExtractor):
         ## xpc player:
         "https://www.vmovier.com/56000?from=index_new_img",
         ## youku player:
-        "https://www.vmovier.com/56052?from=index_new_title",
+        # "https://www.vmovier.com/56052?from=index_new_title",
         "https://www.vmovier.com/55952?from=index_new_img",
         "https://www.vmovier.com/55108",
     ]
