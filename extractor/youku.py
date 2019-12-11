@@ -31,11 +31,11 @@ class Extractor(ToolSet):
         'https://m.youku.com/alipay_video/id_XNDQ0MTg2MDk1Ng==.html?spm=a2hww.12630586.entDrawer2.1',
         "https://v.youku.com/v_show/id_XMzg5Mjc5NDExMg==.html?spm=a2h0j.11185381.bpmodule-playpage-segments.5~5~A&&s=1f1b995a017c11df97c0",
 
-        # "https://v.youku.com/v_show/id_XNDIyMTIwMjc2MA==.html?spm=a2ha1.12675304.m_2556_c_8261.d_2&s=5b4e34d331864a6d89dc&scm=20140719.manual.2556.show_5b4e34d331864a6d89dc",
-        # "https://v.youku.com/v_show/id_XNDEyNDE5MzYyOA==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5MzYyOA%3D%3D",
-        # "https://v.youku.com/v_show/id_XMzIzNTkyNzYyOA==.html?spm=a2ha1.12675304.m_2561_c_8264.d_1&s=efbfbd043420efbfbdef&scm=20140719.rcmd.2561.show_efbfbd043420efbfbdef",
-        # "https://v.youku.com/v_show/id_XMTcxNTA2OTEwNA==.html?spm=a2ha1.12528442.m_4424_c_11054_4.d_5&s=cb4582f4f72011e5a080&scm=20140719.rcmd.4424.show_cb4582f4f72011e5a080",
-        # "https://v.youku.com/v_show/id_XNDEyNDE5NzQ1Mg==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5NzQ1Mg%3D%3D",
+        "https://v.youku.com/v_show/id_XNDIyMTIwMjc2MA==.html?spm=a2ha1.12675304.m_2556_c_8261.d_2&s=5b4e34d331864a6d89dc&scm=20140719.manual.2556.show_5b4e34d331864a6d89dc",
+        "https://v.youku.com/v_show/id_XNDEyNDE5MzYyOA==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5MzYyOA%3D%3D",
+        "https://v.youku.com/v_show/id_XMzIzNTkyNzYyOA==.html?spm=a2ha1.12675304.m_2561_c_8264.d_1&s=efbfbd043420efbfbdef&scm=20140719.rcmd.2561.show_efbfbd043420efbfbdef",
+        "https://v.youku.com/v_show/id_XMTcxNTA2OTEwNA==.html?spm=a2ha1.12528442.m_4424_c_11054_4.d_5&s=cb4582f4f72011e5a080&scm=20140719.rcmd.4424.show_cb4582f4f72011e5a080",
+        "https://v.youku.com/v_show/id_XNDEyNDE5NzQ1Mg==.html?spm=a2ha1.12675304.m_2559_c_8263.d_1&scm=20140719.manual.2559.video_XNDEyNDE5NzQ1Mg%3D%3D",
 
     ]
 
@@ -46,44 +46,45 @@ class Extractor(ToolSet):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
-        vid = webpage_url.split('?')[0].split('/')[-1].replace('==', '').lstrip('id_').split('.')[0]
-        webpage_url = f"https://v.youku.com/v_show/id_{vid}"
-        data = {"video_id": vid,
-                "client_id": "b598bfd8ec862716",
-                "callback": f'youkuPlayer_call_{int(time.time() * 1000)}',
-                "type": "pc",
-                "embsig": "",
-                "version": "1.0",
-                "_t": "006315043435963385"}
-        yk_url = 'https://api.youku.com/players/custom.json?'
-        html = await self.request(
-            url=yk_url,
-            session=session,
-            params=data,
-            ssl=False,
-        )
-
-        customdata = json.loads(html)
-        stealsign = customdata['stealsign']
-        gather_results = await asyncio.gather(*[
-            self.extract_info(vid=vid, sign=stealsign, client_id=data['client_id'], session=session),
-            self.extract_comment_count(vid=vid, session=session),
-            self.extract_webpage(url=webpage_url, session=session)
-        ])
-        result = self.merge_dicts(
-            {
-                # "webpage_url": webpage_url,
-                "vid": vid,
-                "downloader": "ytd",
-            },
-            *gather_results[:2]
-        )
         try:
-            result['category'] += gather_results[2]['category']
-        except KeyError:
-            return result
+            vid = webpage_url.split('?')[0].split('/')[-1].replace('==', '').lstrip('id_').split('.')[0]
+        except:
+            traceback.print_exc()
+            return False
+        else:
+            webpage_url = f"https://v.youku.com/v_show/id_{vid}"
+            data = {"video_id": vid,
+                    "client_id": "b598bfd8ec862716",
+                    "callback": "f'youkuPlayer_call_{int(time.time() * 1000)}'",
+                    "type": "pc",
+                    "embsig": "",
+                    "version": "1.0",
+                    "_t": "006315043435963385"}
+            yk_url = 'https://api.youku.com/players/custom.json?'
+            html = await self.request(
+                url=yk_url,
+                session=session,
+                params=data,
+                ssl=False,
+            )
 
-        return {**gather_results[2], **result}
+            customdata = json.loads(html)
+            stealsign = customdata['stealsign']
+            gather_results = await asyncio.gather(*[
+                self.extract_info(vid=vid, sign=stealsign, client_id=data['client_id'], session=session),
+                self.extract_comment_count(vid=vid, session=session),
+                self.extract_webpage(url=webpage_url, session=session)
+            ])
+            result = self.merge_dicts(
+                {
+                    # "webpage_url": webpage_url,
+                    "vid": vid,
+                    "downloader": "ytd",
+                },
+                *gather_results[:2]
+            )
+            result['category'] += gather_results[2]['category']
+            return {**gather_results[2], **result}
 
     @RequestRetry(default_exception_return={},
                   default_other_exception_return={})
@@ -133,6 +134,7 @@ class Extractor(ToolSet):
             # item['cdn_url'] = jmespath.search('max_by(data.stream, &size).segs[].cdn_url', videodata)
             play_addr = jmespath.search('max_by(data.stream, &size).segs[].cdn_url', videodata)[0]
         except:
+            traceback.print_exc()
             height = jmespath.search('data.stream[-1].height', videodata)
             width = jmespath.search('data.stream[-1].width', videodata)
             # item['cdn_url'] = jmespath.search('data.stream[-1].segs[].cdn_url', videodata)
