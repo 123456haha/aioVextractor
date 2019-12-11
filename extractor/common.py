@@ -12,6 +12,7 @@ class Extractor(BaseExtractor):
     """
     TEST_CASE = [
         "http://peacefulcuisine.com/category/videos/#",
+        # "https://www.behance.net/gallery/86216105/GOGORO-VIVA-LOGO-ANIMATION",
     ]
     @validate
     @RequestRetry
@@ -24,5 +25,5 @@ class Extractor(BaseExtractor):
 if __name__ == '__main__':
     from pprint import pprint
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url="https://www.behance.net/gallery/86216105/GOGORO-VIVA-LOGO-ANIMATION")
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)

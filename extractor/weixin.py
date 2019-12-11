@@ -26,6 +26,7 @@ class Extractor(BaseExtractor):
         "https://mp.weixin.qq.com/s/Ld6tw7ZjzFcUkPXa79HH5Q",
         "https://mp.weixin.qq.com/s/6lDIjP799J2b07RHoNil1A",
         "https://mp.weixin.qq.com/s/yjzmRFDEwJgXDfGaK_ooUQ",
+        "https://mp.weixin.qq.com/s/WR6EdO8CYcpRHvsOM62Tdw",
     ]
 
     def __init__(self, *args, **kwargs):
