@@ -3,7 +3,7 @@
 # Created by panos on 1/21/19
 # IDE: PyCharm
 
-import re
+import re, json
 from bs4 import BeautifulSoup
 from aioVextractor.extractor.base_extractor import (
     BaseExtractor,
@@ -71,17 +71,25 @@ class Extractor(BaseExtractor):
             item['author'] = author.text.strip()
             # item['cover_list'] = selector.find('img', attrs={"class": "rich_pages "})
             item['play_addr'] = iframe[1].replace(";", "&")
-            if re.match("https://mp.weixin.qq.com/mp/readtemplate", item['play_addr']):
-                pass
-                ## item['play_addr'] = self.test()
-
-            ## 'https://mp.weixin.qq.com/mp/readtemplate?t=pages/video_player_tmpl&amp&action=mpvideo&amp&auto=0&amp&vid=wxv_1064559816019968002'
-            ## 'https://mp.weixin.qq.com/mp/readtemplate?t=pages/video_player_tmpl&amp&action=mpvideo&amp&auto=0&amp&vid=wxv_1081584742547505153'
-            ## 'https://v.qq.com/iframe/preview.html?width=500&amp&height=375&amp&auto=0&amp&vid=s0167ynbnt9'
-            item['cover'] = unquote(iframe[0])
             item['vid'] = iframe[1].split(';')[-1].strip("vid=")
+            if re.match("https://mp.weixin.qq.com/mp/readtemplate", item['play_addr']):
+                item['play_addr'] = await self.parse(item['vid'], session)
+            item['cover'] = unquote(iframe[0])
             results.append(item)
         return results
+
+    async def parse(self, vid, session):
+        json_url = f'https://mp.weixin.qq.com/mp/videoplayer?action=get_mp_video_play_url&preview=0&__biz=MzU0ODE3Nzc4Nw==&mid=2247525077&idx=1&vid={vid}&uin=&key=&pass_ticket=&wxtoken=777&appmsg_token=&x5=0&f=json'
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
+        }
+        texts = await self.request(
+            url=json_url,
+            session=session,
+            headers=headers
+        )
+        html = json.loads(texts)
+        return html['url_info'][0]['url']
 
 
 if __name__ == '__main__':
