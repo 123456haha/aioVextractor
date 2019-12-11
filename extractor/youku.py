@@ -83,7 +83,6 @@ class Extractor(ToolSet):
                 },
                 *gather_results[:2]
             )
-            result['category'] += gather_results[2]['category']
             return {**gather_results[2], **result}
 
     @RequestRetry(default_exception_return={},
