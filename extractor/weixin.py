@@ -3,15 +3,15 @@
 # Created by panos on 1/21/19
 # IDE: PyCharm
 
-from scrapy.selector import Selector
+import re, json
+from bs4 import BeautifulSoup
 import asyncio
-import jmespath
-from urllib.parse import unquote
 from aioVextractor.extractor.base_extractor import (
     BaseExtractor,
     validate,
     RequestRetry
 )
+from urllib.parse import unquote
 
 
 class Extractor(BaseExtractor):
@@ -32,85 +32,44 @@ class Extractor(BaseExtractor):
     def __init__(self, *args, **kwargs):
         BaseExtractor.__init__(self, *args, **kwargs)
         self.from_ = "weixin"
-        self.results = []
-        self.result = []
 
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
-        await asyncio.gather(
-            self.version_uno(webpage_url=webpage_url, session=session),
-            self.version_dos(webpage_url=webpage_url),
-                                       )
-        return self.results
-
-
-    async def version_uno(self, webpage_url, session):
-        headers = self.general_headers(user_agent=self.random_ua())
+        headers = {
+            'authority': 'mp.weixin.qq.com',
+            'origin': 'https://mp.weixin.qq.com',
+            'x-requested-with': 'XMLHttpRequest',
+            'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
+            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'accept': '*/*',
+            'sec-fetch-site': 'same-origin',
+            'sec-fetch-mode': 'cors',
+            'referer': 'https://mp.weixin.qq.com/s/yjzmRFDEwJgXDfGaK_ooUQ',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'zh-CN,zh;q=0.9',
+            'cookie': 'tvfe_boss_uuid=40a1a90fe02e1541; pgv_pvid=585509504; rewardsn=; wxtokenkey=777; ua_id=7Oq2IR31TRYerQZIAAAAAO5-dmYN2D2W0TO7HAz1PsI=; pgv_pvi=2672868352; pgv_si=s7425719296',
+        }
         text = await self.request(
             url=webpage_url,
             session=session,
             headers=headers
         )
-        selector = Selector(text=text)
-        urls = selector.css('iframe[data-src]::attr(data-src)').extract()
-        if not urls:
-            return False
-        results = await asyncio.gather(
-            *[
-                self.extract_iframe(
-                    iframe_url=iframe_url,
-                    session=session
-                )
-                for iframe_url in urls
-            ])
-
-        outputs = []
-        for result in results:
-            if result:
-                for ele in result:
-                    if ele:
-                        # ele['from'] = self.from_
-                        # ele['webpage_url'] = webpage_url
-                        outputs.append(ele)
-        self.results += outputs
-
-    async def version_dos(self, webpage_url):
-        browser = await self.launch_browers()
-        page = await browser.newPage()
-        page.on('response', self.intercept_response)
-        await page.goto(webpage_url)
-        await asyncio.sleep(2)
-        await page.evaluate('window.scrollTo(0,document.body.scrollHeight)')
-        response_text = await page.content()
-        selector = Selector(text=response_text)
-        cover_list = list(map(lambda x:unquote(x), selector.css(".video_iframe::attr(data-cover)").extract()))
-        for num, ele in enumerate(self.result):
-            ele["cover"] = cover_list[num]
-            # ele["webpage_url"] = webpage_url
-        self.results += self.result
-        # await page.waitForResponse(lambda response: "mp.weixin.qq.com/mp/videoplayer" in response.url)
-        # await page.waitForRequest(lambda response: "mp.weixin.qq.com/mp/videoplayer" in response.url, timeout=3)
-        await browser.close()
-
-
-    async def intercept_response(self, response):
-        resourceType = response.request.resourceType
-        if resourceType in ['xhr'] and 'mp.weixin.qq.com/mp/videoplayer' in response.url:
-            response_json = await response.json()
-            self.extract_page(response=response_json)
-
-    def extract_page(self, response):
-        result = jmespath.search('max_by(url_info, &width).{'
-                '"play_addr": url,'
-                '"width": width,'
-                '"height": height,'
-                '"duration": duration_ms'
-                '}', response)
-        result['duration'] = result['duration']//1000 if result['duration'] else None
-        result['vid'] =  result['play_addr'].split("/")[-1].split(".")[0]
-        # result['from'] =  self.from_
-        self.result.append(result)
+        re_list = []
+        res = re.findall('<iframe.*?data-cover="(.*?)".*?data-src="(.*?)">', text)
+        for i in res:
+            item = dict()
+            selector = BeautifulSoup(text, 'lxml')
+            title = selector.find('h2', attrs={"class": "rich_media_title"})
+            item['title'] = title.text.strip()
+            author = selector.find('a', attrs={"id": "js_name"})
+            item['author'] = author.text.strip()
+            item['cover_list'] = selector.find('img', attrs={"class": "rich_pages "})
+            item['play_addr'] = i[1].replace(";", "&")
+            item['cover'] = unquote(i[0])
+            item['vid'] = i[1].split(';')[-1].strip("vid=")
+            re_list.append(item)
+        return re_list
 
 
 if __name__ == '__main__':
@@ -119,3 +78,4 @@ if __name__ == '__main__':
     with Extractor() as extractor:
         res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)
+
