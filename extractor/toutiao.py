@@ -8,7 +8,6 @@ import random
 from urllib.parse import urlparse
 import binascii
 import base64
-from scrapy import Selector
 import jmespath
 import execjs
 import platform
@@ -19,7 +18,6 @@ from aioVextractor.extractor.base_extractor import (
     RequestRetry
 )
 import time
-import asyncio
 
 if platform.system() in {"Linux", "Darwin"}:
     import ujson as json
@@ -62,39 +60,21 @@ class Extractor(BaseExtractor):
     @validate
     @RequestRetry
     async def entrance(self, webpage_url, session, *args, **kwargs):
-        if re.match("http[s]?://m\.toutiaocdn\.com/i\d{10,36}", webpage_url) \
-                or re.match("http[s]?://m\.toutiao\.com/i\d{10,36}", webpage_url):
-            js_file_path = os.path.join(
-                os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
-                "special/generate_signature.js"
-            )
-            AS, CP, _signature = self.get_token(path=js_file_path)
-            i = re.findall("i(\d{10,36})", webpage_url)[0]
-            api = f'https://m.toutiao.com/i{i}/info/?_signature={_signature}&i={i}'
-            response = await self.request(
-                url=api,
-                session=session,
-                headers=self.general_headers(user_agent=self.random_ua()),
-                response_type="json"
-            )
-            result = self.extract_ipage(response=response)
-            vid = result['vid']
-        else:
-            browser = await self.launch_browers()
-            page = await browser.newPage()
-            await page.goto(webpage_url)
-            html = await page.content()
-            SSR_HYDRATED_DATA_RAW = Selector(text=html).css("#SSR_HYDRATED_DATA::text").extract_first()
-            while SSR_HYDRATED_DATA_RAW is None and time.time() - self.last_response <= 10:
-                html = await page.content()
-                SSR_HYDRATED_DATA_RAW = Selector(text=html).css("#SSR_HYDRATED_DATA::text").extract_first()
-                await asyncio.sleep(2)
-            else:
-                SSR_HYDRATED_DATA = json.loads(SSR_HYDRATED_DATA_RAW)
-
-            result = self.extract(response=SSR_HYDRATED_DATA)
-            vid = re.findall('"vid"\s?:\s?"(\w{5,40})"', html)[0]
-            await browser.close()
+        js_file_path = os.path.join(
+            os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
+            "special/generate_signature.js"
+        )
+        AS, CP, _signature = self.get_token(path=js_file_path)
+        i = re.findall(".(\d{10,36})", webpage_url)[0]
+        api = f'https://m.toutiao.com/i{i}/info/?_signature={_signature}&i={i}'
+        response = await self.request(
+            url=api,
+            session=session,
+            headers=self.general_headers(user_agent=self.random_ua()),
+            response_type="json"
+        )
+        result = self.extract_ipage(response=response)
+        vid = result['vid']
         play_addr = await self.cal_play_addr(vid=vid, session=session)
         return self.merge_dicts(result, play_addr)
 
@@ -110,7 +90,7 @@ class Extractor(BaseExtractor):
         response = await self.request(
             url=url,
             session=session,
-            headers=self.general_headers(user_agent=self.random_ua())
+            headers=self.general_headers(user_agent=self.random_ua()),
         )
         video_json = json.loads(response)
         main_url = jmespath.search("max_by(data.video_list.*, &size).main_url", video_json)
@@ -128,30 +108,7 @@ class Extractor(BaseExtractor):
             "vid": jmespath.search("data.video_id", video_json),
             "duration": duration,
             "cover": jmespath.search("data.poster_url", video_json),
-            # "from": self.from_,
-            # "webpage_url": webpage_url,
         }
-
-    @staticmethod
-    def extract(response):
-        video = jmespath.search('Projection.video', response)
-        user_info = jmespath.search('Projection.video.user_info', response)
-        result = {
-            "duration": jmespath.search("video_duration", video),
-            "view_count": jmespath.search("video_watch_count", video),
-            "avatar": jmespath.search("avatar_url", user_info),
-            "author": jmespath.search("name", user_info),
-            "author_id": jmespath.search("user_id", user_info),
-            "like_count": jmespath.search("video_like_count", video),
-            "upload_ts": jmespath.search("video_publish_time", video),
-            "description": jmespath.search("video_abstract", video),
-            "vid": jmespath.search("vid", video),
-            "title": jmespath.search("title", video),
-            "cover": "http://p3.pstatp.com/large/" + jmespath.search("poster_uri", video),
-            # "from": self.from_,
-            # "webpage_url": webpage_url,
-        }
-        return result
 
     @staticmethod
     def extract_ipage(response):

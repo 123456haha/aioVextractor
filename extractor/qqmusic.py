@@ -38,13 +38,16 @@ class Extractor(BaseExtractor):
         browser = await self.launch_browers()
         page = await browser.newPage()
         await page.goto(webpage_url)
-
-        while time.time() - self.last_response < 3:
+        html = await page.content()
+        mv__name = self.Selector(text=html).css('.mv__name::text').extract_first()
+        while mv__name is None and time.time() - self.last_response < 5:
             await asyncio.sleep(0.1)
-        page_text = await page.content()
-        await browser.close()
-        self.extract_page(response=page_text)
-        return self.results
+        else:
+            page_text = await page.content()
+            print(page_text)
+            await browser.close()
+            self.extract_page(response=page_text)
+            return self.results
 
     def extract_page(self, response):
         selector = self.Selector(text=response)

@@ -1,0 +1,24 @@
+name: deployment
+
+on: 
+  push:
+    branches: master
+
+jobs:
+  deployment:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: deployment_uno
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST_UNO }}
+        username: ${{ secrets.USERNAME_UNO }}
+        password: ${{ secrets.PASSWORD_UNO }}
+        script: ${{ secrets.UPDATE_SERVICE }}
+    - name: deployment_dos
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST_DOS }}
+        username: ${{ secrets.USERNAME_DOS }}
+        password: ${{ secrets.PASSWORD_DOS }}
+        script: ${{ secrets.UPDATE_SERVICE }}

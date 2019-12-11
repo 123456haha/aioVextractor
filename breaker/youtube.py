@@ -29,6 +29,7 @@ class Breaker(BaseBreaker):
     target_website = [
         "http[s]?://www\.youtube\.com/channel/[\w-]{10,36}",
         "http[s]?://www\.youtube\.com/playlist\?list=[\w-]{10,36}",
+        "http[s]?://www\.youtube\.com/user.*",
     ]
 
     downloader = 'ytd'
@@ -37,6 +38,7 @@ class Breaker(BaseBreaker):
         "https://www.youtube.com/channel/UCSRpCBq2xomj7Sz0od73jWw/videos",
         "https://www.youtube.com/channel/UCAyj5vEhoaw6fDFBpSbQvRg",
         "https://www.youtube.com/playlist?list=PLs54iBUqIopDv2wRhkqArl9AEV1PU-gmc",
+        "https://www.youtube.com/user/ShortoftheWeek/videos",
     ]
 
     def __init__(self, *args, **kwargs):

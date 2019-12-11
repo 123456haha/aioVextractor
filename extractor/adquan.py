@@ -22,7 +22,7 @@ class Extractor(BaseExtractor):
     TEST_CASE = [
         "https://creative.adquan.com/show/286788",
         "https://creative.adquan.com/show/286778",
-        "http://www.adquan.com/post-2-49507.html",
+        # "http://www.adquan.com/post-2-49507.html",
         "http://creative.adquan.com/show/49469",
         "http://creative.adquan.com/show/49415",
         "https://mobile.adquan.com/creative/detail/288096",
