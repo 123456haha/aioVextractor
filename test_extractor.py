@@ -5,7 +5,7 @@
 """
 RUN ME BEFORE GOING SERIOUS!
 
-pytest test_extractor.py --concmode=mproc  --disable-pytest-warnings --color=yes
+pytest test_extractor.py --concmode=mproc  --disable-pytest-warnings --color=yes --log-cli-level=CRITICAL
 
 """
 import sys, os
