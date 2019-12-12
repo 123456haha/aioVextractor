@@ -18,8 +18,8 @@ class Extractor(BaseExtractor):
     ]
 
     TEST_CASE = [
-        # "分享台灣音樂風雲榜的视频《陈奕迅《苦瓜》唱尽世间百态，催人泪下！》http://music.163.com/video/9F01C451779850285AE78A477164A8C0/?userid=387580397 (@网易云音乐)",
-        # "分享非洲大使的视频《11.17 北京 木秦艾瑞欧《粉色苏打》》http://music.163.com/video/29AC8C00A0EE1B8EA609BEAF381727C9/?userid=387580397 (@网易云音乐)",
+        "分享台灣音樂風雲榜的视频《陈奕迅《苦瓜》唱尽世间百态，催人泪下！》http://music.163.com/video/9F01C451779850285AE78A477164A8C0/?userid=387580397 (@网易云音乐)",
+        "分享非洲大使的视频《11.17 北京 木秦艾瑞欧《粉色苏打》》http://music.163.com/video/29AC8C00A0EE1B8EA609BEAF381727C9/?userid=387580397 (@网易云音乐)",
         "分享音乐小纸条儿的视频《咆哮吧，钢铁侠！AC/DC《Back In Black》这是摇滚老炮的怒吼！》http://music.163.com/video/30364DD42E8F33C7BD2A92DCA4E8DFED/?userid=387580397 (@网易云音乐)",
     ]
 
