@@ -22,7 +22,7 @@ class Extractor(BaseExtractor):
     TEST_CASE = [
         "https://creative.adquan.com/show/286788",
         "https://creative.adquan.com/show/286778",
-        # "http://www.adquan.com/post-2-49507.html",
+        "http://www.adquan.com/post-2-49507.html",
         "http://creative.adquan.com/show/49469",
         "http://creative.adquan.com/show/49415",
         "https://mobile.adquan.com/creative/detail/288096",
@@ -40,19 +40,12 @@ class Extractor(BaseExtractor):
         Cookie = 'Hm_lvt_b9772bb26f0ebb4e77be78655c6aba4e=1575882598; ' \
                  'acw_tc=65c86a0c15758827105424225eba98fda6d222f47abc0f66507ad18b9ee8b0; ' \
                  'area=eyJpdiI6IllPSEp0eXFZNG1RaExCQWhDbWI3WGc9PSIsInZhbHVlIjoiTm54UTcxYURYYmFGa01aYmhkRjQ1UT09IiwibWFjIjoiMGM2ZGRhZGQ5OTliZmIyNGQxMzJiMTQ3MTRkNWJmZDJiNjM1OTNiNTM5Nzc4N2QzZmUyMWQ1YjIxMDIzN2JjZSJ9; ' \
-                 'acw_sc__v2=5def5e44c6e696eb3d9dcc5e3400e1bc1930a9b8; ' \
-                 'acw_sc__v3=5def5e4673266e5ec7ff4cdbd04589ba88e76e32; ' \
-                 'Hm_lpvt_b9772bb26f0ebb4e77be78655c6aba4e=1575968408; ' \
-                 'XSRF-TOKEN=eyJpdiI6IjNPRG92WEVTbkpJdjJ2NjR0OWxOY0E9PSIsInZhbHVlIjoiXC94K1N4TU9KWCtVRUJQWDRQOEFZXC9XTmtOb1ErS2pCSzRQazZXVTh0Wk94dCs5T1ZqWjVKaWRwbHhWTE9OXC9oMGdJUmpuZWRuMmNPNnQwMWZ0elg5Y2c9PSIsIm1hYyI6IjIzODBmZGMwNDE1NmNmNmExMTM3MmE3YmQ1NWU0OTkyNDgwOGNlMTg0Mzc0ZTZlMzhiOTZmZjU3MzBjOTA4YTYifQ%3D%3D; ' \
-                 'laravel_session_production=eyJpdiI6IkJcL3h6dkpLeVN4R1wvY1VkOGRTV1VqUT09IiwidmFsdWUiOiJibGl2RklWREtkMW55dW0xeE1aaDdHSVR1TXRPRHk0K3RyMzlUblNHTFA5b05NS3hpTndvSk1WSHN3ME9ublVkdzBlQk11S3FGTFk2YktrXC8ycEdQSWc9PSIsIm1hYyI6ImRkMTc1MTM1OTQ0OTFiMGRkZTg1M2MzZmFkODljNzYzOGM1OWEzMWY3NTY2NmZkMTdlMDU2ODk1YzFmMWUzNzUifQ%3D%3D; ' \
-                 'SERVERID=235be1bfd767f5d87ef3d43a3712e539|1575968407|1575968325'
+                 'Hm_lpvt_b9772bb26f0ebb4e77be78655c6aba4e=1576136108; ' \
+                 'XSRF-TOKEN=eyJpdiI6IndrSVwvc25nc0tQV1UwRUgwbFVBVFpBPT0iLCJ2YWx1ZSI6IllFRGs5ODNsZk1IekNWdlFHeTZhRWxnbzRHWlR1OXlRaW9BajlDRVl4TE5pVHE5dXZMcUtoNjZcL3NBNmcxMjZYXC9cL3llSmgwK2JYc1g4Q1N2WExqd3Z3PT0iLCJtYWMiOiIyNDIwMTg2MjE0YzM0ODQ3ODU3MmRmOTFiYjBlOWNjMzRkYTM5M2I3MGUwNjg3ZDUzMWVjMzNlY2UwN2FiY2E2In0%3D; ' \
+                 'laravel_session_production=eyJpdiI6Ik9zdldMVGZpb24wOG05VmNBWUNkcVE9PSIsInZhbHVlIjoid0xvWFg4VUpObTFYZjdOYXdCZnN1SHRWVHlMUzJ1eGlYYWRJaUZzMlM2R1lTTmxNcUdjODArS05tT083SG5lMU9SREU1XC9vdFJkVXVlVVBPWWlYbG5BPT0iLCJtYWMiOiI3ZjQ3NTQzOWE5MDNiM2MzODQ4MzYwOTNlNmE5MGNmM2NjY2YzZDI4YTY0YmM0Njg2Y2Q1OGUxNTU2YTE3YmE0In0%3D; ' \
+                 'SERVERID=235be1bfd767f5d87ef3d43a3712e539|1576136108|1576136106; acw_sc__v2=5df1edcf5295e5cee219314bdb543364a9e9bb14'
         # Cookie = ''
         headers['Cookie'] = Cookie
-        # cookies = {
-        #     'acw_sc__v2': '5d53aa5bb49e0baea03a2f7ea7c2988205474261',
-        #
-        # }
-
         text = await self.request(
             url=webpage_url,
             session=session,
