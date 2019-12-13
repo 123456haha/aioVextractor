@@ -22,3 +22,5 @@ from aioVextractor.breaker.weibo import Breaker as weiboBK
 from aioVextractor.breaker.xinpianchang import Breaker as xinpianchangBK
 from aioVextractor.breaker.youtube import Breaker as youtubeBK
 from aioVextractor.breaker.ispot import Breaker as ispotBK
+from aioVextractor.breaker.adforum import Breaker as adforumBK
+from aioVextractor.breaker.tvcf import Breaker as tvcfBK
