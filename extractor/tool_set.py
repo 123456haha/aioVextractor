@@ -391,7 +391,7 @@ class ToolSet(BasicToolSet, metaclass=ABCMeta):
     async def entrance(self, *args, **kwargs):
         pass
 
-    def sync_entrance(self, webpage_url):
+    def sync_entrance(self, webpage_url, *args, **kwargs):
         """
         A synchronous entrance to call self.entrance()
         :param webpage_url:
@@ -401,7 +401,7 @@ class ToolSet(BasicToolSet, metaclass=ABCMeta):
         async def wrapper():
             async with aiohttp.ClientSession() as session:
                 try:
-                    return await self.entrance(webpage_url=webpage_url, session=session)
+                    return await self.entrance(webpage_url=webpage_url, session=session, *args, **kwargs)
                 except:
                     traceback.print_exc()
 

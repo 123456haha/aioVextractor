@@ -24,7 +24,7 @@ class Extractor(BaseExtractor):
     TEST_CASE = [
         "https://www.behance.net/gallery/86216105/GOGORO-VIVA-LOGO-ANIMATION",
         "https://www.behance.net/gallery/76062469/Oreo-Stay-Playful?tracking_source=curated_galleries",
-        # "https://www.behance.net/gallery/86072525/I-am-Hunger-in-America-Feeding-America?tracking_source=curated_galleries",
+        "https://www.behance.net/gallery/86072525/I-am-Hunger-in-America-Feeding-America?tracking_source=curated_galleries",
     ]
 
     def __init__(self, *args, **kwargs):

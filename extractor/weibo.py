@@ -45,6 +45,7 @@ class Extractor(BaseExtractor):
         "https://weibo.com/tv/v/IfIZrymE6?fid=1034:4437478581411755",
         "https://video.weibo.com/show?fid=1034:4437478581411755",
         "https://video.weibo.com/show?fid=1034%3A4443264082971524",
+        "https://m.weibo.cn/status/4448396397693495?"
 
     ]
 
@@ -179,7 +180,8 @@ class Extractor(BaseExtractor):
         except:
             pass
         result['play_addr'] = jmespath.search("page_info.urls.mp4_720p_mp4", status)
-
+        if not result['play_addr']:
+            result['play_addr'] = jmespath.search("page_info.urls.*", status)[-1]
         return result
 
     @staticmethod
