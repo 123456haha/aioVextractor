@@ -26,12 +26,15 @@ class Extractor(BaseExtractor):
     target_website = [
         "http[s]?://www\.tvcf\.co\.kr/YCf/V\.asp\?Code=\w{7,15}",
         "http[s]?://play\.tvcf\.co\.kr/\d{3,10}",
+        "http[s]?://www\.adconsumerreport\.com/Report/View\.aspx\?.*?Code=\w{8,15}",
     ]
 
     TEST_CASE = [
         "http://www.tvcf.co.kr/YCf/V.asp?Code=A000363280",
         "https://play.tvcf.co.kr/750556",
         "https://play.tvcf.co.kr/755843",
+        "http://www.tvcf.co.kr/YCf/V.asp?Code=A000363280",
+        "https://www.adconsumerreport.com/Report/View.aspx?Code=A000366122",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -219,5 +222,5 @@ if __name__ == '__main__':
     from pprint import pprint
 
     with Extractor() as extractor:
-        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[0])
+        res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)
