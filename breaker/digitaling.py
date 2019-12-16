@@ -53,10 +53,9 @@ class Breaker(BaseBreaker):
             cookies=cookies
         )
         html_ = re.findall('<\?xml version="1.0"\?>([\s\S]*)', response)[0]
-
         items_ = re.findall('<item>([\S\s]*?)</item>', html_)
+        output = []
         for item_ in items_:
-            output = []
             title = re.findall('<title><!\[CDATA\[ ([\S\s]*?)]]></title>', item_)[0]
             link = re.findall('<link><!\[CDATA\[ ([\S\s]*?)]]></link>', item_)[0]
             description = re.findall('<description><!\[CDATA\[ ([\S\s]*?)]]></description>', item_)[0]
@@ -75,7 +74,7 @@ class Breaker(BaseBreaker):
                     'from':self.from_,
                 }
                 output.append(item)
-            return output,False,{}
+        return output,False,{}
 
 
 if __name__ == '__main__':
