@@ -3,7 +3,7 @@
 # Created by panos on 2019/7/6
 # IDE: PyCharm
 
-import re,json
+import re, json
 from aioVextractor.utils import RequestRetry
 from aioVextractor.breaker import (
     BaseBreaker,
@@ -16,8 +16,6 @@ class Breaker(BaseBreaker):
         "http[s]?://creative\.adquan\.com/",
     ]
 
-    downloader = 'ytd'
-
     TEST_CASE = [
         "https://creative.adquan.com/",
     ]
@@ -29,11 +27,8 @@ class Breaker(BaseBreaker):
     @BreakerValidater
     @RequestRetry
     async def breakdown(self, webpage_url, session, **kwargs):
-        page = int(kwargs.pop("page", 2))
-        if page-1 == 0:
-            size = 16
-        else:
-            size =12
+        page = int(kwargs.pop("page", 1))
+        size = 16 if page - 1 == 0 else 12
         cookies = {
             'Hm_lvt_b9772bb26f0ebb4e77be78655c6aba4e': '1575882598',
             'acw_tc': '65c86a0a15758827064914767eb58249973cec5a9a242bdf48e19abbf4d8c3',
@@ -59,7 +54,7 @@ class Breaker(BaseBreaker):
 
         params = (
             ('size', size),
-            ('p', page-1),
+            ('p', page - 1),
             ('industry', '0'),
             ('typeclass', '0'),
             ('area', '0'),
@@ -77,16 +72,10 @@ class Breaker(BaseBreaker):
         )
         html = json.loads(clips)
 
-        datas = re.findall('<li>([\s\S]*?)</a></h2>',str(html))
+        datas = re.findall('<li>([\s\S]*?)</a></h2>', str(html))
         url = 'https://creative.adquan.com'
         for data in datas:
-            webpage_url = url + re.findall('<a class="title_img" href="(.*?)"',data)[0]
-
-
-
-
-
-
+            webpage_url = url + re.findall('<a class="title_img" href="(.*?)"', data)[0]
 
 
 if __name__ == '__main__':
@@ -94,7 +83,7 @@ if __name__ == '__main__':
 
     with Breaker() as breaker:
         res = breaker.sync_breakdown(
-            webpage_url=Breaker.TEST_CASE[0],
+            webpage_url=Breaker.TEST_CASE[-1],
             # page=2,
         )
         pprint(res)

@@ -11,6 +11,7 @@ from aioVextractor.breaker import (
 from aioVextractor.utils import RequestRetry
 import re
 
+
 class Breaker(BaseBreaker):
     target_website = [
         "http[s]?://www\.digitaling\.com/\w{3}"
@@ -37,9 +38,13 @@ class Breaker(BaseBreaker):
             'Connection': 'keep-alive',
             'Cache-Control': 'max-age=0',
             'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
+                          'AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/78.0.3904.108 Safari/537.36',
             'Sec-Fetch-User': '?1',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;'
+                      'q=0.9,image/webp,image/apng,*/*;'
+                      'q=0.8,application/signed-exchange;v=b3',
             'Sec-Fetch-Site': 'none',
             'Sec-Fetch-Mode': 'navigate',
             'Accept-Encoding': 'gzip, deflate, br',
@@ -70,11 +75,11 @@ class Breaker(BaseBreaker):
                     'webpage_url': link,
                     'cover': cover,
                     'vid': vid,
-                    'playlist_url':webpage_url,
-                    'from':self.from_,
+                    'playlist_url': webpage_url,
+                    'from': self.from_,
                 }
                 output.append(item)
-        return output,False,{}
+        return output, False, {}
 
 
 if __name__ == '__main__':
