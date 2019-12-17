@@ -3,14 +3,12 @@
 # Created by panos on 2019/6/20
 # IDE: PyCharm
 
-import re
 from aioVextractor.extractor.base_extractor import (
     BaseExtractor,
     validate,
     RequestRetry
 )
 import jmespath
-
 
 
 class Extractor(BaseExtractor):
@@ -67,12 +65,12 @@ class Extractor(BaseExtractor):
 
     def extract(self, response_json):
         result = {
-            'play_addr': jmespath.search('data.feeds[0].video_url',response_json),
-            'title': jmespath.search('data.feeds[0].feed_desc_withat',response_json),
-            'comment_count': jmespath.search('data.feeds[0].total_comment_num',response_json),
-            'like_count': jmespath.search('data.feeds[0].ding_count',response_json),
-            'vid': jmespath.search('data.feeds[0].id',response_json),
-            'cover': jmespath.search('data.feeds[0].extern_info.mpEx.feed_cover',response_json),
+            'play_addr': jmespath.search('data.feeds[0].video_url', response_json),
+            'title': jmespath.search('data.feeds[0].feed_desc_withat', response_json),
+            'comment_count': jmespath.search('data.feeds[0].total_comment_num', response_json),
+            'like_count': jmespath.search('data.feeds[0].ding_count', response_json),
+            'vid': jmespath.search('data.feeds[0].id', response_json),
+            'cover': jmespath.search('data.feeds[0].extern_info.mpEx.feed_cover', response_json),
         }
 
         self.results.append(result)
@@ -80,6 +78,7 @@ class Extractor(BaseExtractor):
 
 if __name__ == '__main__':
     from pprint import pprint
+
     with Extractor() as extractor:
         res = extractor.sync_entrance(webpage_url=Extractor.TEST_CASE[-1])
         pprint(res)

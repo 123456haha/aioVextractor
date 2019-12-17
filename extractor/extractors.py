@@ -46,4 +46,5 @@ from aioVextractor.extractor.xiami import Extractor as xiamiIE
 from aioVextractor.extractor.qqmusic import Extractor as qqmusicIE
 from aioVextractor.extractor.douban import Extractor as doubanIE
 from aioVextractor.extractor.maoyan import Extractor as maoyanIE
+from aioVextractor.extractor.weishi import Extractor as weishiIE
 
