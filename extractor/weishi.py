@@ -74,6 +74,7 @@ class Extractor(BaseExtractor):
             'vid': jmespath.search('data.feeds[0].id',response_json),
             'cover': jmespath.search('data.feeds[0].extern_info.mpEx.feed_cover',response_json),
         }
+
         self.results.append(result)
 
 
