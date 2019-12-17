@@ -17,11 +17,30 @@ class Breaker(BaseBreaker):
     target_website = [
         "http[s]?://www\.eyepetizer\.net/pgc\.html\?.*",
         "http[s]?://www\.eyepetizer\.net/tag\.html\?.*",
+        "http[s]?://baobab\.kaiyanapp\.com/api/v1/tag/videos\?id=.*"
     ]
 
     TEST_CASE = [
         "https://www.eyepetizer.net/pgc.html?deviceModel=iPhone&pid=22&utm_source=wechat-moments&vc=6312&vn=5.9.0&udid=324851f6406581f1ec04d1eff1d8198e508abf64&utm_campaign=routine&uid=0&utm_medium=share",
         "https://www.eyepetizer.net/tag.html?vc=6312&utm_medium=share&utm_source=wechat-moments&vn=5.9.0&deviceModel=iPhone&tid=1019&udid=3b94062b8c5d6a875a30557d6543e0128765a641&utm_campaign=routine",
+
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=16&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=12&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1022&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=2&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1019&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1025&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=24&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1018&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1024&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1020&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=30&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1023&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=140&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=26&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=666&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=28&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=32&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
     ]
 
     def __init__(self, *args, **kwargs):
@@ -32,12 +51,12 @@ class Breaker(BaseBreaker):
     @RequestRetry
     async def breakdown(self, webpage_url, session, **kwargs):
         page = int(kwargs.pop("page", 1))
-        if "tag" in webpage_url:
+        if re.match("http[s]?://www\.eyepetizer\.net/tag\.html\?.*", webpage_url):
             tid = re.findall("tid=(\d{1,8})", webpage_url)[0]
             response = await self.retrieve_tag_paging_api(tid=tid, page=page, session=session)
             results = self.extract_tag_pageing_api(response_json=response, playlist_url=webpage_url)
             return results
-        elif "pgc" in webpage_url:
+        elif re.match("http[s]?://www\.eyepetizer\.net/pgc\.html\?.*", webpage_url):
             if page > 1:
                 apiUrl = kwargs['nextPageUrl']
             else:
@@ -46,6 +65,38 @@ class Breaker(BaseBreaker):
             response = await self.request_user_info(session=session, webpage_url=apiUrl)
             results = self.extract_user_info(response_json=response, playlist_url=webpage_url)
             return results
+        else:
+            id = re.findall("id=(\d{1,4})", webpage_url)[0]
+            headers = {
+                'authority': 'baobab.kaiyanapp.com',
+                'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
+                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+                'cookie': 'sajssdk_2015_cross_new_user=1; '
+                          'sensorsdata2015jssdkcross=%7B%22distinct_id%22%3A%2216f11663aaf5bb-009f6059607723-31760856-2073600-16f11663ab0a31%22%2C%22%24device_id%22%3A%2216f11663aaf5bb-009f6059607723-31760856-2073600-16f11663ab0a31%22%2C%22props%22%3A%7B%22%24latest_traffic_source_type%22%3A%22%E4%BB%98%E8%B4%B9%E5%B9%BF%E5%91%8A%E6%B5%81%E9%87%8F%22%2C%22%24latest_referrer%22%3A%22%22%2C%22%24latest_referrer_host%22%3A%22%22%2C%22%24latest_search_keyword%22%3A%22%E6%9C%AA%E5%8F%96%E5%88%B0%E5%80%BC%22%2C%22%24latest_utm_source%22%3A%22eyepetizer-homepage%22%2C%22%24latest_utm_medium%22%3A%22internal%22%2C%22%24latest_utm_campaign%22%3A%22routine%22%7D%7D',
+            }
+            params = (
+                ('id', id),
+                ('f', 'iphone'),
+                ('net', 'wifi'),
+                ('p_product', 'EYEPETIZER_IOS'),
+                ('size', '414.0X736.0'),
+                ('v', '5.4.1'),
+                ('vc', '5813'),
+            )
+            api = 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=16&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813'
+            # api = 'https://www.kaiyanapp.com/detail.html?vid=179056&utm_source=eyepetizer-homepage&utm_medium=internal&utm_campaign=routine'
+            response = await self.request(
+                url=api,
+
+                headers=headers,
+                params=params,
+                session=session,
+                response_type="json",
+            )
+            results = self.extract(response=response,webpage_url=webpage_url)
+            return results
+
+
 
     @RequestRetry
     async def retrieve_tag_paging_api(self, tid, session, page):
@@ -218,6 +269,34 @@ class Breaker(BaseBreaker):
             except:
                 continue
         return results, has_next, {"nextPageUrl": nextPageUrl}
+
+    def extract(self, response, webpage_url):
+        has_next = jmespath.search("nextPageUrl", response)
+        nextPageUrl = jmespath.search("nextPageUrl", response)
+        datas = jmespath.search('itemList[*].data.content.data', response)
+        item_list = []
+        for item in datas:
+            try:
+                item_list.append({
+                    "vid": item['id'],
+                    "cover": jmespath.search("cover.*", item)[0],
+                    "description": item['description'],
+                    "title": item['title'],
+                    "author": jmespath.search("author.name", item),
+#                     "releaseTime": item['releaseTime'],
+                    "from": self.from_,
+                    "playlist_url": webpage_url,
+                    "webpage_url": item['playUrl'],
+                    "forward_count": jmespath.search("consumption.replycount", item),
+                    "collect_count": jmespath.search("consumption.collectioncount", item),
+                    "share_count": jmespath.search("consumption.share", item),
+                    "view_count": jmespath.search("consumption.playcount", item),
+                    "upload_ts": item['updateTime'],
+                })
+            except:
+                traceback.print_exc()
+                continue
+        return item_list, has_next, {"next_page": nextPageUrl}
 
 
 if __name__ == '__main__':
