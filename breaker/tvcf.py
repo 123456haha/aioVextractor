@@ -18,20 +18,19 @@ class Breaker(BaseBreaker):
 
     TEST_CASE = [
         "https://www.tvcf.co.kr/MovieK/List.asp",
-        "https://www.tvcf.co.kr/MovieE/List.asp",
     ]
 
     def __init__(self, *args, **kwargs):
         BaseBreaker.__init__(self, *args, **kwargs)
-        self.from_ = "topys"
+        self.from_ = "tvcf"
 
     @BreakerValidater
     @RequestRetry
     async def breakdown(self, webpage_url, session, **kwargs):
-        page = int(kwargs.pop("page", 3054))
+        page = int(kwargs.pop("page", 1))
         headers = {
-            'Cookie':'ASPSESSIONIDSQRDCBBB=ONNFDEOADPCKKFPIBCPGBBGP',
-            'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
+            'Cookie': 'ASPSESSIONIDSQRDCBBB=ONNFDEOADPCKKFPIBCPGBBGP',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
         }
         params = (
             ('page', page),
@@ -54,7 +53,7 @@ class Breaker(BaseBreaker):
         has_next = selector.css(f'a[onclick*=fnPageGo\({page + 1}\)]::text')
         output = []
         for article in selector.css('div[class=thumWrapfix]'):
-            ele = {}
+            ele = dict()
             ele['webpage_url'] = article.css("div[class=thumWrapfix] a::attr(href)").extract_first()
             ele['vid'] = ele['webpage_url'].split('/')[-1]
             ele['cover'] = article.css("div[class=thumWrapfix] a div::attr(data-src)").extract_first()
@@ -63,8 +62,7 @@ class Breaker(BaseBreaker):
             ele['playlist_url'] = webpage_url
             ele['from'] = self.from_
             output.append(ele)
-        return output, True if has_next else False, {}
-
+        return output, has_next, {}
 
 
 if __name__ == '__main__':
