@@ -24,3 +24,5 @@ from aioVextractor.breaker.youtube import Breaker as youtubeBK
 from aioVextractor.breaker.ispot import Breaker as ispotBK
 from aioVextractor.breaker.adforum import Breaker as adforumBK
 from aioVextractor.breaker.tvcf import Breaker as tvcfBK
+from aioVextractor.breaker.digitaling import Breaker as digitalingBK
+from aioVextractor.breaker.adquan import Breaker as adquanBK
