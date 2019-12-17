@@ -66,7 +66,7 @@ class Breaker(BaseBreaker):
             results = self.extract_user_info(response_json=response, playlist_url=webpage_url)
             return results
         else:
-            id = re.findall("id=(\d{1,4})", webpage_url)[0]
+            vid = re.findall("id=(\d{1,4})", webpage_url)[0]
             headers = {
                 'authority': 'baobab.kaiyanapp.com',
                 'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
@@ -75,7 +75,7 @@ class Breaker(BaseBreaker):
                           'sensorsdata2015jssdkcross=%7B%22distinct_id%22%3A%2216f11663aaf5bb-009f6059607723-31760856-2073600-16f11663ab0a31%22%2C%22%24device_id%22%3A%2216f11663aaf5bb-009f6059607723-31760856-2073600-16f11663ab0a31%22%2C%22props%22%3A%7B%22%24latest_traffic_source_type%22%3A%22%E4%BB%98%E8%B4%B9%E5%B9%BF%E5%91%8A%E6%B5%81%E9%87%8F%22%2C%22%24latest_referrer%22%3A%22%22%2C%22%24latest_referrer_host%22%3A%22%22%2C%22%24latest_search_keyword%22%3A%22%E6%9C%AA%E5%8F%96%E5%88%B0%E5%80%BC%22%2C%22%24latest_utm_source%22%3A%22eyepetizer-homepage%22%2C%22%24latest_utm_medium%22%3A%22internal%22%2C%22%24latest_utm_campaign%22%3A%22routine%22%7D%7D',
             }
             params = (
-                ('id', id),
+                ('id', vid),
                 ('f', 'iphone'),
                 ('net', 'wifi'),
                 ('p_product', 'EYEPETIZER_IOS'),
@@ -87,16 +87,13 @@ class Breaker(BaseBreaker):
             # api = 'https://www.kaiyanapp.com/detail.html?vid=179056&utm_source=eyepetizer-homepage&utm_medium=internal&utm_campaign=routine'
             response = await self.request(
                 url=api,
-
                 headers=headers,
                 params=params,
                 session=session,
                 response_type="json",
             )
-            results = self.extract(response=response,webpage_url=webpage_url)
+            results = self.extract(response=response, webpage_url=webpage_url)
             return results
-
-
 
     @RequestRetry
     async def retrieve_tag_paging_api(self, tid, session, page):
@@ -283,15 +280,14 @@ class Breaker(BaseBreaker):
                     "description": item['description'],
                     "title": item['title'],
                     "author": jmespath.search("author.name", item),
-#                     "releaseTime": item['releaseTime'],
                     "from": self.from_,
                     "playlist_url": webpage_url,
-                    "webpage_url": item['playUrl'],
-                    "forward_count": jmespath.search("consumption.replycount", item),
-                    "collect_count": jmespath.search("consumption.collectioncount", item),
-                    "share_count": jmespath.search("consumption.share", item),
-                    "view_count": jmespath.search("consumption.playcount", item),
-                    "upload_ts": item['updateTime'],
+                    "webpage_url": jmespath.search("webUrl.*", item)[0],
+                    "forward_count": jmespath.search("consumption.replyCount", item),
+                    "collect_count": jmespath.search("consumption.collectionCount", item),
+                    "share_count": jmespath.search("consumption.shareCount", item),
+                    "view_count": jmespath.search("consumption.playCount", item),
+                    "upload_ts": item['updateTime'] // 1000,
                 })
             except:
                 traceback.print_exc()
