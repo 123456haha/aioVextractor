@@ -26,3 +26,4 @@ from aioVextractor.breaker.adforum import Breaker as adforumBK
 from aioVextractor.breaker.tvcf import Breaker as tvcfBK
 from aioVextractor.breaker.digitaling import Breaker as digitalingBK
 from aioVextractor.breaker.adquan import Breaker as adquanBK
+from aioVextractor.breaker.topys import Breaker as topysBK
