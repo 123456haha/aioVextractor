@@ -24,22 +24,22 @@ class Breaker(BaseBreaker):
         "https://www.eyepetizer.net/pgc.html?deviceModel=iPhone&pid=22&utm_source=wechat-moments&vc=6312&vn=5.9.0&udid=324851f6406581f1ec04d1eff1d8198e508abf64&utm_campaign=routine&uid=0&utm_medium=share",
         "https://www.eyepetizer.net/tag.html?vc=6312&utm_medium=share&utm_source=wechat-moments&vn=5.9.0&deviceModel=iPhone&tid=1019&udid=3b94062b8c5d6a875a30557d6543e0128765a641&utm_campaign=routine",
 
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=16&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=12&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1022&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=2&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1019&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1025&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=24&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1018&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1024&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1020&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=30&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1023&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=140&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=26&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=666&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
-        'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=28&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=16&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=12&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1022&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=2&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1019&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1025&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=24&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1018&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1024&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1020&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=30&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=1023&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=140&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=26&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=666&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
+        # 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=28&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
         'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=32&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813',
     ]
 
@@ -67,6 +67,10 @@ class Breaker(BaseBreaker):
             return results
         else:
             vid = re.findall("id=(\d{1,4})", webpage_url)[0]
+            if page > 1:
+                url = f'https://baobab.kaiyanapp.com/api/v1/tag/videos?start={(page - 1) * 10}&num=10&strategy=date&id={vid}'
+            else:
+                url = webpage_url
             headers = {
                 'authority': 'baobab.kaiyanapp.com',
                 'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
@@ -83,10 +87,10 @@ class Breaker(BaseBreaker):
                 ('v', '5.4.1'),
                 ('vc', '5813'),
             )
-            api = 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=16&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813'
+            # api = 'https://baobab.kaiyanapp.com/api/v1/tag/videos?id=16&f=iphone&net=wifi&p_product=EYEPETIZER_IOS&size=414.0X736.0&v=5.4.1&vc=5813'
             # api = 'https://www.kaiyanapp.com/detail.html?vid=179056&utm_source=eyepetizer-homepage&utm_medium=internal&utm_campaign=routine'
             response = await self.request(
-                url=api,
+                url=url,
                 headers=headers,
                 params=params,
                 session=session,
@@ -286,13 +290,12 @@ class Breaker(BaseBreaker):
                     "forward_count": jmespath.search("consumption.replyCount", item),
                     "collect_count": jmespath.search("consumption.collectionCount", item),
                     "share_count": jmespath.search("consumption.shareCount", item),
-                    "view_count": jmespath.search("consumption.playCount", item),
-                    "upload_ts": item['updateTime'] // 1000,
+                    "view_count": jmespath.search("consumption.playCount", item)
                 })
             except:
                 traceback.print_exc()
                 continue
-        return item_list, has_next, {"next_page": nextPageUrl}
+        return item_list, has_next, {"nextPageUrl": nextPageUrl}
 
 
 if __name__ == '__main__':
@@ -301,5 +304,7 @@ if __name__ == '__main__':
     with Breaker() as breaker:
         res = breaker.sync_breakdown(
             webpage_url=Breaker.TEST_CASE[-1],
+            page=2,
+            next_page='https://baobab.kaiyanapp.com/api/v1/tag/videos?start=10&num=10&strategy=date&id=16'
         )
         pprint(res)
