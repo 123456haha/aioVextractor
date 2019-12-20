@@ -23,13 +23,13 @@ class Breaker(BaseBreaker):
     TEST_CASE = [
         'https://www.vmovier.com/',
 
-        # 'https://www.xinpianchang.com/channel/index/id-0/sort-pick/type-0?form=indexEditorPick&position=more',
+        'https://www.xinpianchang.com/channel/index/id-0/sort-pick/type-0?form=indexEditorPick&position=more',
         # 'https://www.xinpianchang.com/channel/index/id-49/sort-like?from=indexCate4&position=more',
         # 'https://www.xinpianchang.com/channel/index/id-129/sort-like?from=indexCate4&position=more',
         # 'https://www.xinpianchang.com/channel/index/id-31/sort-like?from=indexCate2&position=more',
         # 'https://www.xinpianchang.com/channel/index/id-29/sort-like?from=indexCate1&position=more',
         # 'https://www.xinpianchang.com/channel/index/id-76/sort-like?from=indexCate3&position=more',
-        # 'https://www.xinpianchang.com/channel/index/id-1/sort-like?from=indexCate1&position=more',
+        'https://www.xinpianchang.com/channel/index/id-1/sort-like?from=indexCate1&position=more',
     ]
 
     def __init__(self, *args, **kwargs):
@@ -118,7 +118,7 @@ class Breaker(BaseBreaker):
                 item['like_count'] = data_list.xpath('.//div[@class="post-ope"]/span[2]/text()').extract_first()
                 item['forward_count'] = data_list.xpath('.//div[@class="post-ope"]/a/text()').extract_first()
                 item['description'] = data_list.xpath('.//div[@class="index-intro"]/a/text()').extract_first()
-                item['playlist_url'] = f"https://www.xinpianchang.com/a{item['vid']}"
+                item['playlist_url'] = f"https://www.xinpianchang.com/{item['vid']}?from=index_new_img"
                 item['webpage_url'] = webpage_url,
                 item['from'] = 'xinpianchang'
                 results.append(item)
@@ -179,3 +179,4 @@ if __name__ == '__main__':
 #     url = next_url
 # else:
 #     url = webpage_url
+
