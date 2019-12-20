@@ -304,7 +304,7 @@ if __name__ == '__main__':
     with Breaker() as breaker:
         res = breaker.sync_breakdown(
             webpage_url=Breaker.TEST_CASE[-1],
-            page=2,
-            next_page='https://baobab.kaiyanapp.com/api/v1/tag/videos?start=10&num=10&strategy=date&id=16'
+            # page=2,
+            # next_page='https://baobab.kaiyanapp.com/api/v1/tag/videos?start=10&num=10&strategy=date&id=16'
         )
         pprint(res)
